@@ -1,0 +1,62 @@
+; Human Enemy entity scene  —  e_human_enemy.tscn
+;
+; Root:   HumanEnemyBody (CharacterBody2D, extends HumanBase)
+; Children:
+;   CollisionShape2D  – capsule hitbox (radius 10, height 24)
+;   BodySprite        – Sprite2D body visual (weak.png placeholder)
+;   AimPivot          – Node2D; rotated each frame by HumanBase
+;     RightHand       – Node2D weapon/primary-hand mount  (x=16, y=0)
+;       HandSprite    – Sprite2D hand visual
+;     LeftHand        – Node2D off-hand mount             (x=10, y=-6)
+;       HandSprite    – Sprite2D hand visual
+;
+; The ECS bridge entity (HumanEnemyECSState / HumanEnemy) is added at runtime
+; by HumanEnemyBody._setup_ecs_entity(). Gameplay state lives in that child.
+;
+; Aim direction:
+;   AISystem writes C_AimState.aim_direction toward the target each frame.
+;   HumanBase reads it in _get_aim_direction() (overridden by HumanEnemyBody)
+;   and rotates AimPivot so both hands + held weapon track the target in 360°.
+
+[gd_scene format=3 uid="uid://he_human_enemy_scene_1"]
+
+[ext_resource type="Script" path="res://scripts/entities/enemies/e_human_enemy_body.gd" id="1_hebdy"]
+[ext_resource type="Texture2D" uid="uid://kndl7cwew65g" path="res://assets/game/textures/entities/enemy_mob/weak/weak.png" id="2_weak"]
+[ext_resource type="Texture2D" uid="uid://gtnpwtfb288i" path="res://assets/game/textures/entities/ball/ball_hand.png" id="3_hand"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_he"]
+radius = 10.0
+height = 24.0
+
+; ── Root ──────────────────────────────────────────────────────────────────────
+[node name="HumanEnemyBody" type="CharacterBody2D"]
+script = ExtResource("1_hebdy")
+
+; ── Physics hitbox ────────────────────────────────────────────────────────────
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_he")
+
+; ── Body visual ───────────────────────────────────────────────────────────────
+; weak.png is a placeholder. Swap for a proper human enemy sprite when available.
+[node name="BodySprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_weak")
+
+; ── Aim rig ───────────────────────────────────────────────────────────────────
+; AimPivot sits at the body centre. HumanEnemyBody._get_aim_direction() returns
+; C_AimState.aim_direction (written by AISystem), so the hands + weapon track
+; the target entity in 360° without direct scene coupling.
+[node name="AimPivot" type="Node2D" parent="."]
+
+; Right hand — primary weapon hand.
+[node name="RightHand" type="Node2D" parent="AimPivot"]
+position = Vector2(16, 0)
+
+[node name="HandSprite" type="Sprite2D" parent="AimPivot/RightHand"]
+texture = ExtResource("3_hand")
+
+; Left hand — off-hand / secondary item mount.
+[node name="LeftHand" type="Node2D" parent="AimPivot"]
+position = Vector2(10, -6)
+
+[node name="HandSprite" type="Sprite2D" parent="AimPivot/LeftHand"]
+texture = ExtResource("3_hand")
