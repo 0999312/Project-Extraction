@@ -72,6 +72,8 @@ func define_components() -> Array:
 				C_CombatState.new(),
 				C_Faction.new(C_Faction.FactionType.NON_HUMAN_ENEMY),
 				C_AIState.new(350.0, 60.0),
+				# NonHumanEnemyBody reads this to rotate the whole body toward the target.
+				C_AimState.new(),
 			]
 		EnemyVariant.CHARGER:
 			return [
@@ -82,6 +84,7 @@ func define_components() -> Array:
 				C_CombatState.new(),
 				C_Faction.new(C_Faction.FactionType.NON_HUMAN_ENEMY),
 				C_AIState.new(250.0, 80.0),
+				C_AimState.new(),
 			]
 		EnemyVariant.DRONE:
 			return [
@@ -92,6 +95,7 @@ func define_components() -> Array:
 				C_CombatState.new(),
 				C_Faction.new(C_Faction.FactionType.NON_HUMAN_ENEMY),
 				C_AIState.new(450.0, 300.0),
+				C_AimState.new(),
 			]
 		EnemyVariant.BLOB:
 			return [
@@ -102,6 +106,7 @@ func define_components() -> Array:
 				C_CombatState.new(),
 				C_Faction.new(C_Faction.FactionType.NON_HUMAN_ENEMY),
 				C_AIState.new(200.0, 100.0),
+				C_AimState.new(),
 			]
 	# Fallback — should not be reached with a valid variant value.
 	return []

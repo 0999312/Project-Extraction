@@ -60,6 +60,9 @@ func define_components() -> Array:
 		# Human enemies carry a ranged weapon; CombatSystem fills in the weapon ID.
 		C_Faction.new(C_Faction.FactionType.HUMAN_ENEMY),
 		C_AIState.new(280.0, 200.0),
+		# Aim direction is written by AISystem from last_known_target_position.
+		# HumanEnemyBody reads it to rotate the AimPivot rig.
+		C_AimState.new(),
 	]
 
 #endregion GECS Lifecycle

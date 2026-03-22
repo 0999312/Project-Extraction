@@ -3,6 +3,10 @@
 ## The Player's scene-tree body: a [CharacterBody2D] that handles physics
 ## movement, collision, and animation (GDD §6.1, Tech Stack §5.1).
 ##
+## Extends [HumanBase] to inherit the AimPivot rig (left/right hands + weapon
+## 360° rotation). Overrides [method HumanBase._get_aim_direction] to use the
+## current mouse cursor position as the aim point.
+##
 ## [b]GECS Best Practice — Hybrid Node + ECS Bridge:[/b]
 ## Gameplay state (HP, stamina, status effects, inventory, combat) lives in a
 ## child [BaseEntity] node called [code]_ecs_entity[/code]. This pattern keeps
@@ -14,14 +18,14 @@
 ##   animation player              C_StatusEffects
 ##   camera shake events           C_CombatState, C_InventoryRef
 ##   InputBridge writes            C_Position (synced from Node)
-##   move_input / aim_dir          C_Velocity, C_Faction
+##   move_input / aim_dir          C_Velocity, C_Faction, C_AimState
 ##
 ## Input is written by the InputBridge autoload (G.U.I.D.E → EventBus),
 ## not read directly from [Input], keeping the simulation command-driven.
 ##
 ## [b]Component data is modified directly[/b] — no logic methods on components.
 class_name Player
-extends CharacterBody2D
+extends HumanBase
 
 
 #region Constants
@@ -66,7 +70,10 @@ func _ready() -> void:
 	_setup_ecs_entity()
 
 
+## Updates the aim pivot (via [HumanBase]), handles sprint stamina, applies
+## physics movement, and syncs state back to ECS.
 func _physics_process(delta: float) -> void:
+	super(delta)  # HumanBase: rotates _aim_pivot to face mouse cursor
 	_handle_sprint_stamina(delta)
 	_sync_input_to_ecs()
 	_apply_movement()
@@ -97,6 +104,7 @@ func _setup_ecs_entity() -> void:
 		C_CombatState.new(),
 		C_InventoryRef.new(),
 		C_Faction.new(C_Faction.FactionType.PLAYER),
+		C_AimState.new(),  # Written each frame in _sync_position_to_ecs()
 	])
 
 	# Register with the active GECS World if one exists.
@@ -104,6 +112,23 @@ func _setup_ecs_entity() -> void:
 		ECS.world.add_entity(_ecs_entity)
 
 #endregion ECS Bridge Setup
+
+
+#region Aim Direction Override
+
+## Returns the direction from the Player's body centre to the mouse cursor.
+## This is fed into [HumanBase._update_aim_pivot] to rotate the arm/weapon rig.
+##
+## Falls back to [member aim_direction] if the mouse is exactly on the entity
+## (avoids a zero-length normalisation).
+func _get_aim_direction() -> Vector2:
+	var to_mouse := get_global_mouse_position() - global_position
+	if to_mouse.length_squared() > AIM_EPSILON:
+		return to_mouse.normalized()
+	# Fallback: keep last known aim direction set by InputBridge.
+	return aim_direction if aim_direction != Vector2.ZERO else Vector2.RIGHT
+
+#endregion Aim Direction Override
 
 
 #region Physics & Movement
@@ -147,7 +172,8 @@ func _apply_movement() -> void:
 
 
 ## Writes the post-slide Node position and aim angle back into [C_Position]
-## so ECS systems always read an accurate world position.
+## and [C_AimState] so ECS systems always read an accurate world position
+## and aim direction.
 func _sync_position_to_ecs() -> void:
 	if _ecs_entity == null:
 		return
@@ -155,6 +181,10 @@ func _sync_position_to_ecs() -> void:
 	if pos_comp:
 		pos_comp.world_position = global_position
 		pos_comp.facing_angle = aim_direction.angle()
+	# Keep C_AimState in sync so CombatSystem and observers can read it.
+	var aim_comp: C_AimState = _ecs_entity.get_component(C_AimState)
+	if aim_comp:
+		aim_comp.aim_direction = _get_aim_direction()
 
 
 ## Returns the current movement speed after applying encumbrance and status
