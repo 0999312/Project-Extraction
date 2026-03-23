@@ -36,6 +36,11 @@ const BASE_SPEED: float = 200.0
 const BASE_SPRINT_SPEED: float = 320.0
 ## Stamina consumed per second while sprinting.
 const STAMINA_SPRINT_COST_PER_SEC: float = 15.0
+const GUIDE_ACTION_MOVE := &"pe_move"
+const GUIDE_ACTION_AIM_AXIS := &"pe_aim_axis"
+const GUIDE_ACTION_FIRE := &"pe_fire"
+const GUIDE_ACTION_AIM_HOLD := &"pe_aim_hold"
+const GUIDE_ACTION_SPRINT := &"pe_sprint"
 
 #endregion Constants
 
@@ -67,6 +72,9 @@ var _ecs_entity: BaseEntity = null
 #region Godot Lifecycle
 
 func _ready() -> void:
+	add_to_group("player")
+	GuideInputRuntime.ensure_initialized()
+	GUIDE.enable_mapping_context(GuideInputRuntime.get_context())
 	_setup_ecs_entity()
 
 
@@ -74,6 +82,7 @@ func _ready() -> void:
 ## physics movement, and syncs state back to ECS.
 func _physics_process(delta: float) -> void:
 	super(delta)  # HumanBase: rotates _aim_pivot to face mouse cursor
+	_poll_guide_input()
 	_handle_sprint_stamina(delta)
 	_sync_input_to_ecs()
 	_apply_movement()
@@ -110,6 +119,18 @@ func _setup_ecs_entity() -> void:
 	# Register with the active GECS World if one exists.
 	if ECS.world:
 		ECS.world.add_entity(_ecs_entity)
+	elif not ECS.world_changed.is_connected(_on_ecs_world_changed):
+		ECS.world_changed.connect(_on_ecs_world_changed)
+
+
+func _on_ecs_world_changed(world: World) -> void:
+	if _ecs_entity == null or world == null:
+		return
+	if world.entities.has(_ecs_entity):
+		return
+	world.add_entity(_ecs_entity)
+	if ECS.world_changed.is_connected(_on_ecs_world_changed):
+		ECS.world_changed.disconnect(_on_ecs_world_changed)
 
 #endregion ECS Bridge Setup
 
@@ -159,6 +180,10 @@ func _sync_input_to_ecs() -> void:
 	var vel_comp: C_Velocity = _ecs_entity.get_component(C_Velocity)
 	if vel_comp:
 		vel_comp.velocity = move_input.normalized() * _get_current_speed()
+	var combat: C_CombatState = _ecs_entity.get_component(C_CombatState)
+	if combat:
+		combat.is_aiming = _is_action_triggered(GUIDE_ACTION_AIM_HOLD)
+		combat.wants_fire = _is_action_triggered(GUIDE_ACTION_FIRE)
 
 
 ## Reads [C_Velocity.velocity] and drives [method CharacterBody2D.move_and_slide].
@@ -204,6 +229,26 @@ func _get_current_speed() -> float:
 	if status and status.fracture:
 		mult *= status.fracture_move_speed_mult
 	return selected_speed * mult
+
+
+func _poll_guide_input() -> void:
+	move_input = _get_action_axis_2d(GUIDE_ACTION_MOVE).limit_length(1.0)
+	is_sprinting = _is_action_triggered(GUIDE_ACTION_SPRINT)
+	var stick_aim := _get_action_axis_2d(GUIDE_ACTION_AIM_AXIS)
+	if stick_aim.length_squared() > AIM_EPSILON:
+		aim_direction = stick_aim.normalized()
+
+
+func _get_action_axis_2d(name: StringName) -> Vector2:
+	var action: GUIDEAction = GuideInputRuntime.get_action(name)
+	if action == null:
+		return Vector2.ZERO
+	return action.value_axis_2d
+
+
+func _is_action_triggered(name: StringName) -> bool:
+	var action: GUIDEAction = GuideInputRuntime.get_action(name)
+	return action != null and action.is_triggered()
 
 #endregion Physics & Movement
 

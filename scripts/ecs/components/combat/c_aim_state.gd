@@ -24,6 +24,9 @@ extends Component
 ## Empty string = free-aim (patrol look-around, line-of-sight sweep, etc.).
 @export var aim_target_id: String = ""
 
+## Optional precision multiplier for this entity (1.0 = default spread).
+@export var precision_multiplier: float = 1.0
+
 
 ## Convenience constructor.
 ## Usage: [code]C_AimState.new(Vector2.RIGHT)[/code]
