@@ -29,22 +29,22 @@ layout_mode = 2
 [node name="RebindButton" type="Button" parent="VBoxContainer/ButtonsRow" unique_id=253367660]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Rebind"
+text = "ui.input.rebind"
 
 [node name="ClearButton" type="Button" parent="VBoxContainer/ButtonsRow" unique_id=1879004060]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Clear"
+text = "ui.input.clear"
 
 [node name="ResetButton" type="Button" parent="VBoxContainer/ButtonsRow" unique_id=1262543969]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Reset Defaults"
+text = "ui.input.reset_defaults"
 
 [node name="StatusLabel" type="Label" parent="VBoxContainer" unique_id=1225332935]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Select an action to rebind."
+text = "ui.input.select_action_rebind"
 
 [node name="GUIDEInputDetector" type="Node" parent="." unique_id=1828279914]
 unique_name_in_owner = true

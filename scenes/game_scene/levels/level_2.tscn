@@ -45,7 +45,7 @@ theme_override_constants/separation = 16
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1262952876]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
-text = "Example Level #2"
+text = "ui.level.2.title"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -61,24 +61,24 @@ script = ExtResource("2_8s04l")
 [node name="LoseButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1578808337]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Lose"
+text = "ui.common.lose"
 
 [node name="WinButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=36332483]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Win"
+text = "ui.common.win"
 
 [node name="LoseButton2" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1193639893]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Lose"
+text = "ui.common.lose"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=436062293]
 layout_mode = 2
 
 [node name="TutorialButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=159066621]
 layout_mode = 2
-text = "Tutorial"
+text = "ui.common.tutorial"
 
 [node name="InputDisplayLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1559831149]
 layout_mode = 2
@@ -88,12 +88,12 @@ script = ExtResource("3_kjg0a")
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=135269161]
 layout_mode = 2
-text = "Change Level Color: "
+text = "ui.level.change_color_label"
 
 [node name="ColorPickerButton" type="ColorPickerButton" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1109372399]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Change Color"
+text = "ui.level.change_color_button"
 
 [node name="TutorialManager" type="Node" parent="." unique_id=792445142]
 unique_name_in_owner = true

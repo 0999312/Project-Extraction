@@ -99,6 +99,7 @@ Added field:
 - Registers and processes:
   - `S_CombatFireSystem`
   - `S_ProjectileMotionSystem`
+- Polls GUIDE `pe_pause` action and opens `PauseMenuController` in `DemoGame`.
 
 ## scripts/ecs/game_state.gd
 
@@ -107,3 +108,21 @@ Added game loop phase API:
 - `enum GamePhase { HOMESTEAD, DEPLOY, RAID, EXTRACT }`
 - `set_game_phase(phase: GamePhase) -> void`
 - `get_game_phase() -> GamePhase`
+
+## scripts/audio/audio_registry.gd
+
+- `class_name AudioRegistry : RegistryBase`
+- Registry entry type: `Dictionary`
+- Supports selecting entries by load phase:
+  - `get_entries_for_phase(load_phase: String) -> Dictionary`
+
+## scripts/audio/audio_registry_bootstrap.gd
+
+- Autoload bootstrap for project audio/i18n initialization.
+- Registers `core:audio` registry via `RegistryManager`.
+- Registers and preloads audio categories:
+  - Startup: `game:audio/ui`, `game:audio/music`
+  - Game load: `game:audio/game`, `game:audio/environment`
+- Loads and applies UI translations:
+  - `res://resources/i18n/ui_text.en.json`
+  - `res://resources/i18n/ui_text.zh.json`

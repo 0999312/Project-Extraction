@@ -334,7 +334,7 @@ parameters/conditions/intro_done = false
 modulate = Color(1, 1, 1, 0)
 
 [node name="TitleLabel" parent="MenuContainer/TitleMargin/TitleContainer" index="0" unique_id=359406872]
-text = "ProjectExtraction"
+text = "ui.main_menu.title"
 
 [node name="SubTitleContainer" parent="MenuContainer/SubTitleMargin" parent_id_path=PackedInt32Array(1510335937) index="0" unique_id=930520368]
 modulate = Color(1, 1, 1, 0)
@@ -349,13 +349,13 @@ lock = true
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-text = "Continue"
+text = "ui.main_menu.continue"
 
 [node name="LevelSelectButton" type="Button" parent="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer" index="2" unique_id=1608098344]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-text = "Level Select"
+text = "ui.main_menu.level_select"
 
 [node name="VersionContainer" parent="VersionMargin" parent_id_path=PackedInt32Array(1732528471) index="0" unique_id=1603969262]
 modulate = Color(1, 1, 1, 0)
@@ -369,10 +369,8 @@ offset_left = -210.0
 offset_top = -100.0
 offset_right = 210.0
 offset_bottom = 100.0
-text = "Are you sure you want to start a new game?
-
-All progress in the current game will be lost."
-title = "New Game"
+text = "ui.main_menu.confirm_new_game_text"
+title = "ui.main_menu.confirm_new_game_title"
 
 [node name="MouseFilter" type="Control" parent="." index="8" unique_id=1554668260]
 layout_mode = 1

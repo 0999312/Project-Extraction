@@ -20,8 +20,8 @@ func _ready() -> void:
 	_tree.hide_root = true
 	_tree.columns = 2
 	_tree.column_titles_visible = true
-	_tree.set_column_title(0, "Action")
-	_tree.set_column_title(1, "Binding")
+	_tree.set_column_title(0, tr("ui.input.action"))
+	_tree.set_column_title(1, tr("ui.input.binding"))
 	_build_tree()
 	_tree.item_selected.connect(_on_tree_item_selected)
 	_tree.item_activated.connect(_on_tree_item_activated)
@@ -48,7 +48,7 @@ func _format_binding(item) -> String:
 	var remapper := GuideInputRuntime.get_remapper()
 	var binding: GUIDEInput = remapper.get_bound_input_or_null(item)
 	if binding == null:
-		return "(Unbound)"
+		return tr("ui.input.unbound")
 	return _formatter.input_as_text(binding)
 
 
@@ -69,7 +69,7 @@ func _on_rebind_pressed() -> void:
 		return
 	_is_rebinding = true
 	_refresh_buttons()
-	_status_label.text = "Press a key/button/axis for \"%s\"..." % _selected_config_item.display_name
+	_status_label.text = tr("ui.input.press_for_action").format([tr(_selected_config_item.display_name)])
 	var value_type: GUIDEAction.GUIDEActionValueType = _selected_config_item.value_type
 	match value_type:
 		GUIDEAction.GUIDEActionValueType.BOOL:
@@ -88,14 +88,14 @@ func _on_clear_pressed() -> void:
 	var remapper := GuideInputRuntime.get_remapper()
 	remapper.set_bound_input(_selected_config_item, null)
 	GuideInputRuntime.apply_remapping_config(remapper.get_mapping_config())
-	_status_label.text = "Cleared binding."
+	_status_label.text = tr("ui.input.cleared")
 	_build_tree()
 
 
 func _on_reset_pressed() -> void:
 	GuideInputRuntime.apply_remapping_config(GUIDERemappingConfig.new())
 	GuideInputRuntime.ensure_initialized()
-	_status_label.text = "Restored defaults."
+	_status_label.text = tr("ui.input.restored_defaults")
 	_build_tree()
 
 
@@ -105,12 +105,12 @@ func _on_input_detected(input: GUIDEInput) -> void:
 	if _selected_config_item == null:
 		return
 	if input == null:
-		_status_label.text = "Rebind cancelled."
+		_status_label.text = tr("ui.input.rebind_cancelled")
 		return
 	var remapper := GuideInputRuntime.get_remapper()
 	remapper.set_bound_input(_selected_config_item, input)
 	GuideInputRuntime.apply_remapping_config(remapper.get_mapping_config())
-	_status_label.text = "Bound \"%s\"." % _selected_config_item.display_name
+	_status_label.text = tr("ui.input.bound_action").format([tr(_selected_config_item.display_name)])
 	_build_tree()
 
 

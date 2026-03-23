@@ -5,15 +5,13 @@
 [node name="OverlaidWindow" unique_id=1288807767 instance=ExtResource("1_sjjon")]
 custom_minimum_size = Vector2(420, 200)
 update_content = true
-text = "Progress is saved.
-Pressing Continue from the main menu will load at the last checkpoint."
-title = "Tutorial"
+text = "ui.tutorial.2.body"
+title = "ui.common.tutorial"
 title_font_size = 20
 
 [node name="TitleLabel" parent="ContentContainer/BoxContainer/TitleMargin/BoxContainer" parent_id_path=PackedInt32Array(1788474031) index="0" unique_id=1049966061]
 theme_override_font_sizes/font_size = 20
-text = "Tutorial"
+text = "ui.common.tutorial"
 
 [node name="DescriptionLabel" parent="ContentContainer/BoxContainer/BodyMargin" parent_id_path=PackedInt32Array(590613964) index="0" unique_id=617407155]
-text = "Progress is saved.
-Pressing Continue from the main menu will load at the last checkpoint."
+text = "ui.tutorial.2.body"
