@@ -43,7 +43,6 @@ func _make_aim_mapping() -> GUIDEActionMapping:
 	var mapping := GUIDEActionMapping.new()
 	mapping.action = action
 	mapping.input_mappings = [
-		_make_mouse_pos_mapping(),
 		_make_joy_axis_2d_mapping(JOY_AXIS_RIGHT_X, JOY_AXIS_RIGHT_Y),
 	]
 	return mapping
@@ -96,6 +95,7 @@ func _make_sprint_mapping() -> GUIDEActionMapping:
 	mapping.action = action
 	mapping.input_mappings = [
 		_make_key_mapping(KEY_SHIFT),
+		_make_key_mapping(KEY_CTRL),
 		_make_joy_button_mapping(JOY_BUTTON_LEFT_SHOULDER),
 	]
 	return mapping
@@ -109,16 +109,12 @@ func _make_move_keys_mapping(scale_x: float, scale_y: float, keycode: Key) -> GU
 	var mapping := GUIDEInputMapping.new()
 	mapping.input = input
 	mapping.is_remappable = true
-	mapping.modifiers = [scale]
-	return mapping
-
-
-func _make_mouse_pos_mapping() -> GUIDEInputMapping:
-	var mapping := GUIDEInputMapping.new()
-	var input := GUIDEInputMouseAxis2D.new()
-	mapping.input = input
-	mapping.is_remappable = true
-	mapping.modifiers = []
+	if is_zero_approx(scale_x):
+		var swizzle := GUIDEModifierInputSwizzle.new()
+		swizzle.order = GUIDEModifierInputSwizzle.GUIDEInputSwizzleOperation.YXZ
+		mapping.modifiers = [swizzle, scale]
+	else:
+		mapping.modifiers = [scale]
 	return mapping
 
 

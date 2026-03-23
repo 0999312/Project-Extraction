@@ -1,7 +1,7 @@
 class_name S_CombatFireSystem
 extends System
 
-const BaseProjectileScene := preload("res://scripts/ecs/projectiles/e_base_projectile.gd")
+const BaseProjectileScript := preload("res://scripts/ecs/projectiles/e_base_projectile.gd")
 
 func setup() -> void:
 	randomize()
@@ -28,7 +28,7 @@ func process(entities: Array[Entity], components: Array, delta: float) -> void:
 		if combat.fire_cooldown > 0.0:
 			continue
 
-		var projectile := BaseProjectile.new()
+		var projectile := BaseProjectileScript.new()
 		var projectile_pos := C_Position.new(pos.world_position, aim.aim_direction.angle())
 		var projectile_data := C_ProjectileData.new(850.0, 20.0, 0.0, 2.0)
 		projectile_data.spread_deviation_rad = deg_to_rad(_compute_spread_degrees(combat, aim))

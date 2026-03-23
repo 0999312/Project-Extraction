@@ -65,6 +65,7 @@ var is_sprinting: bool = false
 ## Child [BaseEntity] that holds all authoritative gameplay state components.
 ## Registered with the GECS World during [method _ready].
 var _ecs_entity: BaseEntity = null
+var _using_stick_aim: bool = false
 
 #endregion Private Variables
 
@@ -117,6 +118,11 @@ func _setup_ecs_entity() -> void:
 	])
 
 	# Register with the active GECS World if one exists.
+	var combat: C_CombatState = _ecs_entity.get_component(C_CombatState)
+	if combat:
+		combat.equipped_weapon_id = "game:item/weapon/pistol"
+		combat.ammo_max = 15
+		combat.ammo_current = 15
 	if ECS.world:
 		ECS.world.add_entity(_ecs_entity)
 	elif not ECS.world_changed.is_connected(_on_ecs_world_changed):
@@ -143,6 +149,8 @@ func _on_ecs_world_changed(world: World) -> void:
 ## Falls back to [member aim_direction] if the mouse is exactly on the entity
 ## (avoids a zero-length normalisation).
 func _get_aim_direction() -> Vector2:
+	if _using_stick_aim and aim_direction.length_squared() > AIM_EPSILON:
+		return aim_direction.normalized()
 	var to_mouse := get_global_mouse_position() - global_position
 	if to_mouse.length_squared() > AIM_EPSILON:
 		return to_mouse.normalized()
@@ -205,7 +213,7 @@ func _sync_position_to_ecs() -> void:
 	var pos_comp: C_Position = _ecs_entity.get_component(C_Position)
 	if pos_comp:
 		pos_comp.world_position = global_position
-		pos_comp.facing_angle = aim_direction.angle()
+		pos_comp.facing_angle = _get_aim_direction().angle()
 	# Keep C_AimState in sync so CombatSystem and observers can read it.
 	var aim_comp: C_AimState = _ecs_entity.get_component(C_AimState)
 	if aim_comp:
@@ -235,7 +243,8 @@ func _poll_guide_input() -> void:
 	move_input = _get_action_axis_2d(GUIDE_ACTION_MOVE).limit_length(1.0)
 	is_sprinting = _is_action_triggered(GUIDE_ACTION_SPRINT)
 	var stick_aim := _get_action_axis_2d(GUIDE_ACTION_AIM_AXIS)
-	if stick_aim.length_squared() > AIM_EPSILON:
+	_using_stick_aim = stick_aim.length_squared() > AIM_EPSILON
+	if _using_stick_aim:
 		aim_direction = stick_aim.normalized()
 
 

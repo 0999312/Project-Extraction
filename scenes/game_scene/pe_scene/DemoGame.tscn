@@ -4,8 +4,10 @@
 [ext_resource type="PackedScene" uid="uid://b8e0ghhkjbg1d" path="res://scenes/entities/e_player.tscn" id="2_c2hrh"]
 [ext_resource type="Script" path="res://scripts/ecs/systems/s_combat_fire_system.gd" id="3_fire_system"]
 [ext_resource type="Script" path="res://scripts/ecs/systems/s_projectile_motion_system.gd" id="4_projectile_motion"]
+[ext_resource type="Script" path="res://scripts/ecs/gameplay/demo_game_runtime.gd" id="5_demo_runtime"]
 
 [node name="DemoGame" type="Node2D" unique_id=1627913092]
+script = ExtResource("5_demo_runtime")
 
 [node name="CombatFireSystem" type="Node" parent="."]
 script = ExtResource("3_fire_system")

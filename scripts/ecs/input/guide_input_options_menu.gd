@@ -11,6 +11,7 @@ var _item_to_config: Dictionary = {}
 var _selected_item: TreeItem
 var _selected_config_item
 var _formatter: GUIDEInputFormatter
+var _is_rebinding: bool = false
 
 
 func _ready() -> void:
@@ -23,6 +24,7 @@ func _ready() -> void:
 	_tree.set_column_title(1, "Binding")
 	_build_tree()
 	_tree.item_selected.connect(_on_tree_item_selected)
+	_tree.item_activated.connect(_on_tree_item_activated)
 	_rebind_button.pressed.connect(_on_rebind_pressed)
 	_clear_button.pressed.connect(_on_clear_pressed)
 	_reset_button.pressed.connect(_on_reset_pressed)
@@ -52,7 +54,7 @@ func _format_binding(item) -> String:
 
 func _refresh_buttons() -> void:
 	var has_selection := _selected_config_item != null
-	_rebind_button.disabled = not has_selection
+	_rebind_button.disabled = not has_selection or _is_rebinding
 	_clear_button.disabled = not has_selection
 
 
@@ -65,6 +67,8 @@ func _on_tree_item_selected() -> void:
 func _on_rebind_pressed() -> void:
 	if _selected_config_item == null:
 		return
+	_is_rebinding = true
+	_refresh_buttons()
 	_status_label.text = "Press a key/button/axis for \"%s\"..." % _selected_config_item.display_name
 	var value_type: GUIDEAction.GUIDEActionValueType = _selected_config_item.value_type
 	match value_type:
@@ -96,6 +100,8 @@ func _on_reset_pressed() -> void:
 
 
 func _on_input_detected(input: GUIDEInput) -> void:
+	_is_rebinding = false
+	_refresh_buttons()
 	if _selected_config_item == null:
 		return
 	if input == null:
@@ -106,3 +112,7 @@ func _on_input_detected(input: GUIDEInput) -> void:
 	GuideInputRuntime.apply_remapping_config(remapper.get_mapping_config())
 	_status_label.text = "Bound \"%s\"." % _selected_config_item.display_name
 	_build_tree()
+
+
+func _on_tree_item_activated() -> void:
+	_on_rebind_pressed()

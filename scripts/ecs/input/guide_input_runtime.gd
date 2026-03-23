@@ -42,6 +42,8 @@ static func get_remapper() -> GUIDERemapper:
 
 static func apply_remapping_config(config: GUIDERemappingConfig) -> void:
 	_remapping_config = config if config != null else GUIDERemappingConfig.new()
+	if _remapper != null:
+		_remapper.initialize([_context], _remapping_config)
 	GUIDE.set_remapping_config(_remapping_config)
 	_save_remapping_config(_remapping_config)
 
