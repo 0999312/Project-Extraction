@@ -26,7 +26,9 @@
 - GUIDE-based remap UI controller used by:
   - `scenes/menus/options_menu/input/guide_input_options_menu.tscn`
 - Supports:
-  - select action binding
+  - keybinding table view (`Action` rows × `Keyboard` / `Mouse` / `Gamepad` columns)
+  - clear movement direction text rows (`Move Up` / `Move Down` / `Move Left` / `Move Right`)
+  - select action binding per table cell
   - rebind with `GUIDEInputDetector`
   - clear binding
   - reset defaults
@@ -118,11 +120,34 @@ Added game loop phase API:
 
 ## scripts/audio/audio_registry_bootstrap.gd
 
-- Autoload bootstrap for project audio/i18n initialization.
+- Autoload bootstrap for project audio registry initialization.
 - Registers `core:audio` registry via `RegistryManager`.
-- Registers and preloads audio categories:
-  - Startup: `game:audio/ui`, `game:audio/music`
-  - Game load: `game:audio/game`, `game:audio/environment`
-- Loads and applies UI translations:
+- Registers audio entries based on configured folder + filename lists from:
+  - `scripts/audio/audio_catalog.gd`
+- Startup:
+  - `game:audio/ui` from `res://assets/game/sounds/ui`
+  - `game:audio/music` from `res://assets/game/sounds/music`
+- Game load:
+  - `game:audio/game` from `res://assets/game/sounds/sounds`
+  - `game:audio/environment` from `res://assets/game/sounds/music`
+
+## scripts/audio/audio_catalog.gd
+
+- Defines startup/gameplay audio registration config.
+- Uses folder + filename arrays per category.
+
+## scripts/localization/localization_bootstrap.gd
+
+- Dedicated localization bootstrap (decoupled from audio bootstrap).
+- Loads:
   - `res://resources/i18n/ui_text.en.json`
   - `res://resources/i18n/ui_text.zh.json`
+- Sets and persists language to:
+  - `AppSettings.GAME_SECTION`
+  - Key: `Language`
+
+## scenes/menus/options_menu/game/language_option_control.gd
+
+- `ListOptionControl` for language switching in `game_options`.
+- Supported values: `en`, `zh`
+- Calls `LocalizationBootstrap.set_language(...)` on change.

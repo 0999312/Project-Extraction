@@ -54,7 +54,17 @@
     "input": {
       "action": "操作",
       "binding": "绑定",
+      "table_action": "操作",
+      "table_keyboard": "键盘",
+      "table_mouse": "鼠标",
+      "table_gamepad": "手柄",
+      "not_applicable": "—",
       "action_move": "移动",
+      "action_move_up": "向上移动",
+      "action_move_down": "向下移动",
+      "action_move_left": "向左移动",
+      "action_move_right": "向右移动",
+      "action_move_gamepad": "移动（摇杆）",
       "action_aim": "瞄准",
       "action_fire": "开火",
       "action_aim_hold": "瞄准 / ADS",
@@ -77,6 +87,11 @@
       "input_device": "输入设备："
     },
     "options": {
+      "language": {
+        "label": "语言",
+        "english": "English",
+        "chinese_simplified": "简体中文"
+      },
       "reset_game": {
         "label": "重置游戏：",
         "confirm_label": "确认重置：",

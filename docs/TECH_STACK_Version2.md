@@ -45,6 +45,15 @@
 - **@nathanhoad/godot_sound_manager** (recommended for ease of use)
   - Autoload playback for SFX/BGM.
   - Wrapped via Audio Bridge so replacement is painless later.
+  - Project audio registry now uses folder + filename configuration (`scripts/audio/audio_catalog.gd`)
+    and is initialized by `scripts/audio/audio_registry_bootstrap.gd`.
+
+### 1.8 Localization
+- JSON-based UI localization is initialized independently by
+  `scripts/localization/localization_bootstrap.gd` (decoupled from audio bootstrap).
+- Current supported languages: `en`, `zh`.
+- Active language is stored in `AppSettings.GAME_SECTION` with key `Language`
+  and can be changed from `game_options`.
 
 ---
 
@@ -251,3 +260,15 @@ Missing RL fallback:
 - [ ] Implement safehouse home system modules + build/upgrade + automation graph
 - [ ] Implement multi-slot save + versioning/migration
 - [ ] Implement ECS bridges and entity-type-specific pipelines
+
+---
+
+## 11) Current Option & Input UX Adjustments
+
+- `game_options` now includes language switching (English / 简体中文),
+  persisted to `GameSettings.Language`.
+- Keybinding UI is presented as a table:
+  - Columns: `Keyboard` / `Mouse` / `Gamepad`
+  - Rows: concrete actions
+  - Movement directions are explicit rows:
+    - `Move Up`, `Move Down`, `Move Left`, `Move Right`

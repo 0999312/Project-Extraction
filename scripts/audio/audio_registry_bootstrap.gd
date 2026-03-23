@@ -1,41 +1,20 @@
 extends Node
 
 const AUDIO_REGISTRY_TYPE := "audio"
-const AUDIO_CATEGORY_GAME := "game"
-const AUDIO_CATEGORY_UI := "ui"
-const AUDIO_CATEGORY_ENVIRONMENT := "environment"
-const AUDIO_CATEGORY_MUSIC := "music"
-const AUDIO_LOAD_PHASE_STARTUP := "startup"
-const AUDIO_LOAD_PHASE_GAME := "game_load"
 const REGISTRY_NAMESPACE := "game"
-
-const EN_TRANSLATION := "res://resources/i18n/ui_text.en.json"
-const ZH_TRANSLATION := "res://resources/i18n/ui_text.zh.json"
 const SUPPORTED_AUDIO_EXTENSIONS := [".ogg", ".wav", ".mp3"]
 
 
 func _ready() -> void:
 	_register_audio_registry()
-	_register_startup_audio()
-	_load_ui_translations()
+	_register_audio_groups(AudioCatalog.STARTUP_AUDIO_GROUPS)
 
 
 func register_gameplay_audio() -> void:
 	var registry := _get_audio_registry()
 	if registry == null:
 		return
-	_register_entry(
-		registry,
-		AUDIO_CATEGORY_GAME,
-		AUDIO_LOAD_PHASE_GAME,
-		"res://assets/audio/sfx/game"
-	)
-	_register_entry(
-		registry,
-		AUDIO_CATEGORY_ENVIRONMENT,
-		AUDIO_LOAD_PHASE_GAME,
-		"res://assets/audio/sfx/environment"
-	)
+	_register_audio_groups(AudioCatalog.GAMEPLAY_AUDIO_GROUPS)
 
 
 func _register_audio_registry() -> void:
@@ -43,31 +22,27 @@ func _register_audio_registry() -> void:
 		RegistryManager.register_registry(AUDIO_REGISTRY_TYPE, AudioRegistry.new())
 
 
-func _register_startup_audio() -> void:
+func _register_audio_groups(audio_groups: Array) -> void:
 	var registry := _get_audio_registry()
 	if registry == null:
 		return
-	_register_entry(
-		registry,
-		AUDIO_CATEGORY_UI,
-		AUDIO_LOAD_PHASE_STARTUP,
-		"res://assets/audio/sfx/ui"
-	)
-	_register_entry(
-		registry,
-		AUDIO_CATEGORY_MUSIC,
-		AUDIO_LOAD_PHASE_STARTUP,
-		"res://assets/audio/music"
-	)
+	for audio_group in audio_groups:
+		_register_entry(registry, audio_group)
 
 
-func _register_entry(registry: AudioRegistry, category: String, load_phase: String, folder: String) -> void:
+func _register_entry(registry: AudioRegistry, audio_group: Dictionary) -> void:
+	var category := str(audio_group.get("category", ""))
+	var load_phase := str(audio_group.get("load_phase", ""))
+	var folder := str(audio_group.get("folder", ""))
 	var resource_location := ResourceLocation.new(REGISTRY_NAMESPACE, "audio/%s" % category)
+	var file_names: Array = audio_group.get("files", [])
+	var stream_entries := _load_streams_from_files(folder, file_names)
 	registry.register(resource_location, {
 		"category": category,
 		"load_phase": load_phase,
 		"path": folder,
-		"streams": _load_streams_from_folder(folder),
+		"files": file_names.duplicate(),
+		"streams": stream_entries,
 	})
 
 
@@ -78,33 +53,24 @@ func _get_audio_registry() -> AudioRegistry:
 	return null
 
 
-func _load_ui_translations() -> void:
-	I18NManager.load_translation("en", EN_TRANSLATION)
-	I18NManager.load_translation("zh", ZH_TRANSLATION)
-	var locale := TranslationServer.get_locale().to_lower()
-	if locale.begins_with("zh"):
-		I18NManager.set_language("zh")
-	else:
-		I18NManager.set_language("en")
-
-
-func _load_streams_from_folder(folder_path: String) -> Array:
+func _load_streams_from_files(folder_path: String, file_names: Array) -> Array:
 	var streams: Array = []
-	if not DirAccess.dir_exists_absolute(folder_path):
+	if folder_path.is_empty() or not DirAccess.dir_exists_absolute(folder_path):
 		return streams
-	var dir := DirAccess.open(folder_path)
-	if dir == null:
-		return streams
-	dir.list_dir_begin()
-	var file_name := dir.get_next()
-	while file_name != "":
-		if not dir.current_is_dir() and _is_audio_file(file_name):
-			var stream_path := "%s/%s" % [folder_path, file_name]
-			var stream := load(stream_path)
-			if stream is AudioStream:
-				streams.append(stream)
-		file_name = dir.get_next()
-	dir.list_dir_end()
+	for file_name_variant in file_names:
+		var file_name := str(file_name_variant)
+		if not _is_audio_file(file_name):
+			continue
+		var stream_path := "%s/%s" % [folder_path, file_name]
+		if not ResourceLoader.exists(stream_path):
+			continue
+		var stream := load(stream_path)
+		if stream is AudioStream:
+			streams.append({
+				"file_name": file_name,
+				"path": stream_path,
+				"stream": stream,
+			})
 	return streams
 
 

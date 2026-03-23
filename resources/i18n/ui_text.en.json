@@ -54,7 +54,17 @@
     "input": {
       "action": "Action",
       "binding": "Binding",
+      "table_action": "Action",
+      "table_keyboard": "Keyboard",
+      "table_mouse": "Mouse",
+      "table_gamepad": "Gamepad",
+      "not_applicable": "—",
       "action_move": "Move",
+      "action_move_up": "Move Up",
+      "action_move_down": "Move Down",
+      "action_move_left": "Move Left",
+      "action_move_right": "Move Right",
+      "action_move_gamepad": "Move (Stick)",
       "action_aim": "Aim",
       "action_fire": "Fire",
       "action_aim_hold": "Aim / ADS",
@@ -77,6 +87,11 @@
       "input_device": "Input Device :"
     },
     "options": {
+      "language": {
+        "label": "Language",
+        "english": "English",
+        "chinese_simplified": "简体中文"
+      },
       "reset_game": {
         "label": "Reset Game :",
         "confirm_label": "Confirm Reset :",

@@ -45,6 +45,16 @@
 - **@nathanhoad/godot_sound_manager**（推荐，易于使用）
   - 自动加载播放音效/背景音乐。
   - 通过音频桥接器包装，以便日后轻松替换。
+  - 当前项目音频注册改为“按文件夹 + 文件名配置”
+    （`scripts/audio/audio_catalog.gd`），由
+    `scripts/audio/audio_registry_bootstrap.gd` 初始化。
+
+### 1.8 本地化
+- UI JSON 本地化由 `scripts/localization/localization_bootstrap.gd`
+  独立初始化（与音频注册解耦）。
+- 当前支持语言：`en`、`zh`。
+- 当前语言写入 `AppSettings.GAME_SECTION` 的 `Language` 键，
+  并可在 `game_options` 中切换。
 
 ---
 
@@ -251,3 +261,15 @@ MSF 演示使用带有 `scene/script` 的 `ItemInfo`。对于本项目：
 - [ ] 实现安全屋家园系统模块 + 建造/升级 + 自动化图
 - [ ] 实现多存档位保存 + 版本控制/迁移
 - [ ] 实现 ECS 桥接器和实体类型特定的管道
+
+---
+
+## 11) 当前选项与输入界面调整
+
+- `game_options` 已增加语言切换（English / 简体中文），并持久化到
+  `GameSettings.Language`。
+- 按键绑定界面整理为表格：
+  - 列：`键盘` / `鼠标` / `手柄`
+  - 行：具体操作
+  - 方向移动采用明确文本行：
+    - `向上移动`、`向下移动`、`向左移动`、`向右移动`
