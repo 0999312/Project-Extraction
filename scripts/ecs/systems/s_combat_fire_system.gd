@@ -20,13 +20,13 @@ func process(entities: Array[Entity], components: Array, delta: float) -> void:
 	var combats: Array = components[0]
 	var aims: Array = components[1]
 	var positions: Array = components[2]
-	var factions: Array = components[3]
+	var faction_components: Array = components[3]
 	for i in entities.size():
 		var entity := entities[i]
 		var combat: C_CombatState = combats[i]
 		var aim: C_AimState = aims[i]
 		var pos: C_Position = positions[i]
-		var faction: C_Faction = factions[i]
+		var faction: C_Faction = faction_components[i]
 		combat.fire_cooldown = maxf(0.0, combat.fire_cooldown - delta)
 		combat.recoil_accum = maxf(0.0, combat.recoil_accum - combat.recoil_recovery_per_sec * delta)
 		combat.empty_mag_sfx_cooldown = maxf(0.0, combat.empty_mag_sfx_cooldown - delta)
@@ -90,7 +90,7 @@ func _should_start_reload(combat: C_CombatState, faction: C_Faction) -> bool:
 		return false
 	if faction.faction in AI_RELOAD_FACTIONS and combat.ammo_current <= 0:
 		return true
-	return combat.wants_reload and combat.ammo_current <= 0
+	return combat.wants_reload and combat.ammo_current < combat.ammo_max
 
 
 func _start_reload(combat: C_CombatState) -> void:
