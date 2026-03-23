@@ -123,7 +123,7 @@ func _make_joy_axis_2d_mapping(axis_x: JoyAxis, axis_y: JoyAxis) -> GUIDEInputMa
 	input.x = axis_x
 	input.y = axis_y
 	var deadzone := GUIDEModifierDeadzone.new()
-	deadzone.deadzone = 0.18
+	deadzone.lower_threshold = 0.18
 	mapping.input = input
 	mapping.is_remappable = true
 	mapping.modifiers = [deadzone]
@@ -135,7 +135,7 @@ func _make_joy_axis_1d_mapping(axis: JoyAxis) -> GUIDEInputMapping:
 	var input := GUIDEInputJoyAxis1D.new()
 	input.axis = axis
 	var deadzone := GUIDEModifierDeadzone.new()
-	deadzone.deadzone = 0.2
+	deadzone.lower_threshold = 0.2
 	mapping.input = input
 	mapping.is_remappable = true
 	mapping.modifiers = [deadzone]

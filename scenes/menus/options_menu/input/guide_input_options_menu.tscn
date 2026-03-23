@@ -1,9 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://c82w8t2oblwal"]
 
-[ext_resource type="Script" path="res://scripts/ecs/input/guide_input_options_menu.gd" id="1_script"]
-[ext_resource type="Script" path="res://addons/guide/remapping/guide_input_detector.gd" id="2_detector"]
+[ext_resource type="Script" uid="uid://dotafm33h644d" path="res://scripts/ecs/input/guide_input_options_menu.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://db27ccgomq455" path="res://addons/guide/remapping/guide_input_detector.gd" id="2_detector"]
 
-[node name="Controls" type="MarginContainer"]
+[node name="Controls" type="MarginContainer" unique_id=1643603504]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -11,35 +11,41 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2087399734]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="BindingsTree" type="Tree" parent="VBoxContainer" unique_name_in_owner=true]
+[node name="BindingsTree" type="Tree" parent="VBoxContainer" unique_id=2091003023]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 340)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="ButtonsRow" type="HBoxContainer" parent="VBoxContainer"]
+[node name="ButtonsRow" type="HBoxContainer" parent="VBoxContainer" unique_id=556377966]
 layout_mode = 2
 
-[node name="RebindButton" type="Button" parent="VBoxContainer/ButtonsRow" unique_name_in_owner=true]
+[node name="RebindButton" type="Button" parent="VBoxContainer/ButtonsRow" unique_id=253367660]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Rebind"
 
-[node name="ClearButton" type="Button" parent="VBoxContainer/ButtonsRow" unique_name_in_owner=true]
+[node name="ClearButton" type="Button" parent="VBoxContainer/ButtonsRow" unique_id=1879004060]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Clear"
 
-[node name="ResetButton" type="Button" parent="VBoxContainer/ButtonsRow" unique_name_in_owner=true]
+[node name="ResetButton" type="Button" parent="VBoxContainer/ButtonsRow" unique_id=1262543969]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Reset Defaults"
 
-[node name="StatusLabel" type="Label" parent="VBoxContainer" unique_name_in_owner=true]
+[node name="StatusLabel" type="Label" parent="VBoxContainer" unique_id=1225332935]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Select an action to rebind."
 
-[node name="GUIDEInputDetector" type="Node" parent="."]
+[node name="GUIDEInputDetector" type="Node" parent="." unique_id=1828279914]
+unique_name_in_owner = true
 script = ExtResource("2_detector")

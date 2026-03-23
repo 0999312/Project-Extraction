@@ -28,6 +28,7 @@ PhantomCameraManager="*uid://duq6jhf6unyis"
 GUIDE="*uid://p2jwrgjcbexr"
 ECS="*uid://dfqwl5njvdnmq"
 DebugMenu="*uid://cggqb75a8w8r"
+SoundManager="*uid://c8sghfd0v8moa"
 
 [display]
 
@@ -40,7 +41,7 @@ project/assembly_name="ProjectExtraction"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg", "res://addons/gdUnit4/plugin.cfg", "res://addons/gecs/plugin.cfg", "res://addons/godot-plugin-refresher/plugin.cfg", "res://addons/guide/plugin.cfg", "res://addons/maaacks_game_template/plugin.cfg", "res://addons/mc_game_framework/plugin.cfg", "res://addons/phantom_camera/plugin.cfg")
+enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg", "res://addons/gdUnit4/plugin.cfg", "res://addons/gecs/plugin.cfg", "res://addons/godot-plugin-refresher/plugin.cfg", "res://addons/guide/plugin.cfg", "res://addons/maaacks_game_template/plugin.cfg", "res://addons/mc_game_framework/plugin.cfg", "res://addons/phantom_camera/plugin.cfg", "res://addons/script-ide/plugin.cfg", "res://addons/sound_manager/plugin.cfg")
 
 [gui]
 
