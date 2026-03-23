@@ -64,8 +64,8 @@ func get_world_position() -> Vector2:
 	var pos_comp: C_Position = get_component(C_Position)
 	if pos_comp:
 		return pos_comp.world_position
-	if self is Node2D:
-		return (self as Node2D).global_position
+	#if self is Node2D:
+		#return (self as Node2D).global_position
 	return Vector2.ZERO
 
 #endregion Position Helpers

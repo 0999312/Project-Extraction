@@ -1,6 +1,7 @@
 [gd_scene format=4 uid="uid://vxha7ywwiikg"]
 
 [ext_resource type="TileSet" uid="uid://71caum7va6qv" path="res://assets/game/tiles/tileset_demo.tres" id="1_ateyy"]
+[ext_resource type="PackedScene" uid="uid://b8e0ghhkjbg1d" path="res://scenes/entities/e_player.tscn" id="2_c2hrh"]
 
 [node name="DemoGame" type="Node2D" unique_id=1627913092]
 
@@ -12,3 +13,6 @@ collision_enabled = false
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1259125727]
 tile_map_data = PackedByteArray("AAAGAAUAAAAAAAMAAAAjABEAAAAEAAIAAAAKABQAAAAAAAUAAAAjABMAAAAEAAIAAAAjAA8AAAAEAAIAAAAjABAAAAAEAAIAAAAjAAIAAAAEAAIAAAAjAAMAAAAEAAIAAAAjAAQAAAAEAAIAAAAjAAUAAAAEAAIAAAAjAAYAAAAEAAIAAAAjAAcAAAAEAAIAAAAjAAgAAAAEAAIAAAAjAAkAAAAEAAIAAAAjAAoAAAAEAAIAAAAjAAsAAAAEAAIAAAAjAAwAAAAEAAIAAAAjAA0AAAAEAAIAAAAjAA4AAAAEAAIAAAAjABIAAAAEAAIAAAA=")
 tile_set = ExtResource("1_ateyy")
+
+[node name="Player" parent="." unique_id=1200860737 instance=ExtResource("2_c2hrh")]
+position = Vector2(374, 377)
