@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b8e0ghhkjbg1d"]
 
-[ext_resource type="Script" uid="uid://c80o8g72c1t0s" path="res://scripts/entities/gameplay/e_player.gd" id="1_player"]
+[ext_resource type="Script" uid="uid://c80o8g72c1t0s" path="res://scripts/ecs/entities/gameplay/e_player.gd" id="1_player"]
 [ext_resource type="Texture2D" uid="uid://ca6gr7lukemuk" path="res://assets/game/textures/entities/ball/ball_right.png" id="2_ball_r"]
 [ext_resource type="Texture2D" uid="uid://gtnpwtfb288i" path="res://assets/game/textures/entities/ball/ball_hand.png" id="3_hand"]
 [ext_resource type="Texture2D" uid="uid://c7qnals2vslnu" path="res://assets/game/textures/items/pistol.png" id="4_fqt4w"]

@@ -30,6 +30,8 @@ extends Component
 ## [code]true[/code] while the entity is actively aiming.
 ## CombatSystem uses this to reduce bullet spread.
 @export var is_aiming: bool = false
+## [code]true[/code] while the fire input is held.
+@export var wants_fire: bool = false
 
 ## Seconds until the next ranged shot is allowed. Decremented by CombatSystem.
 @export var fire_cooldown: float = 0.0
@@ -45,6 +47,19 @@ extends Component
 @export var is_reloading: bool = false
 ## Reload progress (0–1). Written by CombatSystem each frame during reload.
 @export var reload_progress: float = 0.0
+
+## Recoil accumulator used by CombatSystem to increase spread during sustained fire.
+@export var recoil_accum: float = 0.0
+## Degrees of base hip-fire spread (no recoil modifier).
+@export var hipfire_spread_deg: float = 6.0
+## Degrees of base ADS spread (no recoil modifier).
+@export var ads_spread_deg: float = 1.5
+## Added spread in degrees per 1.0 recoil_accum.
+@export var recoil_spread_per_accum_deg: float = 2.0
+## Recoil accumulated per fired shot.
+@export var recoil_per_shot: float = 0.6
+## Recoil recovery per second.
+@export var recoil_recovery_per_sec: float = 2.0
 
 
 ## Convenience constructor. All fields start at safe defaults.

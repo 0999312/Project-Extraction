@@ -46,6 +46,8 @@ extends Component
 ## Set to [code]true[/code] by ProjectileSystem after the first collision,
 ## preventing double-hit processing before the entity is queued for removal.
 @export var has_hit: bool = false
+## Shot spread deviation in radians applied at spawn from aim direction.
+@export var spread_deviation_rad: float = 0.0
 
 
 ## Convenience constructor.

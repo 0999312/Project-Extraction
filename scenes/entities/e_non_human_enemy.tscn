@@ -21,7 +21,7 @@
 
 [gd_scene format=3 uid="uid://nhe_non_human_enemy_scene_1"]
 
-[ext_resource type="Script" path="res://scripts/entities/enemies/e_non_human_enemy_body.gd" id="1_nhebdy"]
+[ext_resource type="Script" path="res://scripts/ecs/entities/enemies/e_non_human_enemy_body.gd" id="1_nhebdy"]
 [ext_resource type="Texture2D" uid="uid://dj1mqbkr1efcy" path="res://assets/game/textures/entities/enemy_mob/rapid/rapid_1.png" id="2_rapid"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_nhe"]

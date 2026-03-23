@@ -46,7 +46,10 @@ func setup(
 		push_error("BaseProjectile.setup: C_ProjectileData component is missing.")
 		return
 	# Direct field writes — no logic methods on the component.
-	proj.velocity = direction.normalized() * proj.speed
+	var shot_dir := direction.normalized()
+	if absf(proj.spread_deviation_rad) > 0.000001:
+		shot_dir = shot_dir.rotated(proj.spread_deviation_rad)
+	proj.velocity = shot_dir * proj.speed
 	proj.damage = dmg
 	proj.penetration = pen
 	proj.owner_entity_id = owner_id
