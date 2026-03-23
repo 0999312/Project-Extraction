@@ -95,7 +95,6 @@ func _make_sprint_mapping() -> GUIDEActionMapping:
 	mapping.action = action
 	mapping.input_mappings = [
 		_make_key_mapping(KEY_SHIFT),
-		_make_key_mapping(KEY_CTRL),
 		_make_joy_button_mapping(JOY_BUTTON_LEFT_SHOULDER),
 	]
 	return mapping

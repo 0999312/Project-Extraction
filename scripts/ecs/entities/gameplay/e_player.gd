@@ -65,7 +65,7 @@ var is_sprinting: bool = false
 ## Child [BaseEntity] that holds all authoritative gameplay state components.
 ## Registered with the GECS World during [method _ready].
 var _ecs_entity: BaseEntity = null
-var _using_stick_aim: bool = false
+var _using_gamepad_aim: bool = false
 
 #endregion Private Variables
 
@@ -149,7 +149,7 @@ func _on_ecs_world_changed(world: World) -> void:
 ## Falls back to [member aim_direction] if the mouse is exactly on the entity
 ## (avoids a zero-length normalisation).
 func _get_aim_direction() -> Vector2:
-	if _using_stick_aim and aim_direction.length_squared() > AIM_EPSILON:
+	if _using_gamepad_aim and aim_direction.length_squared() > AIM_EPSILON:
 		return aim_direction.normalized()
 	var to_mouse := get_global_mouse_position() - global_position
 	if to_mouse.length_squared() > AIM_EPSILON:
@@ -243,8 +243,8 @@ func _poll_guide_input() -> void:
 	move_input = _get_action_axis_2d(GUIDE_ACTION_MOVE).limit_length(1.0)
 	is_sprinting = _is_action_triggered(GUIDE_ACTION_SPRINT)
 	var stick_aim := _get_action_axis_2d(GUIDE_ACTION_AIM_AXIS)
-	_using_stick_aim = stick_aim.length_squared() > AIM_EPSILON
-	if _using_stick_aim:
+	_using_gamepad_aim = stick_aim.length_squared() > AIM_EPSILON
+	if _using_gamepad_aim:
 		aim_direction = stick_aim.normalized()
 
 

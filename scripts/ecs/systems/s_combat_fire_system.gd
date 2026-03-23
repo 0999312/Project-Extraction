@@ -31,7 +31,7 @@ func process(entities: Array[Entity], components: Array, delta: float) -> void:
 		var projectile := BaseProjectileScript.new()
 		var projectile_pos := C_Position.new(pos.world_position, aim.aim_direction.angle())
 		var projectile_data := C_ProjectileData.new(850.0, 20.0, 0.0, 2.0)
-		projectile_data.spread_deviation_rad = deg_to_rad(_compute_spread_degrees(combat, aim))
+		projectile_data.spread_deviation_rad = deg_to_rad(_compute_spread_offset_degrees(combat, aim))
 		projectile.add_components([projectile_pos, projectile_data])
 		ECS.world.add_entity(projectile)
 		projectile.setup(aim.aim_direction, projectile_data.damage, projectile_data.penetration, entity.id, combat.equipped_weapon_id)
@@ -41,7 +41,7 @@ func process(entities: Array[Entity], components: Array, delta: float) -> void:
 		combat.recoil_accum += combat.recoil_per_shot
 
 
-func _compute_spread_degrees(combat: C_CombatState, aim: C_AimState) -> float:
+func _compute_spread_offset_degrees(combat: C_CombatState, aim: C_AimState) -> float:
 	var base_spread := combat.ads_spread_deg if combat.is_aiming else combat.hipfire_spread_deg
 	base_spread += combat.recoil_accum * combat.recoil_spread_per_accum_deg
 	base_spread *= maxf(0.01, aim.precision_multiplier)
