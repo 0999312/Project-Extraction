@@ -11,6 +11,7 @@ const REGISTRY_NAMESPACE := "game"
 
 const EN_TRANSLATION := "res://resources/i18n/ui_text.en.json"
 const ZH_TRANSLATION := "res://resources/i18n/ui_text.zh.json"
+const SUPPORTED_AUDIO_EXTENSIONS := [".ogg", ".wav", ".mp3"]
 
 
 func _ready() -> void:
@@ -61,8 +62,8 @@ func _register_startup_audio() -> void:
 
 
 func _register_entry(registry: AudioRegistry, category: String, load_phase: String, folder: String) -> void:
-	var id := ResourceLocation.new(REGISTRY_NAMESPACE, "audio/%s" % category)
-	registry.register(id, {
+	var resource_location := ResourceLocation.new(REGISTRY_NAMESPACE, "audio/%s" % category)
+	registry.register(resource_location, {
 		"category": category,
 		"load_phase": load_phase,
 		"path": folder,
@@ -109,4 +110,7 @@ func _load_streams_from_folder(folder_path: String) -> Array:
 
 func _is_audio_file(file_name: String) -> bool:
 	var lower := file_name.to_lower()
-	return lower.ends_with(".ogg") or lower.ends_with(".wav") or lower.ends_with(".mp3")
+	for extension in SUPPORTED_AUDIO_EXTENSIONS:
+		if lower.ends_with(extension):
+			return true
+	return false

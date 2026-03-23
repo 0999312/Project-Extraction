@@ -2,9 +2,11 @@ extends Node2D
 
 @onready var _combat_fire_system: S_CombatFireSystem = $CombatFireSystem
 @onready var _projectile_motion_system: S_ProjectileMotionSystem = $ProjectileMotionSystem
+@onready var _pause_menu_controller: Node = $PauseMenuController
 
 var _world: World
 var _systems_registered: bool = false
+var _pause_pressed_last_frame: bool = false
 const GUIDE_ACTION_PAUSE := &"pe_pause"
 
 
@@ -44,7 +46,8 @@ func _poll_pause_input() -> void:
 	var action: GUIDEAction = GuideInputRuntime.get_action(GUIDE_ACTION_PAUSE)
 	if action == null:
 		return
-	if action.is_triggered():
-		var pause_controller: Node = get_node_or_null("PauseMenuController")
-		if pause_controller != null and pause_controller.has_method("pause"):
-			pause_controller.pause()
+	var is_triggered := action.is_triggered()
+	if is_triggered and not _pause_pressed_last_frame:
+		if _pause_menu_controller != null:
+			_pause_menu_controller.pause()
+	_pause_pressed_last_frame = is_triggered
