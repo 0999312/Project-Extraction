@@ -62,6 +62,8 @@ func _build_table() -> void:
 		{"label_key": "ui.input.action_aim", "columns": action_rows.get(&"pe_aim_axis", {})},
 		{"label_key": "ui.input.action_fire", "columns": action_rows.get(&"pe_fire", {})},
 		{"label_key": "ui.input.action_aim_hold", "columns": action_rows.get(&"pe_aim_hold", {})},
+		{"label_key": "ui.input.action_reload", "columns": action_rows.get(&"pe_reload", {})},
+		{"label_key": "ui.input.action_fire_mode_toggle", "columns": action_rows.get(&"pe_fire_mode_toggle", {})},
 		{"label_key": "ui.input.action_sprint", "columns": action_rows.get(&"pe_sprint", {})},
 		{"label_key": "ui.input.action_pause", "columns": action_rows.get(&"pe_pause", {})},
 	]

@@ -2,6 +2,29 @@
 
 ## Completed in this update
 
+- Implemented shooting-system expansion for aim/fire/reload workflow:
+  - Projectile spawn supports multi-pellet shots and weaponized projectile attributes
+  - Added fire mode model (`SAFE/SEMI/AUTO`) and runtime mode switching
+  - Added player reload input and reload processing state
+  - Added non-player auto reload behavior on empty magazine
+  - Added empty magazine reminder SFX playback
+  - Files:
+    - `scripts/ecs/systems/s_combat_fire_system.gd`
+    - `scripts/ecs/components/combat/c_combat_state.gd`
+    - `scripts/ecs/input/player_input_context.gd`
+    - `scripts/ecs/entities/gameplay/e_player.gd`
+- Implemented projectile distance attenuation and distance-based expiry:
+  - `scripts/ecs/components/combat/c_projectile_data.gd`
+  - `scripts/ecs/systems/s_projectile_motion_system.gd`
+- Added aiming camera follow offset (crosshair-follow style while ADS):
+  - `scripts/ecs/gameplay/demo_game_runtime.gd`
+- Extended input/keybinding/i18n for combat controls:
+  - Added `Reload` and `Toggle Fire Mode` actions to input context and keybinding table
+  - Updated translation resources:
+    - `resources/i18n/ui_text.en.json`
+    - `resources/i18n/ui_text.zh.json`
+- Updated API docs for shooting/reload/firemode/attenuation/camera behavior:
+  - `docs/API.md`
 - Decoupled localization bootstrap from audio registry bootstrap:
   - Added `scripts/localization/localization_bootstrap.gd`
   - `AudioRegistryBootstrap` now handles audio registration only

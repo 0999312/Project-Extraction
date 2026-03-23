@@ -8,6 +8,8 @@ func _init() -> void:
 		_make_aim_mapping(),
 		_make_fire_mapping(),
 		_make_aim_hold_mapping(),
+		_make_reload_mapping(),
+		_make_fire_mode_toggle_mapping(),
 		_make_sprint_mapping(),
 		_make_pause_mapping(),
 	]
@@ -97,6 +99,40 @@ func _make_sprint_mapping() -> GUIDEActionMapping:
 	mapping.input_mappings = [
 		_make_key_mapping(KEY_SHIFT),
 		_make_joy_button_mapping(JOY_BUTTON_LEFT_SHOULDER),
+	]
+	return mapping
+
+
+func _make_reload_mapping() -> GUIDEActionMapping:
+	var action := GUIDEAction.new()
+	action.name = &"pe_reload"
+	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
+	action.is_remappable = true
+	action.display_name = "ui.input.action_reload"
+	action.display_category = "Combat"
+
+	var mapping := GUIDEActionMapping.new()
+	mapping.action = action
+	mapping.input_mappings = [
+		_make_key_mapping(KEY_R),
+		_make_joy_button_mapping(JOY_BUTTON_X),
+	]
+	return mapping
+
+
+func _make_fire_mode_toggle_mapping() -> GUIDEActionMapping:
+	var action := GUIDEAction.new()
+	action.name = &"pe_fire_mode_toggle"
+	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
+	action.is_remappable = true
+	action.display_name = "ui.input.action_fire_mode_toggle"
+	action.display_category = "Combat"
+
+	var mapping := GUIDEActionMapping.new()
+	mapping.action = action
+	mapping.input_mappings = [
+		_make_key_mapping(KEY_B),
+		_make_joy_button_mapping(JOY_BUTTON_Y),
 	]
 	return mapping
 

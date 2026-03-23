@@ -68,6 +68,8 @@
       "action_aim": "Aim",
       "action_fire": "Fire",
       "action_aim_hold": "Aim / ADS",
+      "action_reload": "Reload",
+      "action_fire_mode_toggle": "Toggle Fire Mode",
       "action_sprint": "Sprint",
       "action_pause": "Pause",
       "rebind": "Rebind",

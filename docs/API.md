@@ -8,6 +8,8 @@
   - `pe_aim_axis` (`AXIS_2D`)
   - `pe_fire` (`BOOL`)
   - `pe_aim_hold` (`BOOL`)
+  - `pe_reload` (`BOOL`)
+  - `pe_fire_mode_toggle` (`BOOL`)
   - `pe_sprint` (`BOOL`)
 
 ## scripts/ecs/input/guide_input_runtime.gd
@@ -55,12 +57,21 @@
 Added fields:
 
 - `wants_fire: bool`
+- `wants_reload: bool`
+- `wants_fire_mode_toggle: bool`
 - `recoil_accum: float`
 - `hipfire_spread_deg: float`
 - `ads_spread_deg: float`
 - `recoil_spread_per_accum_deg: float`
 - `recoil_per_shot: float`
 - `recoil_recovery_per_sec: float`
+- `fire_mode: FireMode` (`SAFE` / `SEMI` / `AUTO`)
+- `pellets_per_shot: int`
+- `projectile_speed: float`
+- `projectile_max_distance: float`
+- `ads_distance: float`
+- `attack_damage: float`
+- `ammo_max` / `ammo_current` + reload state (`is_reloading`, `reload_progress`, `reload_duration_sec`)
 
 ## scripts/ecs/components/combat/c_aim_state.gd
 
@@ -73,6 +84,9 @@ Added field:
 Added field:
 
 - `spread_deviation_rad: float`
+- `max_distance: float`
+- `remaining_distance: float`
+- `base_damage` / `base_speed` for attenuation curve
 
 ## scripts/ecs/projectiles/e_base_projectile.gd
 
@@ -81,11 +95,15 @@ Added field:
 ## scripts/ecs/systems/s_combat_fire_system.gd
 
 - `class_name S_CombatFireSystem : System`
-- Query: entities with `C_CombatState`, `C_AimState`, `C_Position`
+- Query: entities with `C_CombatState`, `C_AimState`, `C_Position`, `C_Faction`
 - Per tick:
   - cooldown + recoil recovery
-  - if fire requested and available ammo/cooldown, spawn projectile
+  - fire-mode handling (`SAFE`/`SEMI`/`AUTO`)
+  - player manual reload trigger (`pe_reload`) and NPC auto reload when empty mag
+  - empty-mag reminder SFX (`res://assets/game/sounds/ui/cancel.mp3`)
+  - if fire requested and available ammo/cooldown, spawn projectile(s)
   - apply hipfire vs ADS spread + recoil spread
+  - supports per-shot pellet count (`pellets_per_shot`)
   - decrement ammo, set cooldown, add recoil
 
 ## scripts/ecs/systems/s_projectile_motion_system.gd
@@ -93,6 +111,10 @@ Added field:
 - `class_name S_ProjectileMotionSystem : System`
 - Query: entities with `C_ProjectileData`, `C_Position`
 - Advances projectile age/position and removes expired projectiles.
+- Applies distance-based attenuation using `remaining_distance / max_distance`:
+  - gradual damage decay
+  - gradual speed decay
+  - projectile expires when distance is exhausted.
 
 ## scripts/ecs/gameplay/demo_game_runtime.gd
 
@@ -102,6 +124,8 @@ Added field:
   - `S_CombatFireSystem`
   - `S_ProjectileMotionSystem`
 - Polls GUIDE `pe_pause` action and opens `PauseMenuController` in `DemoGame`.
+- Applies ADS camera follow offset toward crosshair direction by writing
+  `PhantomCamera2D.follow_offset` while aiming.
 
 ## scripts/ecs/game_state.gd
 

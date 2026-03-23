@@ -68,6 +68,8 @@
       "action_aim": "瞄准",
       "action_fire": "开火",
       "action_aim_hold": "瞄准 / ADS",
+      "action_reload": "换弹",
+      "action_fire_mode_toggle": "切换快慢机",
       "action_sprint": "冲刺",
       "action_pause": "暂停",
       "rebind": "重新绑定",
