@@ -42,7 +42,7 @@
   - Standardizes loading screens and async resource loading.
 
 ### 1.7 Audio Management
-- **Simple Audio Manager** (recommended for ease of use)
+- **@nathanhoad/godot_sound_manager** (recommended for ease of use)
   - Autoload playback for SFX/BGM.
   - Wrapped via Audio Bridge so replacement is painless later.
 
@@ -234,7 +234,7 @@ Missing RL fallback:
 ## 9) Bridges (Integration Contracts)
 
 - **InputBridge:** G.U.I.D.E → MSF EventBus command events → ECS consumes
-- **AudioBridge:** ECS `PlaySfxEvent` → Simple Audio Manager
+- **AudioBridge:** ECS `PlaySfxEvent` → @nathanhoad/godot_sound_manager
 - **SceneFlowBridge:** extraction/death requests → Maaack Scene Loader transitions
 - **UIBridge:** ECS state → UI updates (event-driven)
 - **CameraBridge:** ECS hit/explosion events → phantom-camera trauma/shake

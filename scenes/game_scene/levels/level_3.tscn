@@ -44,7 +44,7 @@ theme_override_constants/separation = 16
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer" unique_id=96118221]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
-text = "Example Level #3"
+text = "ui.level.3.title"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -60,29 +60,29 @@ script = ExtResource("2_satlj")
 [node name="WinButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=2002907296]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Win"
+text = "ui.common.win"
 
 [node name="LoseButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=38286676]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Lose"
+text = "ui.common.lose"
 
 [node name="LoseButton2" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1680020676]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Lose"
+text = "ui.common.lose"
 
 [node name="LoseButton3" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=46286560]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Lose"
+text = "ui.common.lose"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1286584835]
 layout_mode = 2
 
 [node name="TutorialButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1726909010]
 layout_mode = 2
-text = "Tutorial"
+text = "ui.common.tutorial"
 
 [node name="InputDisplayLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1112709942]
 layout_mode = 2
@@ -92,12 +92,12 @@ script = ExtResource("3_4popk")
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=209057626]
 layout_mode = 2
-text = "Change Level Color: "
+text = "ui.level.change_color_label"
 
 [node name="ColorPickerButton" type="ColorPickerButton" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=879642147]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Change Color"
+text = "ui.level.change_color_button"
 
 [node name="TutorialManager" type="Node" parent="." unique_id=125994400]
 unique_name_in_owner = true

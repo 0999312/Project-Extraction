@@ -9,6 +9,7 @@ func _init() -> void:
 		_make_fire_mapping(),
 		_make_aim_hold_mapping(),
 		_make_sprint_mapping(),
+		_make_pause_mapping(),
 	]
 
 
@@ -17,7 +18,7 @@ func _make_move_mapping() -> GUIDEActionMapping:
 	action.name = &"pe_move"
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.AXIS_2D
 	action.is_remappable = true
-	action.display_name = "Move"
+	action.display_name = "ui.input.action_move"
 	action.display_category = "Movement"
 
 	var mapping := GUIDEActionMapping.new()
@@ -37,7 +38,7 @@ func _make_aim_mapping() -> GUIDEActionMapping:
 	action.name = &"pe_aim_axis"
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.AXIS_2D
 	action.is_remappable = true
-	action.display_name = "Aim"
+	action.display_name = "ui.input.action_aim"
 	action.display_category = "Combat"
 
 	var mapping := GUIDEActionMapping.new()
@@ -53,7 +54,7 @@ func _make_fire_mapping() -> GUIDEActionMapping:
 	action.name = &"pe_fire"
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
 	action.is_remappable = true
-	action.display_name = "Fire"
+	action.display_name = "ui.input.action_fire"
 	action.display_category = "Combat"
 
 	var mapping := GUIDEActionMapping.new()
@@ -71,7 +72,7 @@ func _make_aim_hold_mapping() -> GUIDEActionMapping:
 	action.name = &"pe_aim_hold"
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
 	action.is_remappable = true
-	action.display_name = "Aim / ADS"
+	action.display_name = "ui.input.action_aim_hold"
 	action.display_category = "Combat"
 
 	var mapping := GUIDEActionMapping.new()
@@ -88,7 +89,7 @@ func _make_sprint_mapping() -> GUIDEActionMapping:
 	action.name = &"pe_sprint"
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
 	action.is_remappable = true
-	action.display_name = "Sprint"
+	action.display_name = "ui.input.action_sprint"
 	action.display_category = "Movement"
 
 	var mapping := GUIDEActionMapping.new()
@@ -96,6 +97,24 @@ func _make_sprint_mapping() -> GUIDEActionMapping:
 	mapping.input_mappings = [
 		_make_key_mapping(KEY_SHIFT),
 		_make_joy_button_mapping(JOY_BUTTON_LEFT_SHOULDER),
+	]
+	return mapping
+
+
+func _make_pause_mapping() -> GUIDEActionMapping:
+	var action := GUIDEAction.new()
+	action.name = &"pe_pause"
+	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
+	action.is_remappable = true
+	action.display_name = "ui.input.action_pause"
+	action.display_category = "System"
+
+	var mapping := GUIDEActionMapping.new()
+	mapping.action = action
+	mapping.input_mappings = [
+		_make_key_mapping(KEY_ESCAPE),
+		_make_key_mapping(KEY_P),
+		_make_joy_button_mapping(JOY_BUTTON_START),
 	]
 	return mapping
 

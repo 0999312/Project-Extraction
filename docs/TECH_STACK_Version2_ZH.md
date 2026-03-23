@@ -42,7 +42,7 @@
   - 标准化加载画面和异步资源加载。
 
 ### 1.7 音频管理
-- **Simple Audio Manager** (推荐，易于使用)
+- **@nathanhoad/godot_sound_manager**（推荐，易于使用）
   - 自动加载播放音效/背景音乐。
   - 通过音频桥接器包装，以便日后轻松替换。
 
@@ -234,7 +234,7 @@ MSF 演示使用带有 `scene/script` 的 `ItemInfo`。对于本项目：
 ## 9) 桥接器 (集成契约)
 
 - **InputBridge:** G.U.I.D.E → MSF EventBus 命令事件 → ECS 消费
-- **AudioBridge:** ECS `PlaySfxEvent` → Simple Audio Manager
+- **AudioBridge:** ECS `PlaySfxEvent` → @nathanhoad/godot_sound_manager
 - **SceneFlowBridge:** 撤离/死亡请求 → Maaack Scene Loader 过渡
 - **UIBridge:** ECS 状态 → UI 更新（事件驱动）
 - **CameraBridge:** ECS 受击/爆炸事件 → phantom-camera 震动/抖动

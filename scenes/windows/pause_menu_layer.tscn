@@ -23,10 +23,10 @@ exit_confirmation_node_path = NodePath("../ExitConfirmation")
 menu_container_node_path = NodePath("..")
 pauses_game = true
 update_content = true
-title = "Paused"
+title = "ui.pause.title"
 
 [node name="TitleLabel" parent="PauseMenu/ContentContainer/BoxContainer/TitleMargin/BoxContainer" parent_id_path=PackedInt32Array(1220268013, 1788474031) index="0" unique_id=1049966061]
-text = "Paused"
+text = "ui.pause.title"
 
 [node name="BodyMargin" parent="PauseMenu/ContentContainer/BoxContainer" parent_id_path=PackedInt32Array(1220268013, 394030069) index="1" unique_id=590613964]
 visible = false
@@ -35,57 +35,57 @@ visible = false
 size_flags_vertical = 3
 
 [node name="CloseButton" parent="PauseMenu/ContentContainer/BoxContainer/MenuButtonsMargin/MenuButtons" parent_id_path=PackedInt32Array(1220268013, 1371114575) index="0" unique_id=314526102]
-text = "Resume"
+text = "ui.pause.resume"
 
 [node name="RestartButton" type="Button" parent="PauseMenu/ContentContainer/BoxContainer/MenuButtonsMargin/MenuButtons" parent_id_path=PackedInt32Array(1220268013, 1371114575) index="1" unique_id=74452520]
 layout_mode = 2
-text = "Restart"
+text = "ui.pause.restart"
 
 [node name="SaveGameButton" type="Button" parent="PauseMenu/ContentContainer/BoxContainer/MenuButtonsMargin/MenuButtons" parent_id_path=PackedInt32Array(1220268013, 1371114575) index="2" unique_id=1861484331]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-text = "Save Game"
+text = "ui.pause.save_game"
 
 [node name="LoadGameButton" type="Button" parent="PauseMenu/ContentContainer/BoxContainer/MenuButtonsMargin/MenuButtons" parent_id_path=PackedInt32Array(1220268013, 1371114575) index="3" unique_id=800791711]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-text = "Load Game"
+text = "ui.pause.load_game"
 
 [node name="OptionsButton" type="Button" parent="PauseMenu/ContentContainer/BoxContainer/MenuButtonsMargin/MenuButtons" parent_id_path=PackedInt32Array(1220268013, 1371114575) index="4" unique_id=2034260124]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Options"
+text = "ui.pause.options"
 
 [node name="MainMenuButton" type="Button" parent="PauseMenu/ContentContainer/BoxContainer/MenuButtonsMargin/MenuButtons" parent_id_path=PackedInt32Array(1220268013, 1371114575) index="5" unique_id=784454630]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Main Menu"
+text = "ui.pause.main_menu"
 
 [node name="ExitButton" type="Button" parent="PauseMenu/ContentContainer/BoxContainer/MenuButtonsMargin/MenuButtons" parent_id_path=PackedInt32Array(1220268013, 1371114575) index="6" unique_id=1250480697]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Exit Game"
+text = "ui.pause.exit_game"
 
 [node name="RestartConfirmation" parent="." unique_id=652402855 instance=ExtResource("5_bgbk1")]
 unique_name_in_owner = true
 visible = false
-text = "Restart the game?"
-title = "Confirm Restart"
+text = "ui.pause.confirm_restart_text"
+title = "ui.pause.confirm_restart_title"
 
 [node name="MainMenuConfirmation" parent="." unique_id=1667922945 instance=ExtResource("5_bgbk1")]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(220, 0)
-text = "Exit to the main menu?"
-title = "Confirm Exit"
+text = "ui.pause.confirm_main_menu_text"
+title = "ui.common.confirm_exit_title"
 
 [node name="ExitConfirmation" parent="." unique_id=1205734640 instance=ExtResource("5_bgbk1")]
 unique_name_in_owner = true
 visible = false
-text = "Exit the game?"
-title = "Confirm Exit"
+text = "ui.pause.confirm_exit_game_text"
+title = "ui.common.confirm_exit_title"
 
 [connection signal="hidden" from="PauseMenu" to="." method="_on_pause_menu_hidden"]
 [connection signal="pressed" from="PauseMenu/ContentContainer/BoxContainer/MenuButtonsMargin/MenuButtons/RestartButton" to="PauseMenu" method="_on_restart_button_pressed"]

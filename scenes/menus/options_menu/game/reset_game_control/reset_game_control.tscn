@@ -13,27 +13,27 @@ script = ExtResource("1_mkb8o")
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Reset Game :"
+text = "ui.options.reset_game.label"
 
 [node name="ResetButton" type="Button" parent="." unique_id=57762798]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(72, 32)
 layout_mode = 2
-text = "Reset"
+text = "ui.options.reset_game.reset"
 
 [node name="CancelButton" type="Button" parent="." unique_id=2089314894]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(72, 32)
 layout_mode = 2
-text = "No"
+text = "ui.common.no"
 
 [node name="ConfirmButton" type="Button" parent="." unique_id=989400073]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(72, 32)
 layout_mode = 2
-text = "Yes"
+text = "ui.common.yes"
 
 [connection signal="pressed" from="ResetButton" to="." method="_on_reset_button_pressed"]
 [connection signal="pressed" from="CancelButton" to="." method="_on_cancel_button_pressed"]

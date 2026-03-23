@@ -26,7 +26,7 @@ key = "MouseSensitivity"
 section = "InputSettings"
 
 [node name="OptionLabel" parent="VBoxContainer/MarginContainer/VBoxContainer/MouseSensitivityControl" index="0" unique_id=1854788461]
-text = "Mouse Sensitivity :"
+text = "ui.input.mouse_sensitivity"
 
 [node name="HSlider" parent="VBoxContainer/MarginContainer/VBoxContainer/MouseSensitivityControl" index="1" unique_id=424108384]
 min_value = 0.25

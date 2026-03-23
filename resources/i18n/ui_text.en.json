@@ -1,0 +1,117 @@
+{
+  "ui": {
+    "pause": {
+      "title": "Paused",
+      "resume": "Resume",
+      "restart": "Restart",
+      "save_game": "Save Game",
+      "load_game": "Load Game",
+      "options": "Options",
+      "main_menu": "Main Menu",
+      "exit_game": "Exit Game",
+      "confirm_restart_text": "Restart the game?",
+      "confirm_restart_title": "Confirm Restart",
+      "confirm_main_menu_text": "Exit to the main menu?",
+      "confirm_exit_game_text": "Exit the game?"
+    },
+    "common": {
+      "confirm_exit_title": "Confirm Exit",
+      "continue": "Continue",
+      "exit": "Exit",
+      "main_menu": "Main Menu",
+      "restart": "Restart",
+      "menu": "Menu",
+      "back": "Back",
+      "win": "Win",
+      "lose": "Lose",
+      "tutorial": "Tutorial",
+      "yes": "Yes",
+      "no": "No",
+      "confirm_main_menu_text": "Exit to the main menu?",
+      "confirm_exit_game_text": "Exit the game?"
+    },
+    "main_menu": {
+      "title": "ProjectExtraction",
+      "continue": "Continue",
+      "level_select": "Level Select",
+      "confirm_new_game_text": "Are you sure you want to start a new game?\n\nAll progress in the current game will be lost.",
+      "confirm_new_game_title": "New Game"
+    },
+    "result": {
+      "game_won": {
+        "title": "You won!"
+      },
+      "level_won": {
+        "title": "Level complete!"
+      },
+      "level_lost": {
+        "title": "You lost..."
+      }
+    },
+    "end_credits": {
+      "thanks": "Thanks for playing!"
+    },
+    "input": {
+      "action": "Action",
+      "binding": "Binding",
+      "action_move": "Move",
+      "action_aim": "Aim",
+      "action_fire": "Fire",
+      "action_aim_hold": "Aim / ADS",
+      "action_sprint": "Sprint",
+      "action_pause": "Pause",
+      "rebind": "Rebind",
+      "clear": "Clear",
+      "reset_defaults": "Reset Defaults",
+      "select_action_rebind": "Select an action to rebind.",
+      "unbound": "(Unbound)",
+      "press_for_action": "Press a key/button/axis for \"{0}\"...",
+      "cleared": "Cleared binding.",
+      "restored_defaults": "Restored defaults.",
+      "rebind_cancelled": "Rebind cancelled.",
+      "bound_action": "Bound \"{0}\".",
+      "mouse_sensitivity": "Mouse Sensitivity :",
+      "joypad_sensitivity": "Joypad Sensitivity :"
+    },
+    "audio": {
+      "input_device": "Input Device :"
+    },
+    "options": {
+      "reset_game": {
+        "label": "Reset Game :",
+        "confirm_label": "Confirm Reset :",
+        "reset": "Reset"
+      }
+    },
+    "level": {
+      "1": {
+        "title": "Example Level #1"
+      },
+      "2": {
+        "title": "Example Level #2"
+      },
+      "3": {
+        "title": "Example Level #3"
+      },
+      "change_color_label": "Change Level Color: ",
+      "change_color_button": "Change Color"
+    },
+    "tutorial": {
+      "1": {
+        "body": "Click the Win button to progress.\nClick the Lose button to try again."
+      },
+      "2": {
+        "body": "Progress is saved.\nPressing Continue from the main menu will load at the last checkpoint."
+      },
+      "3": {
+        "body": "The color picker at the bottom-right updates the level state. This change persists until the game is reset.\n\nThe label at the bottom-center displays the current input action detected, if any are setup for the project."
+      }
+    },
+    "level_select": {
+      "default_item": "1 - ExampleLevel",
+      "level_1": "Level 1",
+      "level_2": "Level 2",
+      "level_3": "Level 3"
+    }
+  }
+}

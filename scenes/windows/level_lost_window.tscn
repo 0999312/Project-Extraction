@@ -8,15 +8,15 @@
 custom_minimum_size = Vector2(432, 240)
 script = ExtResource("2_6m2xx")
 update_content = true
-text = "You lost..."
-close_button_text = "Restart"
+text = "ui.result.level_lost.title"
+close_button_text = "ui.common.restart"
 title_visible = false
 
 [node name="TitleMargin" parent="ContentContainer/BoxContainer" parent_id_path=PackedInt32Array(394030069) index="0" unique_id=1262022916]
 visible = false
 
 [node name="DescriptionLabel" parent="ContentContainer/BoxContainer/BodyMargin" parent_id_path=PackedInt32Array(590613964) index="0" unique_id=617407155]
-text = "You lost..."
+text = "ui.result.level_lost.title"
 
 [node name="MenuButtons" parent="ContentContainer/BoxContainer/MenuButtonsMargin" parent_id_path=PackedInt32Array(1413292752) index="0" unique_id=1371114575]
 vertical = false
@@ -25,32 +25,32 @@ vertical = false
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Exit"
+text = "ui.common.exit"
 
 [node name="MainMenuButton" type="Button" parent="ContentContainer/BoxContainer/MenuButtonsMargin/MenuButtons" index="1" unique_id=771901392]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Main Menu"
+text = "ui.common.main_menu"
 
 [node name="CloseButton" parent="ContentContainer/BoxContainer/MenuButtonsMargin/MenuButtons" index="2" unique_id=314526102]
 size_flags_horizontal = 3
-text = "Restart"
+text = "ui.common.restart"
 
 [node name="MainMenuConfirmation" parent="." index="1" unique_id=900874025 instance=ExtResource("3_o54tf")]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
-text = "Exit to the main menu?"
-title = "Confirm Exit"
+text = "ui.common.confirm_main_menu_text"
+title = "ui.common.confirm_exit_title"
 
 [node name="ExitConfirmation" parent="." index="2" unique_id=242385564 instance=ExtResource("3_o54tf")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-text = "Exit the game?"
-title = "Confirm Exit"
+text = "ui.common.confirm_exit_game_text"
+title = "ui.common.confirm_exit_title"
 
 [connection signal="pressed" from="ContentContainer/BoxContainer/MenuButtonsMargin/MenuButtons/ExitButton" to="." method="_on_exit_button_pressed"]
 [connection signal="pressed" from="ContentContainer/BoxContainer/MenuButtonsMargin/MenuButtons/MainMenuButton" to="." method="_on_main_menu_button_pressed"]

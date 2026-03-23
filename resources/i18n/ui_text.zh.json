@@ -1,0 +1,117 @@
+{
+  "ui": {
+    "pause": {
+      "title": "已暂停",
+      "resume": "继续",
+      "restart": "重新开始",
+      "save_game": "保存游戏",
+      "load_game": "读取游戏",
+      "options": "选项",
+      "main_menu": "主菜单",
+      "exit_game": "退出游戏",
+      "confirm_restart_text": "要重新开始游戏吗？",
+      "confirm_restart_title": "确认重新开始",
+      "confirm_main_menu_text": "要返回主菜单吗？",
+      "confirm_exit_game_text": "要退出游戏吗？"
+    },
+    "common": {
+      "confirm_exit_title": "确认退出",
+      "continue": "继续",
+      "exit": "退出",
+      "main_menu": "主菜单",
+      "restart": "重新开始",
+      "menu": "菜单",
+      "back": "返回",
+      "win": "胜利",
+      "lose": "失败",
+      "tutorial": "教程",
+      "yes": "是",
+      "no": "否",
+      "confirm_main_menu_text": "要返回主菜单吗？",
+      "confirm_exit_game_text": "要退出游戏吗？"
+    },
+    "main_menu": {
+      "title": "ProjectExtraction",
+      "continue": "继续",
+      "level_select": "关卡选择",
+      "confirm_new_game_text": "确定要开始新游戏吗？\n\n当前游戏进度将会丢失。",
+      "confirm_new_game_title": "新游戏"
+    },
+    "result": {
+      "game_won": {
+        "title": "你赢了！"
+      },
+      "level_won": {
+        "title": "关卡完成！"
+      },
+      "level_lost": {
+        "title": "你失败了..."
+      }
+    },
+    "end_credits": {
+      "thanks": "感谢游玩！"
+    },
+    "input": {
+      "action": "操作",
+      "binding": "绑定",
+      "action_move": "移动",
+      "action_aim": "瞄准",
+      "action_fire": "开火",
+      "action_aim_hold": "瞄准 / ADS",
+      "action_sprint": "冲刺",
+      "action_pause": "暂停",
+      "rebind": "重新绑定",
+      "clear": "清除",
+      "reset_defaults": "恢复默认",
+      "select_action_rebind": "请选择要重新绑定的操作。",
+      "unbound": "（未绑定）",
+      "press_for_action": "请为“{0}”按下按键/按钮/摇杆轴...",
+      "cleared": "绑定已清除。",
+      "restored_defaults": "已恢复默认设置。",
+      "rebind_cancelled": "已取消重新绑定。",
+      "bound_action": "已绑定“{0}”。",
+      "mouse_sensitivity": "鼠标灵敏度：",
+      "joypad_sensitivity": "手柄灵敏度："
+    },
+    "audio": {
+      "input_device": "输入设备："
+    },
+    "options": {
+      "reset_game": {
+        "label": "重置游戏：",
+        "confirm_label": "确认重置：",
+        "reset": "重置"
+      }
+    },
+    "level": {
+      "1": {
+        "title": "示例关卡 #1"
+      },
+      "2": {
+        "title": "示例关卡 #2"
+      },
+      "3": {
+        "title": "示例关卡 #3"
+      },
+      "change_color_label": "更改关卡颜色：",
+      "change_color_button": "更改颜色"
+    },
+    "tutorial": {
+      "1": {
+        "body": "点击“胜利”按钮以推进进度。\n点击“失败”按钮以重试。"
+      },
+      "2": {
+        "body": "进度会被保存。\n在主菜单点击“继续”将从最近检查点加载。"
+      },
+      "3": {
+        "body": "右下角的颜色选择器会更新关卡状态，该变化会持续到游戏被重置。\n\n底部中间的标签会显示当前检测到的输入操作（如果项目已设置）。"
+      }
+    },
+    "level_select": {
+      "default_item": "1 - 示例关卡",
+      "level_1": "关卡 1",
+      "level_2": "关卡 2",
+      "level_3": "关卡 3"
+    }
+  }
+}

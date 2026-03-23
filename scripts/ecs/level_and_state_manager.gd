@@ -17,3 +17,8 @@ func get_checkpoint_level_path() -> String:
 	if not state_level_path.is_empty():
 		return state_level_path
 	return super.get_checkpoint_level_path()
+
+
+func _ready() -> void:
+	AudioRegistryBootstrap.register_gameplay_audio()
+	super._ready()

@@ -39,7 +39,7 @@ grow_horizontal = 2
 grow_vertical = 2
 auto_height = true
 item_count = 1
-item_0/text = "1 - ExampleLevel"
+item_0/text = "ui.level_select.default_item"
 
 [node name="SceneLister" type="Node" parent="." unique_id=649336979]
 script = ExtResource("3_le4jx")
