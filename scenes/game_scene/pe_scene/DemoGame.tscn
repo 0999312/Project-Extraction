@@ -7,12 +7,6 @@
 [ext_resource type="Script" uid="uid://8umksf8e80fw" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="8_aity4"]
 [ext_resource type="Script" uid="uid://cyh0d64pfygbl" path="res://addons/maaacks_game_template/base/nodes/utilities/pause_menu_controller.gd" id="9_pause_controller"]
 [ext_resource type="PackedScene" uid="uid://wm2nmhcpk5qp" path="res://scenes/windows/pause_menu_layer.tscn" id="10_pause_menu"]
-<<<<<<< HEAD
-[ext_resource type="PackedScene" uid="uid://bp1q68xcoo0hf" path="res://scenes/entities/e_human_enemy.tscn" id="11_human_enemy"]
-[ext_resource type="PackedScene" path="res://scenes/entities/e_non_human_enemy.tscn" id="12_non_human_enemy"]
-
-=======
->>>>>>> c175bcb28388fed13f54be655f1df4bea90ecdfa
 [sub_resource type="Resource" id="Resource_d2c0u"]
 script = ExtResource("8_aity4")
 
@@ -35,17 +29,10 @@ tile_set = ExtResource("1_ateyy")
 [node name="PlayerSpawn" type="Marker2D" parent="." unique_id=1200860737]
 position = Vector2(374, 377)
 
-<<<<<<< HEAD
-[node name="HumanEnemyBody" parent="." unique_id=773050874 instance=ExtResource("11_human_enemy")]
-position = Vector2(577, 378)
-
-[node name="NonHumanEnemyBody" parent="." unique_id=557482440 instance=ExtResource("12_non_human_enemy")]
-=======
 [node name="HumanEnemySpawn" type="Marker2D" parent="."]
 position = Vector2(577, 378)
 
 [node name="NonHumanEnemySpawn" type="Marker2D" parent="."]
->>>>>>> c175bcb28388fed13f54be655f1df4bea90ecdfa
 position = Vector2(705, 377)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1276063257]
