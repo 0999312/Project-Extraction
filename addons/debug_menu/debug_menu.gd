@@ -32,6 +32,7 @@ const GRAPH_MIN_FPS = 10
 const GRAPH_MAX_FPS = 160
 const GRAPH_MIN_FRAMETIME = 1.0 / GRAPH_MIN_FPS
 const GRAPH_MAX_FRAMETIME = 1.0 / GRAPH_MAX_FPS
+const GROUP_COUNT_REFRESH_INTERVAL := 0.25
 
 ## Debug menu display style.
 enum Style {
@@ -78,6 +79,9 @@ var frametime_cpu_avg := GRAPH_MAX_FRAMETIME
 var frametime_gpu_avg := GRAPH_MIN_FRAMETIME
 var frames_per_second := float(GRAPH_MIN_FPS)
 var frame_time_gradient := Gradient.new()
+var _group_count_refresh_remaining := 0.0
+var _cached_actor_count := 0
+var _cached_projectile_count := 0
 
 func _init() -> void:
 	# This must be done here instead of `_ready()` to avoid having `visibility_changed` be emitted immediately.
@@ -349,8 +353,14 @@ func _gpu_graph_draw() -> void:
 	gpu_graph.draw_polyline(gpu_polyline, frame_time_gradient.sample(remap(1000.0 / frametime_gpu_avg, GRAPH_MIN_FPS, GRAPH_MAX_FPS, 0.0, 1.0)), 1.0)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if visible:
+		_group_count_refresh_remaining -= delta
+		if _group_count_refresh_remaining <= 0.0:
+			_cached_actor_count = get_tree().get_nodes_in_group("actors").size()
+			_cached_projectile_count = get_tree().get_nodes_in_group("projectiles").size()
+			_group_count_refresh_remaining = GROUP_COUNT_REFRESH_INTERVAL
+
 		fps_graph.queue_redraw()
 		total_graph.queue_redraw()
 		cpu_graph.queue_redraw()
@@ -430,9 +440,7 @@ func _process(_delta: float) -> void:
 		var frame_time_color := frame_time_gradient.sample(remap(frames_per_second, GRAPH_MIN_FPS, GRAPH_MAX_FPS, 0.0, 1.0))
 		fps.modulate = frame_time_color
 
-		var actor_count := get_tree().get_nodes_in_group("actors").size()
-		var projectile_count := get_tree().get_nodes_in_group("projectiles").size()
-		num_entities.text = "Actors: %d | Projectiles: %d" % [actor_count, projectile_count]
+		num_entities.text = "Actors: %d | Projectiles: %d" % [_cached_actor_count, _cached_projectile_count]
 
 		frame_time.text = str(frametime).pad_decimals(2) + " mspf"
 		frame_time.modulate = frame_time_color
