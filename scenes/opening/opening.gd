@@ -21,6 +21,8 @@ const SUPPORTED_LANGUAGES := ["en", "zh"]
 func _ready() -> void:
 	_init_localization()
 	AudioCatalog.ensure_registry_and_register(AudioCatalog.STARTUP_AUDIO_GROUPS)
+	_configure_ui_audio()
+	AudioCatalog.play_registered_music("music", "main_menu.mp3")
 	super._ready()
 
 
@@ -63,5 +65,21 @@ func _normalize_language(language_code: String) -> String:
 	if normalized in SUPPORTED_LANGUAGES:
 		return normalized
 	return DEFAULT_LANGUAGE
+
+
+func _configure_ui_audio() -> void:
+	if ProjectUISoundController == null:
+		return
+	for child in ProjectUISoundController.get_children():
+		if child is AudioStreamPlayer:
+			child.queue_free()
+	ProjectUISoundController.button_focused = AudioCatalog.get_registered_stream("ui", "select.mp3")
+	ProjectUISoundController.button_pressed = AudioCatalog.get_registered_stream("ui", "click.mp3")
+	ProjectUISoundController.tab_selected = AudioCatalog.get_registered_stream("ui", "select.mp3")
+	ProjectUISoundController.tab_changed = AudioCatalog.get_registered_stream("ui", "select.mp3")
+	if ProjectUISoundController.has_method("_build_all_stream_players"):
+		ProjectUISoundController._build_all_stream_players()
+	if ProjectUISoundController.has_method("_recursive_connect_ui_sounds"):
+		ProjectUISoundController._recursive_connect_ui_sounds(ProjectUISoundController.root_node)
 
 #endregion Localization

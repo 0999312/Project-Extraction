@@ -92,6 +92,8 @@ enum FireMode {
 @export var projectile_penetration: float = 0.0
 ## Projectile life upper bound (seconds).
 @export var projectile_lifetime: float = 2.0
+## Projectile sprite path used by spawned projectiles for collision sizing.
+@export_file("*.png", "*.webp", "*.jpg", "*.jpeg") var projectile_sprite_path: String = "res://assets/game/textures/projectiles/bullet.png"
 ## Aim camera offset distance while ADS.
 @export var ads_distance: float = 170.0
 ## Number of projectiles emitted per single shot.

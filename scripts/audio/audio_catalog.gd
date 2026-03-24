@@ -8,6 +8,7 @@ extends RefCounted
 const REGISTRY_TYPE := "audio"
 const REGISTRY_NAMESPACE := "game"
 const SUPPORTED_AUDIO_EXTENSIONS := [".ogg", ".wav", ".mp3"]
+const DEFAULT_MUSIC_CROSSFADE := 0.35
 
 const STARTUP_AUDIO_GROUPS := [
 	{
@@ -65,25 +66,73 @@ static func ensure_registry_and_register(audio_groups: Array) -> void:
 		RegistryManager.register_registry(REGISTRY_TYPE, AudioRegistry.new())
 	var registry := _get_audio_registry()
 	if registry == null:
+		push_error("[AudioCatalog] Unable to resolve audio registry during startup registration.")
 		return
 	for audio_group in audio_groups:
 		_register_entry(registry, audio_group)
+	_debug_print_registry_contents(registry, "startup")
 
 
 ## Registers the gameplay audio groups (convenience wrapper).
 static func register_gameplay_audio() -> void:
+	if not RegistryManager.has_registry(REGISTRY_TYPE):
+		RegistryManager.register_registry(REGISTRY_TYPE, AudioRegistry.new())
 	var registry := _get_audio_registry()
 	if registry == null:
+		push_error("[AudioCatalog] Unable to resolve audio registry during gameplay registration.")
 		return
 	for audio_group in GAMEPLAY_AUDIO_GROUPS:
 		_register_entry(registry, audio_group)
+	_debug_print_registry_contents(registry, "game_load")
 
 
 static func _get_audio_registry() -> AudioRegistry:
+	if not RegistryManager.has_registry(REGISTRY_TYPE):
+		return null
 	var registry := RegistryManager.get_registry(REGISTRY_TYPE)
 	if registry is AudioRegistry:
 		return registry
 	return null
+
+
+static func get_registered_stream(category: String, preferred_file_name: String = "") -> AudioStream:
+	var registry := _get_audio_registry()
+	if registry == null:
+		return null
+	var key := "%s:audio/%s" % [REGISTRY_NAMESPACE, category]
+	var entry: Variant = registry.get_all_entries().get(key, null)
+	if not (entry is Dictionary):
+		return null
+	var streams: Array = entry.get("streams", [])
+	if streams.is_empty():
+		return null
+	if not preferred_file_name.is_empty():
+		for stream_entry_variant in streams:
+			if not (stream_entry_variant is Dictionary):
+				continue
+			var stream_entry: Dictionary = stream_entry_variant
+			if str(stream_entry.get("file_name", "")) != preferred_file_name:
+				continue
+			var stream: Variant = stream_entry.get("stream", null)
+			if stream is AudioStream:
+				return stream
+	for stream_entry_variant in streams:
+		if not (stream_entry_variant is Dictionary):
+			continue
+		var stream_entry: Dictionary = stream_entry_variant
+		var stream: Variant = stream_entry.get("stream", null)
+		if stream is AudioStream:
+			return stream
+	return null
+
+
+static func play_registered_music(category: String, preferred_file_name: String = "", crossfade: float = DEFAULT_MUSIC_CROSSFADE) -> void:
+	var stream := get_registered_stream(category, preferred_file_name)
+	if stream == null:
+		return
+	if SoundManager.is_music_playing(stream):
+		return
+	SoundManager.play_music(stream, crossfade)
 
 
 static func _register_entry(registry: AudioRegistry, audio_group: Dictionary) -> void:
@@ -100,6 +149,30 @@ static func _register_entry(registry: AudioRegistry, audio_group: Dictionary) ->
 		"files": file_names.duplicate(),
 		"streams": stream_entries,
 	})
+
+
+static func _debug_print_registry_contents(registry: AudioRegistry, phase: String) -> void:
+	var entries := registry.get_all_entries()
+	print("[DEBUG][AudioCatalog] Registry loaded for phase=%s, entries=%d" % [phase, entries.size()])
+	for key_variant in entries.keys():
+		var key := str(key_variant)
+		var entry_variant: Variant = entries[key]
+		if not (entry_variant is Dictionary):
+			print("[DEBUG][AudioCatalog] key=%s entry=%s" % [key, str(entry_variant)])
+			continue
+		var entry: Dictionary = entry_variant
+		var stream_paths: Array[String] = []
+		for stream_variant in entry.get("streams", []):
+			if stream_variant is Dictionary:
+				stream_paths.append(str(stream_variant.get("path", "")))
+		var entry_summary := {
+			"category": str(entry.get("category", "")),
+			"load_phase": str(entry.get("load_phase", "")),
+			"path": str(entry.get("path", "")),
+			"files": entry.get("files", []),
+			"stream_paths": stream_paths,
+		}
+		print("[DEBUG][AudioCatalog] key=%s entry=%s" % [key, str(entry_summary)])
 
 
 static func _load_streams_from_files(folder_path: String, file_names: Array) -> Array:
