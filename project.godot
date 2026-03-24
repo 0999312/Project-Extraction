@@ -33,6 +33,7 @@ SoundManager="*uid://c8sghfd0v8moa"
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
+mouse_cursor/custom_image="uid://dqqov3ytavd46"
 
 [dotnet]
 
