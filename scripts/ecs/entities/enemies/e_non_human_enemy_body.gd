@@ -1,143 +1,111 @@
-## NonHumanEnemyBody  (e_non_human_enemy_body.gd)
-##
-## [CharacterBody2D] physics shell for non-human enemy entities.
-##
-## Non-human enemies do NOT use separate hand/weapon pivots. Instead, the
-## entire body rotates to face the target, giving them an alien or creature-
-## like "whole-body aiming" feel. The rotation angle is read from the ECS
-## entity's [C_AimState] component, which AISystem writes each frame.
-##
-## [b]Bridge pattern:[/b]
-## Gameplay state lives in the child [NonHumanEnemy] ECS entity.
-##
-##   Node (NonHumanEnemyBody CharacterBody2D)  ECS Entity (NonHumanEnemy child)
-##   ────────────────────────────────────────  ─────────────────────────────────
-##   move_and_slide()                          C_Health, C_StatusEffects
-##   Full-body rotation toward target          C_Position (synced from Node)
-##   CollisionShape2D hitbox                   C_Velocity, C_Faction
-##   Sprite2D body visual (rotates with self)  C_AIState, C_AimState, C_CombatState
-##
-## [b]Scene structure (expected):[/b]
-## [codeblock]
-## ┌─ NonHumanEnemyBody  (CharacterBody2D root, this script)
-## │   ├─ CollisionShape2D    ← circle / capsule hitbox
-## │   └─ BodySprite          ← Sprite2D; rotates with the parent body
-## [/codeblock]
-##
-## The [member NonHumanEnemy.variant] property on the ECS entity child
-## selects the archetype (SWARMER, CHARGER, DRONE, BLOB).
 class_name NonHumanEnemyBody
 extends BiologicalBodyBase
 
+enum EnemyVariant {
+	SWARMER,
+	CHARGER,
+	DRONE,
+	BLOB,
+}
 
-#region Constants
-
-## Minimum squared vector length before treating a direction as valid.
-## Matches [constant HumanBase.AIM_EPSILON] for consistency.
 const AIM_EPSILON: float = 0.0001
 
-#endregion Constants
+@export var variant: EnemyVariant = EnemyVariant.SWARMER
 
-
-#region Exports
-
-## Variant to assign to the [NonHumanEnemy] ECS entity at spawn time.
-## Must match [enum NonHumanEnemy.EnemyVariant].
-@export var variant: NonHumanEnemy.EnemyVariant = NonHumanEnemy.EnemyVariant.SWARMER
-
-#endregion Exports
-
-
-#region Private Variables
-
-## Child [NonHumanEnemy] ECS entity holding all authoritative gameplay state.
-## Registered with the GECS World during [method _ready].
-var _ecs_entity: NonHumanEnemy = null
-
-#endregion Private Variables
-
-
-#region Godot Lifecycle
+var _target_actor: Player = null
 
 func _ready() -> void:
-	_setup_ecs_entity()
+	_setup_runtime_state()
+	super._ready()
+	add_to_group("enemies")
+	add_to_group("non_human_enemies")
 
-
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	if not is_alive():
+		return
+	_update_simple_ai(delta)
 	_update_body_rotation()
-	_apply_ecs_movement()
+	_apply_runtime_movement()
+	sync_runtime_position()
 
-#endregion Godot Lifecycle
+func _setup_runtime_state() -> void:
+	match variant:
+		EnemyVariant.SWARMER:
+			health = C_Health.new(25.0)
+			velocity_state = C_Velocity.new(280.0, 1200.0, 800.0)
+			ai_state = C_AIState.new(350.0, 60.0)
+		EnemyVariant.CHARGER:
+			health = C_Health.new(200.0)
+			velocity_state = C_Velocity.new(180.0, 400.0, 300.0)
+			ai_state = C_AIState.new(250.0, 80.0)
+		EnemyVariant.DRONE:
+			health = C_Health.new(50.0)
+			velocity_state = C_Velocity.new(240.0, 700.0, 500.0)
+			ai_state = C_AIState.new(450.0, 300.0)
+		EnemyVariant.BLOB:
+			health = C_Health.new(150.0)
+			velocity_state = C_Velocity.new(80.0, 200.0, 150.0)
+			ai_state = C_AIState.new(200.0, 100.0)
+	status_effects = C_StatusEffects.new()
+	position_state = C_Position.new(global_position)
+	combat_state = C_CombatState.new()
+	faction_state = C_Faction.new(C_Faction.FactionType.NON_HUMAN_ENEMY)
+	aim_state = C_AimState.new()
+	combat_state.equipped_weapon_id = "game:item/weapon/creature"
+	combat_state.ammo_max = 6
+	combat_state.ammo_current = 6
+	combat_state.projectile_speed = 720.0
+	combat_state.projectile_max_distance = 900.0
+	combat_state.attack_damage = 12.0
 
+func set_target_actor(actor: Player) -> void:
+	_target_actor = actor
 
-#region ECS Bridge Setup
+func _update_simple_ai(delta: float) -> void:
+	var player := _resolve_target_actor()
+	combat_state.wants_reload = false
+	combat_state.wants_fire_mode_toggle = false
+	if player == null or not player.is_alive():
+		velocity_state.velocity = Vector2.ZERO
+		combat_state.wants_fire = false
+		combat_state.is_aiming = false
+		ai_state.behavior = C_AIState.AIBehavior.IDLE
+		return
+	var to_target := player.global_position - global_position
+	if to_target.length_squared() > AIM_EPSILON:
+		aim_state.aim_direction = to_target.normalized()
+	ai_state.last_known_target_position = player.global_position
+	ai_state.state_timer += delta
+	var distance := to_target.length()
+	if distance <= ai_state.attack_radius:
+		ai_state.behavior = C_AIState.AIBehavior.ATTACK
+		velocity_state.velocity = Vector2.ZERO
+		combat_state.is_aiming = true
+		combat_state.wants_fire = variant == EnemyVariant.DRONE
+	elif distance <= ai_state.detection_radius:
+		ai_state.behavior = C_AIState.AIBehavior.CHASE
+		velocity_state.velocity = to_target.normalized() * velocity_state.max_speed
+		combat_state.is_aiming = variant == EnemyVariant.DRONE
+		combat_state.wants_fire = false
+	else:
+		ai_state.behavior = C_AIState.AIBehavior.IDLE
+		velocity_state.velocity = Vector2.ZERO
+		combat_state.is_aiming = false
+		combat_state.wants_fire = false
 
-## Creates and registers the child [NonHumanEnemy] ECS entity, applying the
-## [member variant] selected in the Inspector. Called once from [method _ready].
-func _setup_ecs_entity() -> void:
-	_ecs_entity = NonHumanEnemy.new()
-	_ecs_entity.variant = variant
-	_ecs_entity.name = "NonHumanEnemyECSState"
-	add_child(_ecs_entity)
-
-	# Sync starting position into the ECS component.
-	var pos_comp: C_Position = _ecs_entity.get_component(C_Position)
-	if pos_comp:
-		pos_comp.world_position = global_position
-
-	register_ecs_entity(_ecs_entity)
-
-#endregion ECS Bridge Setup
-
-
-#region Body Rotation (Aim)
-
-## Rotates the entire body ([code]self.rotation[/code]) to face the direction
-## stored in [C_AimState.aim_direction].
-##
-## AISystem writes [C_AimState.aim_direction] toward the target entity
-## whenever the enemy is in CHASE or ATTACK state, and toward the patrol
-## direction or last-known-position vector otherwise.
 func _update_body_rotation() -> void:
-	if _ecs_entity == null:
-		return
-	var aim: C_AimState = _ecs_entity.get_component(C_AimState)
-	if aim != null and aim.aim_direction.length_squared() > AIM_EPSILON:
-		rotation = aim.aim_direction.angle()
+	if aim_state != null and aim_state.aim_direction.length_squared() > AIM_EPSILON:
+		rotation = aim_state.aim_direction.angle()
 
-#endregion Body Rotation
-
-
-#region Physics Movement
-
-## Reads [C_Velocity] from the ECS entity and drives [method CharacterBody2D.move_and_slide].
-## Syncs the resulting position back into [C_Position].
-func _apply_ecs_movement() -> void:
-	if _ecs_entity == null:
-		return
-	var vel_comp: C_Velocity = _ecs_entity.get_component(C_Velocity)
-	if vel_comp:
-		velocity = vel_comp.velocity
+func _apply_runtime_movement() -> void:
+	if velocity_state != null:
+		velocity = velocity_state.velocity
 	move_and_slide()
-	# Write the updated physics position back to the ECS component.
-	var pos_comp: C_Position = _ecs_entity.get_component(C_Position)
-	if pos_comp:
-		pos_comp.world_position = global_position
 
-#endregion Physics Movement
-
-
-#region Public API
-
-## Returns the child [NonHumanEnemy] ECS entity holding gameplay state.
-func get_ecs_entity() -> NonHumanEnemy:
-	return _ecs_entity
-
-
-## Returns [code]true[/code] if the enemy's HP > 0.
-func is_alive() -> bool:
-	if _ecs_entity == null:
-		return false
-	return _ecs_entity.is_alive()
-
-#endregion Public API
+func _resolve_target_actor() -> Player:
+	if is_instance_valid(_target_actor):
+		return _target_actor
+	var found := get_tree().get_first_node_in_group("player")
+	if found is Player:
+		_target_actor = found
+	return _target_actor

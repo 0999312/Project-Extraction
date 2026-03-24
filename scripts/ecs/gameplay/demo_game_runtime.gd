@@ -1,65 +1,63 @@
 extends Node2D
 
-@onready var _world: World = $World
-@onready var _combat_fire_system: S_CombatFireSystem = $World/Systems/CombatFireSystem
-@onready var _projectile_motion_system: S_ProjectileMotionSystem = $World/Systems/ProjectileMotionSystem
 @onready var _pause_menu_controller: Node = $PauseMenuController
 @onready var _player: Player = $Player
 @onready var _phantom_camera_2d = $PhantomCamera2D
+@onready var _human_enemy: HumanEnemyBody = $HumanEnemyBody
+@onready var _non_human_enemy: NonHumanEnemyBody = $NonHumanEnemyBody
 
-var _systems_registered: bool = false
+var _combat_fire_system := S_CombatFireSystem.new()
+var _projectile_motion_system := S_ProjectileMotionSystem.new()
+var _projectiles: Node2D = null
 var _pause_pressed_last_frame: bool = false
+
 const GUIDE_ACTION_PAUSE := &"pe_pause"
 const AIM_CAMERA_LERP_SPEED := 9.0
 
-
 func _ready() -> void:
-	ECS.world = _world
-	_register_systems_when_world_ready()
-	# Ensure DemoGame processes after children (Player) so input is polled
-	# before ECS systems consume it.
+	_projectiles = get_node_or_null("Projectiles")
+	if _projectiles == null:
+		_projectiles = Node2D.new()
+		_projectiles.name = "Projectiles"
+		add_child(_projectiles)
+	_combat_fire_system.setup()
 	process_physics_priority = 100
-	print("[DEBUG][DemoGame] _ready | world=%s systems_registered=%s" % [_world.name, _systems_registered])
-
+	_assign_enemy_targets()
+	print("[DEBUG][DemoGame] _ready | actors=%d" % _get_runtime_actors().size())
 
 func _physics_process(delta: float) -> void:
-	_register_systems_when_world_ready()
+	_assign_enemy_targets()
 	_poll_pause_input()
+	_combat_fire_system.process(_get_runtime_actors(), _projectiles, delta)
+	_projectile_motion_system.process(_projectiles, _get_runtime_actors(), delta)
 	_update_aim_camera_offset(delta)
-	if ECS.world != null:
-		ECS.process(delta)
 
+func _get_runtime_actors() -> Array:
+	var actors: Array = []
+	for node in get_tree().get_nodes_in_group("actors"):
+		if node is BiologicalBodyBase:
+			actors.append(node)
+	return actors
 
-func _register_systems_when_world_ready() -> void:
-	if _systems_registered:
-		return
-	if ECS.world == null:
-		return
-	if not ECS.world.systems.has(_combat_fire_system):
-		ECS.world.add_system(_combat_fire_system)
-	if not ECS.world.systems.has(_projectile_motion_system):
-		ECS.world.add_system(_projectile_motion_system)
-	_systems_registered = ECS.world.systems.has(_combat_fire_system) and ECS.world.systems.has(_projectile_motion_system)
-
+func _assign_enemy_targets() -> void:
+	if _human_enemy != null:
+		_human_enemy.set_target_actor(_player)
+	if _non_human_enemy != null:
+		_non_human_enemy.set_target_actor(_player)
 
 func _poll_pause_input() -> void:
 	var action: GUIDEAction = GuideInputRuntime.get_action(GUIDE_ACTION_PAUSE)
 	if action == null:
 		return
 	var is_triggered := action.is_triggered()
-	if is_triggered and not _pause_pressed_last_frame:
-		if _pause_menu_controller != null:
-			_pause_menu_controller.pause()
+	if is_triggered and not _pause_pressed_last_frame and _pause_menu_controller != null:
+		_pause_menu_controller.pause()
 	_pause_pressed_last_frame = is_triggered
-
 
 func _update_aim_camera_offset(delta: float) -> void:
 	if _player == null or _phantom_camera_2d == null:
 		return
-	var ecs_entity := _player.get_ecs_entity()
-	if ecs_entity == null:
-		return
-	var combat: C_CombatState = ecs_entity.get_component(C_CombatState)
+	var combat: C_CombatState = _player.get_combat_state()
 	if combat == null:
 		return
 	var target_offset := Vector2.ZERO

@@ -1,31 +1,28 @@
 class_name S_ProjectileMotionSystem
-extends System
+extends RefCounted
 
 const PROJECTILE_RADIUS_SCALE := 0.75
 
-func query() -> QueryBuilder:
-	return q.with_all([C_ProjectileData, C_Position]).iterate([C_ProjectileData, C_Position])
-
-
-func process(entities: Array[Entity], components: Array, delta: float) -> void:
-	var projectiles: Array = components[0]
-	var positions: Array = components[1]
-	var candidate_entities := _get_collision_candidates()
-	for i in entities.size():
-		var entity := entities[i]
-		var proj: C_ProjectileData = projectiles[i]
-		var pos: C_Position = positions[i]
-		var previous_position := pos.world_position
+func process(projectile_parent: Node, actors: Array, delta: float) -> void:
+	if projectile_parent == null:
+		return
+	for projectile_variant in projectile_parent.get_children():
+		if not (projectile_variant is BaseProjectile):
+			continue
+		var projectile: BaseProjectile = projectile_variant
+		var proj: C_ProjectileData = projectile.projectile_data
+		if proj == null:
+			projectile.queue_free()
+			continue
+		var previous_position := projectile.global_position
 		proj.age += delta
 		var step := proj.velocity * delta
 		var travelled := step.length()
-		pos.world_position += step
-		var hit_target := _find_hit_target(entity, proj, pos.world_position, previous_position, candidate_entities)
+		projectile.global_position += step
+		var hit_target := _find_hit_target(projectile, projectile.global_position, previous_position, actors)
 		if hit_target != null:
 			proj.has_hit = true
-			if entity is BaseProjectile:
-				entity.on_hit(hit_target, pos.world_position)
-			cmd.remove_entity(entity)
+			projectile.on_hit(hit_target, projectile.global_position)
 			continue
 		proj.remaining_distance = maxf(0.0, proj.remaining_distance - travelled)
 		var travel_ratio := 0.0
@@ -36,39 +33,24 @@ func process(entities: Array[Entity], components: Array, delta: float) -> void:
 		if proj.velocity.length_squared() > 0.0:
 			proj.velocity = proj.velocity.normalized() * speed
 		if proj.age >= proj.lifetime or proj.remaining_distance <= 0.0:
-			if entity is BaseProjectile:
-				entity.on_expire()
-			cmd.remove_entity(entity)
+			projectile.on_expire()
 
-
-func _get_collision_candidates() -> Array[Entity]:
-	if ECS.world == null:
-		return []
-	var query := ECS.world.query.with_all([C_Position, C_Health, C_Faction]).enabled()
-	return query.execute()
-
-
-func _find_hit_target(projectile_entity: Entity, projectile_data: C_ProjectileData, current_position: Vector2, previous_position: Vector2, candidate_entities: Array[Entity]) -> Entity:
-	var owner_id := projectile_data.owner_entity_id
-	var radius := maxf(1.0, projectile_data.collision_radius * PROJECTILE_RADIUS_SCALE)
-	for candidate in candidate_entities:
-		if candidate == null or candidate == projectile_entity:
+func _find_hit_target(projectile: BaseProjectile, current_position: Vector2, previous_position: Vector2, actors: Array) -> BiologicalBodyBase:
+	var owner_id := projectile.owner_actor_id
+	var radius := maxf(1.0, projectile.projectile_data.collision_radius * PROJECTILE_RADIUS_SCALE)
+	for actor_variant in actors:
+		if not (actor_variant is BiologicalBodyBase):
 			continue
-		if not (candidate is BaseEntity):
+		var actor: BiologicalBodyBase = actor_variant
+		if not actor.is_alive():
 			continue
-		if not candidate.is_alive():
+		if owner_id == actor.get_actor_id():
 			continue
-		if not owner_id.is_empty() and candidate.id == owner_id:
+		if not projectile.is_hostile_to(actor):
 			continue
-		if projectile_entity is BaseProjectile and not (projectile_entity as BaseProjectile).is_hostile_to(candidate):
-			continue
-		var candidate_position: C_Position = candidate.get_component(C_Position)
-		if candidate_position == null:
-			continue
-		if _segment_distance_to_point_squared(previous_position, current_position, candidate_position.world_position) <= radius * radius:
-			return candidate
+		if _segment_distance_to_point_squared(previous_position, current_position, actor.global_position) <= radius * radius:
+			return actor
 	return null
-
 
 func _segment_distance_to_point_squared(a: Vector2, b: Vector2, point: Vector2) -> float:
 	var segment := b - a

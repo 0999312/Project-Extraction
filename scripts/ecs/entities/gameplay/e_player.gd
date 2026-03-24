@@ -1,42 +1,9 @@
-## Player  (e_player.gd)
-##
-## The Player's scene-tree body: a [CharacterBody2D] that handles physics
-## movement, collision, and animation (GDD §6.1, Tech Stack §5.1).
-##
-## Extends [HumanBase] to inherit the AimPivot rig (left/right hands + weapon
-## 360° rotation). Overrides [method HumanBase._get_aim_direction] to use the
-## current mouse cursor position as the aim point.
-##
-## [b]GECS Best Practice — Hybrid Node + ECS Bridge:[/b]
-## Gameplay state (HP, stamina, status effects, inventory, combat) lives in a
-## child [BaseEntity] node called [code]_ecs_entity[/code]. This pattern keeps
-## physics fast and ECS logic scalable:
-##
-##   Node (CharacterBody2D)        ECS Entity (BaseEntity child)
-##   ─────────────────────         ─────────────────────────────
-##   move_and_slide()              C_Health, C_Stamina
-##   animation player              C_StatusEffects
-##   camera shake events           C_CombatState, C_InventoryRef
-##   InputBridge writes            C_Position (synced from Node)
-##   move_input / aim_dir          C_Velocity, C_Faction, C_AimState
-##
-## Input is written by the InputBridge autoload (G.U.I.D.E → EventBus),
-## not read directly from [Input], keeping the simulation command-driven.
-##
-## [b]Component data is modified directly[/b] — no logic methods on components.
 class_name Player
 extends HumanBase
 
-
-#region Constants
-
-## Base walking speed in pixels per second (no modifiers applied).
 const BASE_SPEED: float = 200.0
-## Sprint speed in pixels per second (before encumbrance / status modifiers).
 const BASE_SPRINT_SPEED: float = 320.0
-## Stamina consumed per second while sprinting.
 const STAMINA_SPRINT_COST_PER_SEC: float = 15.0
-## Minimum squared move input length to count as intentional movement.
 const MOVE_INPUT_EPSILON: float = 0.01
 const GUIDE_ACTION_MOVE := &"pe_move"
 const GUIDE_ACTION_AIM_AXIS := &"pe_aim_axis"
@@ -46,235 +13,126 @@ const GUIDE_ACTION_RELOAD := &"pe_reload"
 const GUIDE_ACTION_FIRE_MODE_TOGGLE := &"pe_fire_mode_toggle"
 const GUIDE_ACTION_SPRINT := &"pe_sprint"
 
-#endregion Constants
-
-
-#region Public Variables
-
-## Movement intent written each frame by InputBridge. Should be normalised or zero.
 var move_input: Vector2 = Vector2.ZERO
-
-## World-space aiming direction (from centre of body).
-## Written by InputBridge from mouse position or right-stick input.
 var aim_direction: Vector2 = Vector2.RIGHT
-
-## [code]true[/code] while the sprint input is held and stamina allows it.
 var is_sprinting: bool = false
 
-#endregion Public Variables
-
-
-#region Private Variables
-
-## Child [BaseEntity] that holds all authoritative gameplay state components.
-## Registered with the GECS World during [method _ready].
-var _ecs_entity: BaseEntity = null
 var _using_gamepad_aim: bool = false
 var _reload_pressed_last_frame: bool = false
 var _fire_mode_pressed_last_frame: bool = false
 
-#endregion Private Variables
-
-
-#region Godot Lifecycle
-
 func _ready() -> void:
+	_setup_runtime_state()
+	super._ready()
 	add_to_group("player")
 	GuideInputRuntime.ensure_initialized()
 	GUIDE.enable_mapping_context(GuideInputRuntime.get_context())
-	_setup_ecs_entity()
 	print("[DEBUG][Player] _ready | group=player GUIDE_context_enabled")
 
-
-## Updates the aim pivot (via [HumanBase]), handles sprint stamina, applies
-## physics movement, and syncs state back to ECS.
 func _physics_process(delta: float) -> void:
-	super(delta)  # HumanBase: rotates _aim_pivot to face mouse cursor
+	super(delta)
+	if not is_alive():
+		return
 	_poll_guide_input()
 	_handle_sprint_stamina(delta)
-	_sync_input_to_ecs()
+	_sync_input_to_runtime()
 	_apply_movement()
-	_sync_position_to_ecs()
+	_sync_runtime_position()
 
-#endregion Godot Lifecycle
+func _setup_runtime_state() -> void:
+	health = C_Health.new(100.0)
+	stamina_state = C_Stamina.new(100.0, 10.0)
+	status_effects = C_StatusEffects.new()
+	position_state = C_Position.new(global_position)
+	velocity_state = C_Velocity.new(BASE_SPEED)
+	combat_state = C_CombatState.new()
+	inventory_ref = C_InventoryRef.new()
+	faction_state = C_Faction.new(C_Faction.FactionType.PLAYER)
+	aim_state = C_AimState.new()
+	combat_state.equipped_weapon_id = "game:item/weapon/pistol"
+	combat_state.ammo_max = 15
+	combat_state.ammo_current = 15
 
-
-#region ECS Bridge Setup
-
-## Creates and registers the child [BaseEntity], adding all gameplay-state
-## [Component]s using [code]_init()[/code] constructors (GECS Best Practice).
-## Called once from [method _ready].
-func _setup_ecs_entity() -> void:
-	_ecs_entity = BaseEntity.new()
-	_ecs_entity.name = "PlayerECSState"
-	add_child(_ecs_entity)
-
-	# Use _init() constructors for compact, readable component setup.
-	var pos := C_Position.new(global_position)
-
-	_ecs_entity.add_components([
-		C_Health.new(100.0),
-		C_Stamina.new(100.0, 10.0),
-		C_StatusEffects.new(),
-		pos,
-		C_Velocity.new(BASE_SPEED),
-		C_CombatState.new(),
-		C_InventoryRef.new(),
-		C_Faction.new(C_Faction.FactionType.PLAYER),
-		C_AimState.new(),  # Written each frame in _sync_position_to_ecs()
-	])
-
-	# Register with the active GECS World if one exists.
-	var combat: C_CombatState = _ecs_entity.get_component(C_CombatState)
-	if combat:
-		combat.equipped_weapon_id = "game:item/weapon/pistol"
-		combat.ammo_max = 15
-		combat.ammo_current = 15
-	register_ecs_entity(_ecs_entity)
-
-#endregion ECS Bridge Setup
-
-
-#region Aim Direction Override
-
-## Returns the direction from the Player's body centre to the mouse cursor.
-## This is fed into [HumanBase._update_aim_pivot] to rotate the arm/weapon rig.
-##
-## Falls back to [member aim_direction] if the mouse is exactly on the entity
-## (avoids a zero-length normalisation).
 func _get_aim_direction() -> Vector2:
 	if _using_gamepad_aim and aim_direction.length_squared() > AIM_EPSILON:
 		return aim_direction.normalized()
 	var to_mouse := get_global_mouse_position() - global_position
 	if to_mouse.length_squared() > AIM_EPSILON:
 		return to_mouse.normalized()
-	# Fallback: keep last known aim direction set by InputBridge.
 	return aim_direction if aim_direction != Vector2.ZERO else Vector2.RIGHT
 
-#endregion Aim Direction Override
-
-
-#region Physics & Movement
-
-## Consumes stamina while sprinting; disables sprint when exhausted.
-## Directly modifies [C_Stamina] fields — no logic methods on the component.
 func _handle_sprint_stamina(delta: float) -> void:
 	if not is_sprinting or move_input.length_squared() < MOVE_INPUT_EPSILON:
+		if stamina_state != null:
+			stamina_state.current_stamina = minf(stamina_state.max_stamina, stamina_state.current_stamina + stamina_state.regen_rate * delta)
+			stamina_state.is_exhausted = stamina_state.current_stamina < stamina_state.exhaustion_threshold
 		return
-	var stamina: C_Stamina = _ecs_entity.get_component(C_Stamina)
-	if stamina == null:
+	if stamina_state == null:
 		return
 	var cost := STAMINA_SPRINT_COST_PER_SEC * delta
-	if stamina.current_stamina < cost:
-		# Not enough stamina — cancel sprint.
+	if stamina_state.current_stamina < cost:
 		is_sprinting = false
 		return
-	# Direct field modification — SprintSystem would own this in full ECS.
-	stamina.current_stamina = maxf(0.0, stamina.current_stamina - cost)
-	if stamina.current_stamina < stamina.exhaustion_threshold:
-		stamina.is_exhausted = true
+	stamina_state.current_stamina = maxf(0.0, stamina_state.current_stamina - cost)
+	stamina_state.is_exhausted = stamina_state.current_stamina < stamina_state.exhaustion_threshold
 
-
-## Resolves the target velocity and writes it into [C_Velocity].
-func _sync_input_to_ecs() -> void:
-	if _ecs_entity == null:
-		return
-	var vel_comp: C_Velocity = _ecs_entity.get_component(C_Velocity)
-	if vel_comp:
-		vel_comp.velocity = move_input.normalized() * _get_current_speed()
-	var combat: C_CombatState = _ecs_entity.get_component(C_CombatState)
-	if combat:
-		var prev_aiming := combat.is_aiming
-		var prev_fire := combat.wants_fire
-		combat.is_aiming = _is_action_triggered(GUIDE_ACTION_AIM_HOLD)
-		combat.wants_fire = _is_action_triggered(GUIDE_ACTION_FIRE)
+func _sync_input_to_runtime() -> void:
+	if velocity_state != null:
+		velocity_state.velocity = move_input.normalized() * _get_current_speed()
+	if combat_state != null:
+		var prev_aiming := combat_state.is_aiming
+		var prev_fire := combat_state.wants_fire
+		combat_state.is_aiming = _is_action_triggered(GUIDE_ACTION_AIM_HOLD)
+		combat_state.wants_fire = _is_action_triggered(GUIDE_ACTION_FIRE)
 		var reload_pressed := _is_action_triggered(GUIDE_ACTION_RELOAD)
-		combat.wants_reload = reload_pressed and not _reload_pressed_last_frame
+		combat_state.wants_reload = reload_pressed and not _reload_pressed_last_frame
 		_reload_pressed_last_frame = reload_pressed
 		var fire_mode_pressed := _is_action_triggered(GUIDE_ACTION_FIRE_MODE_TOGGLE)
-		combat.wants_fire_mode_toggle = fire_mode_pressed and not _fire_mode_pressed_last_frame
+		combat_state.wants_fire_mode_toggle = fire_mode_pressed and not _fire_mode_pressed_last_frame
 		_fire_mode_pressed_last_frame = fire_mode_pressed
-		# DEBUG: log state changes
-		if combat.is_aiming != prev_aiming:
-			print("[DEBUG][Player] AIM %s | dir=(%.2f,%.2f)" % [
-				"ON" if combat.is_aiming else "OFF",
-				aim_direction.x, aim_direction.y])
-		if combat.wants_fire and not prev_fire:
-			print("[DEBUG][Player] FIRE pressed | aiming=%s ammo=%d/%d mode=%s" % [
-				combat.is_aiming, combat.ammo_current, combat.ammo_max,
-				C_CombatState.FireMode.keys()[combat.fire_mode]])
-		if combat.wants_reload:
-			print("[DEBUG][Player] RELOAD requested | ammo=%d/%d" % [
-				combat.ammo_current, combat.ammo_max])
-		if combat.wants_fire_mode_toggle:
+		if combat_state.is_aiming != prev_aiming:
+			print("[DEBUG][Player] AIM %s | dir=(%.2f,%.2f)" % ["ON" if combat_state.is_aiming else "OFF", aim_direction.x, aim_direction.y])
+		if combat_state.wants_fire and not prev_fire:
+			print("[DEBUG][Player] FIRE pressed | aiming=%s ammo=%d/%d mode=%s" % [combat_state.is_aiming, combat_state.ammo_current, combat_state.ammo_max, C_CombatState.FireMode.keys()[combat_state.fire_mode]])
+		if combat_state.wants_reload:
+			print("[DEBUG][Player] RELOAD requested | ammo=%d/%d" % [combat_state.ammo_current, combat_state.ammo_max])
+		if combat_state.wants_fire_mode_toggle:
 			print("[DEBUG][Player] FIRE_MODE_TOGGLE requested")
+	if aim_state != null:
+		aim_state.aim_direction = _get_aim_direction()
 
-
-## Reads [C_Velocity.velocity] and drives [method CharacterBody2D.move_and_slide].
 func _apply_movement() -> void:
-	if _ecs_entity == null:
-		return
-	var vel_comp: C_Velocity = _ecs_entity.get_component(C_Velocity)
-	if vel_comp:
-		velocity = vel_comp.velocity
+	if velocity_state != null:
+		velocity = velocity_state.velocity
 	move_and_slide()
 
-
-## Writes the post-slide Node position and aim angle back into [C_Position]
-## and [C_AimState] so ECS systems always read an accurate world position
-## and aim direction.
-func _sync_position_to_ecs() -> void:
-	if _ecs_entity == null:
-		return
-	var pos_comp: C_Position = _ecs_entity.get_component(C_Position)
-	if pos_comp:
-		pos_comp.world_position = global_position
-		pos_comp.facing_angle = _get_aim_direction().angle()
-	# Keep C_AimState in sync so CombatSystem and observers can read it.
-	var aim_comp: C_AimState = _ecs_entity.get_component(C_AimState)
-	if aim_comp:
-		aim_comp.aim_direction = _get_aim_direction()
-
-
-## Returns the current movement speed after applying encumbrance and status
-## modifiers. Reads [Component] data fields directly — no logic methods.
 func _get_current_speed() -> float:
-	if _ecs_entity == null:
-		return BASE_SPEED
 	var selected_speed := BASE_SPRINT_SPEED if is_sprinting else BASE_SPEED
-	var inv: C_InventoryRef = _ecs_entity.get_component(C_InventoryRef)
-	var status: C_StatusEffects = _ecs_entity.get_component(C_StatusEffects)
 	var mult := 1.0
-	# Encumbrance multiplier (GDD §4.1): scales from 1.0 at 0 % to 0.5 at 100 % weight.
-	if inv and inv.max_weight > 0.0:
-		var enc_ratio := inv.current_weight / inv.max_weight
+	if inventory_ref != null and inventory_ref.max_weight > 0.0:
+		var enc_ratio := inventory_ref.current_weight / inventory_ref.max_weight
 		mult *= clampf(1.0 - enc_ratio * 0.5, 0.3, 1.0)
-	# Fracture penalty (GDD §4.1): directly read from C_StatusEffects data field.
-	if status and status.fracture:
-		mult *= status.fracture_move_speed_mult
+	if status_effects != null and status_effects.fracture:
+		mult *= status_effects.fracture_move_speed_mult
 	return selected_speed * mult
-
 
 func _poll_guide_input() -> void:
 	var prev_move := move_input
 	var prev_sprint := is_sprinting
 	move_input = _get_action_axis_2d(GUIDE_ACTION_MOVE).limit_length(1.0)
-	is_sprinting = _is_action_triggered(GUIDE_ACTION_SPRINT)
+	is_sprinting = _is_action_triggered(GUIDE_ACTION_SPRINT) and (stamina_state == null or not stamina_state.is_exhausted)
 	var stick_aim := _get_action_axis_2d(GUIDE_ACTION_AIM_AXIS)
 	_using_gamepad_aim = stick_aim.length_squared() > AIM_EPSILON
 	if _using_gamepad_aim:
 		aim_direction = stick_aim.normalized()
-	# DEBUG: log movement and sprint changes
 	var started_move := prev_move.length_squared() < MOVE_INPUT_EPSILON and move_input.length_squared() >= MOVE_INPUT_EPSILON
 	var stopped_move := prev_move.length_squared() >= MOVE_INPUT_EPSILON and move_input.length_squared() < MOVE_INPUT_EPSILON
 	if started_move:
-		print("[DEBUG][Player] MOVE started | dir=(%.2f,%.2f) speed=%.0f" % [
-			move_input.x, move_input.y, _get_current_speed()])
+		print("[DEBUG][Player] MOVE started | dir=(%.2f,%.2f) speed=%.0f" % [move_input.x, move_input.y, _get_current_speed()])
 	elif stopped_move:
 		print("[DEBUG][Player] MOVE stopped")
 	if is_sprinting != prev_sprint:
 		print("[DEBUG][Player] SPRINT %s" % ("ON" if is_sprinting else "OFF"))
-
 
 func _get_action_axis_2d(name: StringName) -> Vector2:
 	var action: GUIDEAction = GuideInputRuntime.get_action(name)
@@ -282,39 +140,6 @@ func _get_action_axis_2d(name: StringName) -> Vector2:
 		return Vector2.ZERO
 	return action.value_axis_2d
 
-
 func _is_action_triggered(name: StringName) -> bool:
 	var action: GUIDEAction = GuideInputRuntime.get_action(name)
 	return action != null and action.is_triggered()
-
-#endregion Physics & Movement
-
-
-#region Public API
-
-## Returns the child [BaseEntity] holding gameplay state.
-func get_ecs_entity() -> BaseEntity:
-	return _ecs_entity
-
-
-## Returns [code]true[/code] if the player's HP > 0.
-func is_alive() -> bool:
-	if _ecs_entity == null:
-		return false
-	return _ecs_entity.is_alive()
-
-
-## Convenience accessor — returns the [C_Health] component from the ECS entity.
-func get_health() -> C_Health:
-	if _ecs_entity == null:
-		return null
-	return _ecs_entity.get_component(C_Health)
-
-
-## Convenience accessor — returns the [C_InventoryRef] component.
-func get_inventory_ref() -> C_InventoryRef:
-	if _ecs_entity == null:
-		return null
-	return _ecs_entity.get_component(C_InventoryRef)
-
-#endregion Public API

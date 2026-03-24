@@ -1,130 +1,89 @@
-## HumanEnemyBody  (e_human_enemy_body.gd)
-##
-## [CharacterBody2D] physics shell for human enemy entities.
-##
-## Extends [HumanBase] to share the AimPivot rig (left/right hands + weapon
-## 360° rotation). Overrides [method HumanBase._get_aim_direction] to read
-## the aim direction from the ECS entity's [C_AimState] component — written
-## each frame by AISystem from [C_AIState.last_known_target_position].
-##
-## [b]Bridge pattern:[/b]
-## Gameplay state lives in the child [HumanEnemy] ECS entity. This body node
-## is responsible only for physics movement and scene-tree presentation.
-##
-##   Node (HumanEnemyBody CharacterBody2D)   ECS Entity (HumanEnemy child)
-##   ──────────────────────────────────      ─────────────────────────────
-##   move_and_slide()                        C_Health, C_Stamina
-##   AimPivot → hand / weapon rotation       C_StatusEffects, C_CombatState
-##   CollisionShape2D hitbox                 C_Position (synced from Node)
-##   Sprite2D body visual                    C_Velocity, C_Faction
-##                                           C_AIState, C_AimState
-##
-## [b]Scene structure (expected):[/b]
-## [codeblock]
-## ┌─ HumanEnemyBody  (CharacterBody2D root, this script)
-## │   ├─ CollisionShape2D      ← capsule hitbox
-## │   ├─ BodySprite            ← Sprite2D body visual
-## │   └─ AimPivot              ← Node2D; rotated by HumanBase
-## │       ├─ RightHand         ← Node2D (16, 0)
-## │       │   └─ HandSprite
-## │       └─ LeftHand          ← Node2D (10, -6)
-## │           └─ HandSprite
-## [/codeblock]
 class_name HumanEnemyBody
 extends HumanBase
 
-
-#region Private Variables
-
-## Child [HumanEnemy] ECS entity holding all authoritative gameplay state.
-## Registered with the GECS World during [method _ready].
-var _ecs_entity: HumanEnemy = null
-
-#endregion Private Variables
-
-
-#region Godot Lifecycle
+var _target_actor: Player = null
 
 func _ready() -> void:
-	_setup_ecs_entity()
+	_setup_runtime_state()
+	super._ready()
+	add_to_group("enemies")
+	add_to_group("human_enemies")
 
-
-## Updates aim pivot (via [HumanBase]), then applies ECS-driven movement.
 func _physics_process(delta: float) -> void:
-	super(delta)  # HumanBase: rotates _aim_pivot from _get_aim_direction()
-	_apply_ecs_movement()
+	super(delta)
+	if not is_alive():
+		return
+	_update_simple_ai(delta)
+	_apply_runtime_movement()
+	sync_runtime_position()
 
-#endregion Godot Lifecycle
+func _setup_runtime_state() -> void:
+	health = C_Health.new(80.0)
+	stamina_state = C_Stamina.new(80.0, 5.0)
+	status_effects = C_StatusEffects.new()
+	position_state = C_Position.new(global_position)
+	velocity_state = C_Velocity.new(160.0, 600.0, 500.0)
+	combat_state = C_CombatState.new()
+	inventory_ref = C_InventoryRef.new()
+	faction_state = C_Faction.new(C_Faction.FactionType.HUMAN_ENEMY)
+	ai_state = C_AIState.new(280.0, 200.0)
+	aim_state = C_AimState.new()
+	combat_state.equipped_weapon_id = "game:item/weapon/pistol"
+	combat_state.ammo_max = 12
+	combat_state.ammo_current = 12
 
+func set_target_actor(actor: Player) -> void:
+	_target_actor = actor
 
-#region ECS Bridge Setup
-
-## Creates and registers the child [HumanEnemy] ECS entity.
-## Called once from [method _ready].
-func _setup_ecs_entity() -> void:
-	_ecs_entity = HumanEnemy.new()
-	_ecs_entity.name = "HumanEnemyECSState"
-	add_child(_ecs_entity)
-
-	# Sync starting position into the ECS component.
-	var pos_comp: C_Position = _ecs_entity.get_component(C_Position)
-	if pos_comp:
-		pos_comp.world_position = global_position
-
-	register_ecs_entity(_ecs_entity)
-
-#endregion ECS Bridge Setup
-
-
-#region Aim Direction Override
-
-## Returns the aim direction from the ECS entity's [C_AimState] component.
-##
-## AISystem writes [C_AimState.aim_direction] each frame based on
-## [C_AIState.last_known_target_position] when a target is being chased or
-## attacked, or along the current patrol / line-of-sight direction otherwise.
 func _get_aim_direction() -> Vector2:
-	if _ecs_entity == null:
-		return Vector2.RIGHT
-	var aim: C_AimState = _ecs_entity.get_component(C_AimState)
-	if aim != null and aim.aim_direction.length_squared() > AIM_EPSILON:
-		return aim.aim_direction
+	if aim_state != null and aim_state.aim_direction.length_squared() > AIM_EPSILON:
+		return aim_state.aim_direction
 	return Vector2.RIGHT
 
-#endregion Aim Direction Override
-
-
-#region Physics Movement
-
-## Reads [C_Velocity] from the ECS entity and drives [method CharacterBody2D.move_and_slide].
-## Syncs the resulting position and facing angle back into [C_Position].
-func _apply_ecs_movement() -> void:
-	if _ecs_entity == null:
+func _update_simple_ai(delta: float) -> void:
+	var player := _resolve_target_actor()
+	combat_state.wants_reload = false
+	combat_state.wants_fire_mode_toggle = false
+	if player == null or not player.is_alive():
+		velocity_state.velocity = Vector2.ZERO
+		combat_state.wants_fire = false
+		combat_state.is_aiming = false
+		if ai_state != null:
+			ai_state.behavior = C_AIState.AIBehavior.IDLE
 		return
-	var vel_comp: C_Velocity = _ecs_entity.get_component(C_Velocity)
-	if vel_comp:
-		velocity = vel_comp.velocity
+	var to_target := player.global_position - global_position
+	if to_target.length_squared() > AIM_EPSILON:
+		aim_state.aim_direction = to_target.normalized()
+	if ai_state != null:
+		ai_state.last_known_target_position = player.global_position
+		ai_state.state_timer += delta
+	var distance := to_target.length()
+	if ai_state != null and distance <= ai_state.attack_radius:
+		ai_state.behavior = C_AIState.AIBehavior.ATTACK
+		velocity_state.velocity = Vector2.ZERO
+		combat_state.is_aiming = true
+		combat_state.wants_fire = true
+	elif ai_state != null and distance <= ai_state.detection_radius:
+		ai_state.behavior = C_AIState.AIBehavior.CHASE
+		velocity_state.velocity = to_target.normalized() * minf(velocity_state.max_speed, 70.0)
+		combat_state.is_aiming = true
+		combat_state.wants_fire = false
+	else:
+		if ai_state != null:
+			ai_state.behavior = C_AIState.AIBehavior.IDLE
+		velocity_state.velocity = Vector2.ZERO
+		combat_state.is_aiming = false
+		combat_state.wants_fire = false
+
+func _apply_runtime_movement() -> void:
+	if velocity_state != null:
+		velocity = velocity_state.velocity
 	move_and_slide()
-	# Write the updated physics position back to the ECS component.
-	var pos_comp: C_Position = _ecs_entity.get_component(C_Position)
-	if pos_comp:
-		pos_comp.world_position = global_position
-		pos_comp.facing_angle = _get_aim_direction().angle()
 
-#endregion Physics Movement
-
-
-#region Public API
-
-## Returns the child [HumanEnemy] ECS entity holding gameplay state.
-func get_ecs_entity() -> HumanEnemy:
-	return _ecs_entity
-
-
-## Returns [code]true[/code] if the enemy's HP > 0.
-func is_alive() -> bool:
-	if _ecs_entity == null:
-		return false
-	return _ecs_entity.is_alive()
-
-#endregion Public API
+func _resolve_target_actor() -> Player:
+	if is_instance_valid(_target_actor):
+		return _target_actor
+	var found := get_tree().get_first_node_in_group("player")
+	if found is Player:
+		_target_actor = found
+	return _target_actor

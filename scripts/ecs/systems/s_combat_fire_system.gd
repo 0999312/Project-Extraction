@@ -1,41 +1,38 @@
 class_name S_CombatFireSystem
-extends System
+extends RefCounted
 
 const BaseProjectileScript := preload("res://scripts/ecs/projectiles/e_base_projectile.gd")
-const EMPTY_MAG_SFX_PATH := "res://assets/game/sounds/sounds/mag_empty.mp3"
-const SHOOT_SFX_PATH := "res://assets/game/sounds/sounds/handgun_shoot.mp3"
-const RELOAD_SFX_PATH := "res://assets/game/sounds/sounds/reload.mp3"
 const EMPTY_MAG_SFX_MIN_INTERVAL := 0.35
 const AI_RELOAD_FACTIONS := [
 	C_Faction.FactionType.HUMAN_ENEMY,
 	C_Faction.FactionType.NON_HUMAN_ENEMY,
 ]
 
-var _shoot_sfx: AudioStream
-var _reload_sfx: AudioStream
-var _empty_mag_sfx: AudioStream
+var _shoot_sfx: AudioStream = null
+var _reload_sfx: AudioStream = null
+var _empty_mag_sfx: AudioStream = null
 
 func setup() -> void:
 	randomize()
-	_shoot_sfx = load(SHOOT_SFX_PATH)
-	_reload_sfx = load(RELOAD_SFX_PATH)
-	_empty_mag_sfx = load(EMPTY_MAG_SFX_PATH)
+	_shoot_sfx = AudioCatalog.get_registered_stream("game", "handgun_shoot.mp3")
+	_reload_sfx = AudioCatalog.get_registered_stream("game", "reload.mp3")
+	_empty_mag_sfx = AudioCatalog.get_registered_stream("game", "mag_empty.mp3")
 
-func query() -> QueryBuilder:
-	return q.with_all([C_CombatState, C_AimState, C_Position, C_Faction]).iterate([C_CombatState, C_AimState, C_Position, C_Faction])
-
-
-func process(entities: Array[Entity], components: Array, delta: float) -> void:
-	var combats: Array = components[0]
-	var aims: Array = components[1]
-	var positions: Array = components[2]
-	var faction_components: Array = components[3]
-	for i in entities.size():
-		var entity := entities[i]
-		var combat: C_CombatState = combats[i]
-		var aim: C_AimState = aims[i]
-		var pos: C_Position = positions[i]
-		var faction: C_Faction = faction_components[i]
+func process(actors: Array, projectile_parent: Node, delta: float) -> void:
+	if projectile_parent == null:
+		return
+	for actor_variant in actors:
+		if not (actor_variant is BiologicalBodyBase):
+			continue
+		var actor: BiologicalBodyBase = actor_variant
+		if not actor.is_alive():
+			continue
+		var combat: C_CombatState = actor.get_combat_state()
+		var aim: C_AimState = actor.get_aim_state()
+		var pos: C_Position = actor.get_position_state()
+		var faction: C_Faction = actor.get_faction_state()
+		if combat == null or aim == null or pos == null or faction == null:
+			continue
 		combat.fire_cooldown = maxf(0.0, combat.fire_cooldown - delta)
 		combat.recoil_accum = maxf(0.0, combat.recoil_accum - combat.recoil_recovery_per_sec * delta)
 		combat.empty_mag_sfx_cooldown = maxf(0.0, combat.empty_mag_sfx_cooldown - delta)
@@ -45,10 +42,7 @@ func process(entities: Array[Entity], components: Array, delta: float) -> void:
 			_start_reload(combat)
 		_update_reload_state(combat, delta)
 		var should_fire := _is_fire_requested(combat, faction)
-		if not should_fire:
-			combat.was_fire_pressed_last_frame = combat.wants_fire
-			continue
-		if combat.is_reloading:
+		if not should_fire or combat.is_reloading:
 			combat.was_fire_pressed_last_frame = combat.wants_fire
 			continue
 		if combat.ammo_current <= 0:
@@ -58,44 +52,31 @@ func process(entities: Array[Entity], components: Array, delta: float) -> void:
 		if combat.fire_cooldown > 0.0:
 			combat.was_fire_pressed_last_frame = combat.wants_fire
 			continue
-
 		var pellets := maxi(1, combat.pellets_per_shot)
 		for _pellet_index in range(pellets):
-			var projectile := BaseProjectileScript.new()
-			var projectile_pos := C_Position.new(pos.world_position, aim.aim_direction.angle())
-			var projectile_data := C_ProjectileData.new(
-				combat.projectile_speed,
-				combat.attack_damage,
-				combat.projectile_penetration,
-				combat.projectile_lifetime,
-				combat.projectile_max_distance
-			)
+			var projectile: BaseProjectile = BaseProjectileScript.new()
+			var projectile_data := C_ProjectileData.new(combat.projectile_speed, combat.attack_damage, combat.projectile_penetration, combat.projectile_lifetime, combat.projectile_max_distance)
 			projectile_data.configure_sprite(combat.projectile_sprite_path)
 			projectile_data.spread_deviation_rad = deg_to_rad(_compute_spread_offset_degrees(combat, aim))
-			projectile.add_components([projectile_pos, projectile_data])
-			ECS.world.add_entity(projectile)
-			projectile.setup(aim.aim_direction, projectile_data.damage, projectile_data.penetration, entity.id, combat.equipped_weapon_id)
-
+			projectile.projectile_data = projectile_data
+			projectile.owner_faction = faction.faction
+			projectile.global_position = actor.get_muzzle_position() if actor.has_method("get_muzzle_position") else pos.world_position
+			projectile_parent.add_child(projectile)
+			projectile.setup(aim.aim_direction, projectile_data.damage, projectile_data.penetration, actor.get_actor_id(), combat.equipped_weapon_id)
 		combat.ammo_current -= 1
 		combat.fire_cooldown = combat.fire_interval
 		combat.recoil_accum += combat.recoil_per_shot
 		combat.was_fire_pressed_last_frame = combat.wants_fire
 		_play_shoot_sfx()
-		print("[DEBUG][CombatFire] Entity=%s FIRED | mode=%s ammo=%d/%d recoil=%.2f spread_deg=%.1f aim=(%.2f,%.2f)" % [
-			entity.name, C_CombatState.FireMode.keys()[combat.fire_mode],
-			combat.ammo_current, combat.ammo_max, combat.recoil_accum,
-			combat.hipfire_spread_deg if not combat.is_aiming else combat.ads_spread_deg,
-			aim.aim_direction.x, aim.aim_direction.y])
+		print("[DEBUG][CombatFire] Actor=%s FIRED | mode=%s ammo=%d/%d recoil=%.2f spread_deg=%.1f aim=(%.2f,%.2f)" % [actor.name, C_CombatState.FireMode.keys()[combat.fire_mode], combat.ammo_current, combat.ammo_max, combat.recoil_accum, combat.hipfire_spread_deg if not combat.is_aiming else combat.ads_spread_deg, aim.aim_direction.x, aim.aim_direction.y])
 		if combat.ammo_current <= 0:
 			_play_empty_mag_if_needed(combat)
-
 
 func _compute_spread_offset_degrees(combat: C_CombatState, aim: C_AimState) -> float:
 	var base_spread := combat.ads_spread_deg if combat.is_aiming else combat.hipfire_spread_deg
 	base_spread += combat.recoil_accum * combat.recoil_spread_per_accum_deg
 	base_spread *= maxf(0.01, aim.precision_multiplier)
 	return randf_range(-base_spread, base_spread)
-
 
 func _should_start_reload(combat: C_CombatState, faction: C_Faction) -> bool:
 	if combat.is_reloading:
@@ -108,13 +89,11 @@ func _should_start_reload(combat: C_CombatState, faction: C_Faction) -> bool:
 		return true
 	return combat.wants_reload and combat.ammo_current < combat.ammo_max
 
-
 func _start_reload(combat: C_CombatState) -> void:
 	combat.is_reloading = true
 	combat.reload_progress = 0.0
 	_play_reload_sfx()
 	print("[DEBUG][CombatFire] RELOAD started | ammo=%d/%d" % [combat.ammo_current, combat.ammo_max])
-
 
 func _update_reload_state(combat: C_CombatState, delta: float) -> void:
 	if not combat.is_reloading:
@@ -127,7 +106,6 @@ func _update_reload_state(combat: C_CombatState, delta: float) -> void:
 		combat.reload_progress = 0.0
 		print("[DEBUG][CombatFire] RELOAD complete | ammo=%d/%d" % [combat.ammo_current, combat.ammo_max])
 
-
 func _is_fire_requested(combat: C_CombatState, faction: C_Faction) -> bool:
 	if combat.fire_mode == C_CombatState.FireMode.SAFE:
 		return false
@@ -136,7 +114,6 @@ func _is_fire_requested(combat: C_CombatState, faction: C_Faction) -> bool:
 	if faction.faction == C_Faction.FactionType.PLAYER:
 		return combat.wants_fire and not combat.was_fire_pressed_last_frame
 	return combat.wants_fire
-
 
 func _cycle_fire_mode(combat: C_CombatState) -> void:
 	var prev_mode := combat.fire_mode
@@ -147,10 +124,7 @@ func _cycle_fire_mode(combat: C_CombatState) -> void:
 			combat.fire_mode = C_CombatState.FireMode.AUTO
 		_:
 			combat.fire_mode = C_CombatState.FireMode.SAFE
-	print("[DEBUG][CombatFire] FIRE_MODE changed | %s → %s" % [
-		C_CombatState.FireMode.keys()[prev_mode],
-		C_CombatState.FireMode.keys()[combat.fire_mode]])
-
+	print("[DEBUG][CombatFire] FIRE_MODE changed | %s → %s" % [C_CombatState.FireMode.keys()[prev_mode], C_CombatState.FireMode.keys()[combat.fire_mode]])
 
 func _play_empty_mag_if_needed(combat: C_CombatState) -> void:
 	if combat.empty_mag_sfx_cooldown > 0.0:
@@ -160,19 +134,10 @@ func _play_empty_mag_if_needed(combat: C_CombatState) -> void:
 	combat.empty_mag_sfx_cooldown = EMPTY_MAG_SFX_MIN_INTERVAL
 	print("[DEBUG][CombatFire] EMPTY_MAG sfx played")
 
-
 func _play_shoot_sfx() -> void:
 	if _shoot_sfx != null:
 		SoundManager.play_sound(_shoot_sfx)
 
-
 func _play_reload_sfx() -> void:
 	if _reload_sfx != null:
 		SoundManager.play_sound(_reload_sfx)
-
-
-func deps() -> Dictionary:
-	return {
-		Runs.After: [],
-		Runs.Before: [S_ProjectileMotionSystem],
-	}

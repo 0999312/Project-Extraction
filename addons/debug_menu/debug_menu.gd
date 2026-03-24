@@ -430,7 +430,9 @@ func _process(_delta: float) -> void:
 		var frame_time_color := frame_time_gradient.sample(remap(frames_per_second, GRAPH_MIN_FPS, GRAPH_MAX_FPS, 0.0, 1.0))
 		fps.modulate = frame_time_color
 
-		num_entities.text = "Entities: " + str(ECS.world.entities.size())
+		var actor_count := get_tree().get_nodes_in_group("actors").size()
+		var projectile_count := get_tree().get_nodes_in_group("projectiles").size()
+		num_entities.text = "Actors: %d | Projectiles: %d" % [actor_count, projectile_count]
 
 		frame_time.text = str(frametime).pad_decimals(2) + " mspf"
 		frame_time.modulate = frame_time_color
