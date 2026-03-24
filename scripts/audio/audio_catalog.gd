@@ -126,11 +126,11 @@ static func get_registered_stream(category: String, preferred_file_name: String 
 	return null
 
 
-static func play_registered_music(category: String, preferred_file_name: String = "", crossfade: float = DEFAULT_MUSIC_CROSSFADE) -> void:
+static func play_registered_music(category: String, preferred_file_name: String = "", crossfade: float = DEFAULT_MUSIC_CROSSFADE, force_restart: bool = false) -> void:
 	var stream := get_registered_stream(category, preferred_file_name)
 	if stream == null:
 		return
-	if SoundManager.is_music_playing(stream):
+	if SoundManager.is_music_playing(stream) and not force_restart:
 		return
 	SoundManager.play_music(stream, crossfade)
 
@@ -152,6 +152,8 @@ static func _register_entry(registry: AudioRegistry, audio_group: Dictionary) ->
 
 
 static func _debug_print_registry_contents(registry: AudioRegistry, phase: String) -> void:
+	if not OS.is_debug_build():
+		return
 	var entries := registry.get_all_entries()
 	print("[DEBUG][AudioCatalog] Registry loaded for phase=%s, entries=%d" % [phase, entries.size()])
 	for key_variant in entries.keys():

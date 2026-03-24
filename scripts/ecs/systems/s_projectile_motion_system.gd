@@ -10,6 +10,7 @@ func query() -> QueryBuilder:
 func process(entities: Array[Entity], components: Array, delta: float) -> void:
 	var projectiles: Array = components[0]
 	var positions: Array = components[1]
+	var candidate_entities := _get_collision_candidates()
 	for i in entities.size():
 		var entity := entities[i]
 		var proj: C_ProjectileData = projectiles[i]
@@ -19,7 +20,7 @@ func process(entities: Array[Entity], components: Array, delta: float) -> void:
 		var step := proj.velocity * delta
 		var travelled := step.length()
 		pos.world_position += step
-		var hit_target := _find_hit_target(entity, proj, pos.world_position, previous_position)
+		var hit_target := _find_hit_target(entity, proj, pos.world_position, previous_position, candidate_entities)
 		if hit_target != null:
 			proj.has_hit = true
 			if entity is BaseProjectile:
@@ -40,12 +41,15 @@ func process(entities: Array[Entity], components: Array, delta: float) -> void:
 			cmd.remove_entity(entity)
 
 
-func _find_hit_target(projectile_entity: Entity, projectile_data: C_ProjectileData, current_position: Vector2, previous_position: Vector2) -> Entity:
+func _get_collision_candidates() -> Array[Entity]:
 	if ECS.world == null:
-		return null
-	var owner_id := projectile_data.owner_entity_id
+		return []
 	var query := ECS.world.query.with_all([C_Position, C_Health, C_Faction]).enabled()
-	var candidate_entities: Array[Entity] = query.execute()
+	return query.execute()
+
+
+func _find_hit_target(projectile_entity: Entity, projectile_data: C_ProjectileData, current_position: Vector2, previous_position: Vector2, candidate_entities: Array[Entity]) -> Entity:
+	var owner_id := projectile_data.owner_entity_id
 	var radius := maxf(1.0, projectile_data.collision_radius * PROJECTILE_RADIUS_SCALE)
 	for candidate in candidate_entities:
 		if candidate == null or candidate == projectile_entity:
@@ -61,16 +65,16 @@ func _find_hit_target(projectile_entity: Entity, projectile_data: C_ProjectileDa
 		var candidate_position: C_Position = candidate.get_component(C_Position)
 		if candidate_position == null:
 			continue
-		if _segment_distance_to_point(previous_position, current_position, candidate_position.world_position) <= radius:
+		if _segment_distance_to_point_squared(previous_position, current_position, candidate_position.world_position) <= radius * radius:
 			return candidate
 	return null
 
 
-func _segment_distance_to_point(a: Vector2, b: Vector2, point: Vector2) -> float:
+func _segment_distance_to_point_squared(a: Vector2, b: Vector2, point: Vector2) -> float:
 	var segment := b - a
 	var segment_length_squared := segment.length_squared()
 	if segment_length_squared <= 0.000001:
-		return point.distance_to(a)
+		return point.distance_squared_to(a)
 	var t := clampf((point - a).dot(segment) / segment_length_squared, 0.0, 1.0)
 	var closest := a + segment * t
-	return point.distance_to(closest)
+	return point.distance_squared_to(closest)

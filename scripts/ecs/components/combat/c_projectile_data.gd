@@ -17,6 +17,8 @@ class_name C_ProjectileData
 extends Component
 
 const DEFAULT_SPRITE_PATH := "res://assets/game/textures/projectiles/bullet.png"
+const DEFAULT_PROJECTILE_TEXTURE := preload("res://assets/game/textures/projectiles/bullet.png")
+static var _collision_radius_cache: Dictionary = {}
 
 ## Travel velocity in pixels per second. Computed at spawn from direction × speed.
 @export var velocity: Vector2 = Vector2.ZERO
@@ -87,11 +89,22 @@ func configure_sprite(path: String) -> void:
 
 
 func _compute_collision_radius_from_sprite(path: String) -> float:
+	if _collision_radius_cache.has(path):
+		return _collision_radius_cache[path]
+	if path == DEFAULT_SPRITE_PATH:
+		var default_size := DEFAULT_PROJECTILE_TEXTURE.get_size()
+		if default_size.x > 0.0 and default_size.y > 0.0:
+			var default_radius := maxf(1.0, maxf(default_size.x, default_size.y) * 0.5)
+			_collision_radius_cache[path] = default_radius
+			return default_radius
 	if not ResourceLoader.exists(path):
 		return 4.0
-	var texture := load(path)
+	var texture := ResourceLoader.load(path, "Texture2D", ResourceLoader.CACHE_MODE_REUSE)
 	if texture is Texture2D:
 		var size := texture.get_size()
 		if size.x > 0.0 and size.y > 0.0:
-			return maxf(1.0, maxf(size.x, size.y) * 0.5)
+			var radius := maxf(1.0, maxf(size.x, size.y) * 0.5)
+			_collision_radius_cache[path] = radius
+			return radius
+	_collision_radius_cache[path] = 4.0
 	return 4.0
