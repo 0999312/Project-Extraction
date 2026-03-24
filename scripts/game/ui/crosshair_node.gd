@@ -20,8 +20,18 @@ var _ads_texture: Texture2D = null
 func _ready() -> void:
 	top_level = true
 	z_index = 1024
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_load_textures()
 	set_mode(Mode.RELAXED)
+
+func _process(_delta: float) -> void:
+	if get_tree().paused:
+		texture = _mouse_texture
+		centered = false
+		global_position = get_global_mouse_position()
+		return
+	if mode == Mode.RELAXED:
+		global_position = get_global_mouse_position()
 
 func set_mode(next_mode: Mode) -> void:
 	mode = next_mode
