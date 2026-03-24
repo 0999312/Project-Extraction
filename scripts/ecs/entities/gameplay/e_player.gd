@@ -81,6 +81,7 @@ func _ready() -> void:
 	GuideInputRuntime.ensure_initialized()
 	GUIDE.enable_mapping_context(GuideInputRuntime.get_context())
 	_setup_ecs_entity()
+	print("[DEBUG][Player] _ready | group=player GUIDE_context_enabled")
 
 
 ## Updates the aim pivot (via [HumanBase]), handles sprint stamina, applies
@@ -194,6 +195,8 @@ func _sync_input_to_ecs() -> void:
 		vel_comp.velocity = move_input.normalized() * _get_current_speed()
 	var combat: C_CombatState = _ecs_entity.get_component(C_CombatState)
 	if combat:
+		var prev_aiming := combat.is_aiming
+		var prev_fire := combat.wants_fire
 		combat.is_aiming = _is_action_triggered(GUIDE_ACTION_AIM_HOLD)
 		combat.wants_fire = _is_action_triggered(GUIDE_ACTION_FIRE)
 		var reload_pressed := _is_action_triggered(GUIDE_ACTION_RELOAD)
@@ -202,6 +205,20 @@ func _sync_input_to_ecs() -> void:
 		var fire_mode_pressed := _is_action_triggered(GUIDE_ACTION_FIRE_MODE_TOGGLE)
 		combat.wants_fire_mode_toggle = fire_mode_pressed and not _fire_mode_pressed_last_frame
 		_fire_mode_pressed_last_frame = fire_mode_pressed
+		# DEBUG: log state changes
+		if combat.is_aiming != prev_aiming:
+			print("[DEBUG][Player] AIM %s | dir=(%.2f,%.2f)" % [
+				"ON" if combat.is_aiming else "OFF",
+				aim_direction.x, aim_direction.y])
+		if combat.wants_fire and not prev_fire:
+			print("[DEBUG][Player] FIRE pressed | aiming=%s ammo=%d/%d mode=%s" % [
+				combat.is_aiming, combat.ammo_current, combat.ammo_max,
+				C_CombatState.FireMode.keys()[combat.fire_mode]])
+		if combat.wants_reload:
+			print("[DEBUG][Player] RELOAD requested | ammo=%d/%d" % [
+				combat.ammo_current, combat.ammo_max])
+		if combat.wants_fire_mode_toggle:
+			print("[DEBUG][Player] FIRE_MODE_TOGGLE requested")
 
 
 ## Reads [C_Velocity.velocity] and drives [method CharacterBody2D.move_and_slide].
@@ -250,12 +267,24 @@ func _get_current_speed() -> float:
 
 
 func _poll_guide_input() -> void:
+	var prev_move := move_input
+	var prev_sprint := is_sprinting
 	move_input = _get_action_axis_2d(GUIDE_ACTION_MOVE).limit_length(1.0)
 	is_sprinting = _is_action_triggered(GUIDE_ACTION_SPRINT)
 	var stick_aim := _get_action_axis_2d(GUIDE_ACTION_AIM_AXIS)
 	_using_gamepad_aim = stick_aim.length_squared() > AIM_EPSILON
 	if _using_gamepad_aim:
 		aim_direction = stick_aim.normalized()
+	# DEBUG: log movement and sprint changes
+	var started_move := prev_move.length_squared() < 0.01 and move_input.length_squared() >= 0.01
+	var stopped_move := prev_move.length_squared() >= 0.01 and move_input.length_squared() < 0.01
+	if started_move:
+		print("[DEBUG][Player] MOVE started | dir=(%.2f,%.2f) speed=%.0f" % [
+			move_input.x, move_input.y, _get_current_speed()])
+	elif stopped_move:
+		print("[DEBUG][Player] MOVE stopped")
+	if is_sprinting != prev_sprint:
+		print("[DEBUG][Player] SPRINT %s" % ("ON" if is_sprinting else "OFF"))
 
 
 func _get_action_axis_2d(name: StringName) -> Vector2:

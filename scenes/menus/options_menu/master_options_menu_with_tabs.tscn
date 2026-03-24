@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://bvmm1v4tarha2" path="res://scenes/menus/options_menu/audio/audio_options_menu.tscn" id="4_6wkjv"]
 [ext_resource type="PackedScene" uid="uid://dh567s4jy3m2d" path="res://scenes/menus/options_menu/video/video_options_menu_with_extras.tscn" id="5_kr6xa"]
 [ext_resource type="PackedScene" uid="uid://cdqt3bebxpqxk" path="res://scenes/menus/options_menu/game/game_options_menu.tscn" id="6_n2uhm"]
+[ext_resource type="Script" path="res://scenes/menus/options_menu/localized_options_tab_container.gd" id="7_loc"]
 
 [node name="MasterOptionsMenu" type="TabContainer" unique_id=549332586]
 anchors_preset = 15
@@ -15,7 +16,7 @@ grow_horizontal = 2
 grow_vertical = 2
 tab_alignment = 1
 current_tab = 0
-script = ExtResource("1_fqpxk")
+script = ExtResource("7_loc")
 
 [node name="Controls" parent="." unique_id=2037238962 instance=ExtResource("2_w1dvr")]
 layout_mode = 2

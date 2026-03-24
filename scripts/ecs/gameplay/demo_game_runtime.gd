@@ -14,11 +14,16 @@ const AIM_CAMERA_LERP_SPEED := 9.0
 
 
 func _ready() -> void:
+	AudioRegistryBootstrap.register_gameplay_audio()
 	_world = World.new()
 	_world.name = "RuntimeWorld"
 	add_child(_world)
 	ECS.world = _world
 	_register_systems_when_world_ready()
+	# Ensure DemoGame processes after children (Player) so input is polled
+	# before ECS systems consume it.
+	process_physics_priority = 100
+	print("[DEBUG][DemoGame] _ready | world=%s systems_registered=%s" % [_world.name, _systems_registered])
 
 
 func _physics_process(delta: float) -> void:

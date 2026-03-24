@@ -34,6 +34,8 @@ const GAMEPLAY_AUDIO_GROUPS := [
 			"handgun_shoot.mp3",
 			"human_die.mp3",
 			"mob_die.mp3",
+			"mag_empty.mp3",
+			"reload.mp3",
 		],
 	},
 	{

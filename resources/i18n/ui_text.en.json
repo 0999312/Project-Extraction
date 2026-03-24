@@ -98,7 +98,12 @@
         "label": "Reset Game :",
         "confirm_label": "Confirm Reset :",
         "reset": "Reset"
-      }
+      },
+      "tab_controls": "Controls",
+      "tab_inputs": "Inputs",
+      "tab_audio": "Audio",
+      "tab_video": "Video",
+      "tab_game": "Game"
     },
     "level": {
       "1": {
@@ -130,5 +135,25 @@
       "level_2": "Level 2",
       "level_3": "Level 3"
     }
-  }
+  },
+  "New Game": "New Game",
+  "Options": "Options",
+  "Credits": "Credits",
+  "Exit": "Exit",
+  "Back": "Back",
+  "Loading...": "Loading...",
+  "Still Loading...": "Still Loading...",
+  "Loading Complete!": "Loading Complete!",
+  "Any Moment Now...": "Any Moment Now...",
+  "Master :": "Master :",
+  "Music :": "Music :",
+  "SFX :": "SFX :",
+  "Mute :": "Mute :",
+  "Fullscreen :": "Fullscreen :",
+  "Resolution :": "Resolution :",
+  "Anti-Aliasing :": "Anti-Aliasing :",
+  "Camera Shake :": "Camera Shake :",
+  "Please Confirm...": "Please Confirm...",
+  "Cancel": "Cancel",
+  "OK": "OK"
 }

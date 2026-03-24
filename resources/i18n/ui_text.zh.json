@@ -98,7 +98,12 @@
         "label": "重置游戏：",
         "confirm_label": "确认重置：",
         "reset": "重置"
-      }
+      },
+      "tab_controls": "控制",
+      "tab_inputs": "输入",
+      "tab_audio": "音频",
+      "tab_video": "视频",
+      "tab_game": "游戏"
     },
     "level": {
       "1": {
@@ -130,5 +135,25 @@
       "level_2": "关卡 2",
       "level_3": "关卡 3"
     }
-  }
+  },
+  "New Game": "新游戏",
+  "Options": "选项",
+  "Credits": "制作人员",
+  "Exit": "退出",
+  "Back": "返回",
+  "Loading...": "加载中...",
+  "Still Loading...": "仍在加载...",
+  "Loading Complete!": "加载完成！",
+  "Any Moment Now...": "即将完成...",
+  "Master :": "主音量：",
+  "Music :": "音乐：",
+  "SFX :": "音效：",
+  "Mute :": "静音：",
+  "Fullscreen :": "全屏：",
+  "Resolution :": "分辨率：",
+  "Anti-Aliasing :": "抗锯齿：",
+  "Camera Shake :": "镜头抖动：",
+  "Please Confirm...": "请确认...",
+  "Cancel": "取消",
+  "OK": "确定"
 }
