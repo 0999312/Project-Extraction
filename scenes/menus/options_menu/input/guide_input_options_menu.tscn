@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c82w8t2oblwal"]
 
-[ext_resource type="Script" uid="uid://dotafm33h644d" path="res://scripts/ecs/input/guide_input_options_menu.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://dotafm33h644d" path="res://scripts/game/input/guide_input_options_menu.gd" id="1_script"]
 [ext_resource type="Script" uid="uid://db27ccgomq455" path="res://addons/guide/remapping/guide_input_detector.gd" id="2_detector"]
 
 [node name="Controls" type="MarginContainer" unique_id=1643603504]

@@ -1,0 +1,47 @@
+; Non-Human Enemy entity scene  —  non_human_enemy.tscn
+;
+; Root:   NonHumanEnemy (CharacterBody2D, this class)
+; Children:
+;   CollisionShape2D  – circle hitbox (radius 12; suits the round/alien body)
+;   BodySprite        – Sprite2D body visual (rapid_1.png placeholder)
+;
+; NON-HUMAN ENEMIES DO NOT HAVE SEPARATE HAND NODES.
+; Instead, the entire body (root rotation) tracks the target, giving a
+; creature-like "full-body aiming" behaviour. The sprite rotates with the body.
+;
+; Aim direction:
+;   The body script updates aim direction toward the current target each frame.
+;   NonHumanEnemy._update_body_rotation() sets self.rotation = that angle,
+;   so the sprite and collision shape both face the target simultaneously.
+;
+; Variant selection:
+;   Set the [variant] @export property in the Inspector (SWARMER/CHARGER/DRONE/BLOB).
+;   NonHumanEnemy._setup_runtime_state() applies the selected variant stats.
+;   Default = SWARMER.
+
+[gd_scene format=3 uid="uid://nhe_non_human_enemy_scene_1"]
+
+[ext_resource type="Script" path="res://scripts/game/entities/enemies/non_human_enemy.gd" id="1_nhebdy"]
+[ext_resource type="Texture2D" uid="uid://dj1mqbkr1efcy" path="res://assets/game/textures/entities/enemy_mob/rapid/rapid_1.png" id="2_rapid"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_nhe"]
+radius = 12.0
+
+; ── Root ──────────────────────────────────────────────────────────────────────
+; The variant export controls which enemy preset is created at runtime.
+; Change it in the Inspector to spawn a different non-human enemy type.
+[node name="NonHumanEnemy" type="CharacterBody2D"]
+script = ExtResource("1_nhebdy")
+
+; ── Physics hitbox ────────────────────────────────────────────────────────────
+; A circle shape works for all non-human variants at this stage.
+; Resize per-instance in the Inspector if variants differ significantly.
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_nhe")
+
+; ── Body visual ───────────────────────────────────────────────────────────────
+; rapid_1.png is a placeholder. The sprite rotates with the parent body so it
+; automatically faces the target direction without extra animation code.
+; Replace with an AnimatedSprite2D for frame-based variants (e.g. Blob).
+[node name="BodySprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_rapid")
