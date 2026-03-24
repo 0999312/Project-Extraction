@@ -20,5 +20,4 @@ func get_checkpoint_level_path() -> String:
 
 
 func _ready() -> void:
-	AudioRegistryBootstrap.register_gameplay_audio()
 	super._ready()

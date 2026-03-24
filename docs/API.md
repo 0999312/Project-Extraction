@@ -144,14 +144,20 @@ Added game loop phase API:
 
 ## scripts/audio/audio_registry_bootstrap.gd
 
-- Autoload bootstrap for project audio registry initialization.
-- Registers `core:audio` registry via `RegistryManager`.
-- Registers audio entries based on configured folder + filename lists from:
-  - `scripts/audio/audio_catalog.gd`
-- Startup:
-  - `game:audio/ui` from `res://assets/game/sounds/ui`
-  - `game:audio/music` from `res://assets/game/sounds/music`
-- Game load:
+> **REMOVED** — Replaced by `scenes/opening/opening.gd` (startup audio)
+> and `scenes/loading_screen/loading_screen.gd` (gameplay audio).
+
+## scenes/opening/opening.gd
+
+- Extends the Maaacks template Opening scene.
+- Handles localization initialization: loads i18n JSON translations, applies configured language.
+- Handles startup audio registration: registers `AudioRegistry` via `RegistryManager`, loads startup audio groups from `AudioCatalog.STARTUP_AUDIO_GROUPS`.
+- Exposes `set_language(code)`, `get_supported_languages()`, `register_gameplay_audio()`.
+
+## scenes/loading_screen/loading_screen.gd
+
+- Extends `LoadingScreen` (Maaacks template).
+- Registers gameplay-phase audio groups on `_ready()`:
   - `game:audio/game` from `res://assets/game/sounds/sounds`
   - `game:audio/environment` from `res://assets/game/sounds/music`
 
@@ -162,16 +168,10 @@ Added game loop phase API:
 
 ## scripts/localization/localization_bootstrap.gd
 
-- Dedicated localization bootstrap (decoupled from audio bootstrap).
-- Loads:
-  - `res://resources/i18n/ui_text.en.json`
-  - `res://resources/i18n/ui_text.zh.json`
-- Sets and persists language to:
-  - `AppSettings.GAME_SECTION`
-  - Key: `Language`
+> **REMOVED** — Replaced by `scenes/opening/opening.gd`.
 
 ## scenes/menus/options_menu/game/language_option_control.gd
 
 - `ListOptionControl` for language switching in `game_options`.
 - Supported values: `en`, `zh`
-- Calls `LocalizationBootstrap.set_language(...)` on change.
+- Calls `I18NManager.set_language(...)` and persists via `PlayerConfig` on change.

@@ -1,20 +1,39 @@
-extends Node
+extends "res://addons/maaacks_game_template/base/nodes/opening/opening.gd"
+## Project Extraction opening scene script.
+##
+## Responsibilities formerly handled by autoload bootstraps:
+##   - Loads i18n translation files and applies the configured language
+##     (was LocalizationBootstrap).
+##   - Registers the audio registry and loads startup-phase audio groups
+##     (was AudioRegistryBootstrap).
 
 const EN_TRANSLATION := "res://resources/i18n/ui_text.en.json"
 const ZH_TRANSLATION := "res://resources/i18n/ui_text.zh.json"
 const DEFAULT_LANGUAGE := "en"
 const LANGUAGE_SETTING_KEY := "Language"
-var SUPPORTED_LANGUAGES := PackedStringArray(["en", "zh"])
+const SUPPORTED_LANGUAGES := ["en", "zh"]
 
 
+## Localization and audio init must run BEFORE super._ready(), which starts
+## loading the next scene and setting up the UI.  This guarantees translations
+## are available and the audio registry exists before any text rendering or
+## music playback begins.
 func _ready() -> void:
+	_init_localization()
+	AudioCatalog.ensure_registry_and_register(AudioCatalog.STARTUP_AUDIO_GROUPS)
+	super._ready()
+
+
+#region Localization ──────────────────────────────────────────
+
+func _init_localization() -> void:
 	I18NManager.load_translation("en", EN_TRANSLATION)
 	I18NManager.load_translation("zh", ZH_TRANSLATION)
 	_apply_configured_language()
 
 
 func get_supported_languages() -> PackedStringArray:
-	return SUPPORTED_LANGUAGES
+	return PackedStringArray(SUPPORTED_LANGUAGES)
 
 
 func set_language(language_code: String) -> void:
@@ -44,3 +63,5 @@ func _normalize_language(language_code: String) -> String:
 	if normalized in SUPPORTED_LANGUAGES:
 		return normalized
 	return DEFAULT_LANGUAGE
+
+#endregion Localization

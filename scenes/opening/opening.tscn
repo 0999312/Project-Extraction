@@ -2,8 +2,10 @@
 
 [ext_resource type="PackedScene" uid="uid://sikc02ddepyt" path="res://addons/maaacks_game_template/base/nodes/opening/opening.tscn" id="1_ke3tw"]
 [ext_resource type="Texture2D" uid="uid://daput5j66exgu" path="res://assets/godot_engine_logo/logo_vertical_color_dark.png" id="2_yhkvs"]
+[ext_resource type="Script" path="res://scenes/opening/opening.gd" id="3_open"]
 
 [node name="Opening" unique_id=684202726 instance=ExtResource("1_ke3tw")]
+script = ExtResource("3_open")
 images = Array[Texture2D]([ExtResource("2_yhkvs")])
 
 [node name="ImagesContainer" parent="." index="1" unique_id=1471559661]
