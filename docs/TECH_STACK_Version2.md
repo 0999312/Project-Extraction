@@ -45,12 +45,14 @@
 - **@nathanhoad/godot_sound_manager** (recommended for ease of use)
   - Autoload playback for SFX/BGM.
   - Wrapped via Audio Bridge so replacement is painless later.
-  - Project audio registry now uses folder + filename configuration (`scripts/audio/audio_catalog.gd`)
-    and is initialized by `scripts/audio/audio_registry_bootstrap.gd`.
+  - Project audio registry uses folder + filename configuration (`scripts/audio/audio_catalog.gd`).
+  - Current initialization flow is scene-driven:
+    - Startup groups are registered in `scenes/opening/opening.gd`.
+    - Gameplay groups are registered in `scenes/loading_screen/loading_screen.gd`.
 
 ### 1.8 Localization
-- JSON-based UI localization is initialized independently by
-  `scripts/localization/localization_bootstrap.gd` (decoupled from audio bootstrap).
+- JSON-based UI localization is initialized in `scenes/opening/opening.gd`
+  via `I18NManager` (decoupled from audio registration).
 - Current supported languages: `en`, `zh`.
 - Active language is stored in `AppSettings.GAME_SECTION` with key `Language`
   and can be changed from `game_options`.
@@ -142,6 +144,8 @@ Loot table entries should be registry-driven:
 ### 5.1 Player (Node + ECS Hybrid)
 - Node: `CharacterBody2D` for movement/collision and animations.
 - ECS: authoritative gameplay state and combat decisions.
+- Implementation note: player body extends `HumanBase` (which extends
+  `BiologicalBodyBase`) and owns a child ECS entity bridge.
 
 **Sync path:**
 - Node → ECS: position/aim
@@ -150,6 +154,17 @@ Loot table entries should be registry-driven:
 ### 5.2 Enemies (ECS-first)
 - ECS handles AI state, targeting, weapon usage, health.
 - Node view is minimal and can be chunk-activated/deactivated.
+- Human enemies use the shared `HumanBase` aim-pivot rig; non-human enemies use
+  full-body aiming and both now share `BiologicalBodyBase` registration logic.
+
+### 5.6 Biological Body Base Scene Contract
+- Shared base script: `scripts/ecs/entities/gameplay/e_biological_body_base.gd`.
+- Responsibilities:
+  - Register child ECS entity into active GECS world.
+  - Defer registration through `ECS.world_changed` when world assignment is late.
+- Derived bodies:
+  - `HumanBase` (player + human enemy).
+  - `NonHumanEnemyBody` (non-human enemy full-body rotation).
 
 ### 5.3 Projectiles (ECS-only)
 - ECS updates positions, performs hit checks, applies damage events.

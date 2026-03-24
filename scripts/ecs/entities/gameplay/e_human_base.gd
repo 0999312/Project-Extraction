@@ -29,7 +29,7 @@
 ## [b]GECS note:[/b] This is a scene-tree (physics) class, not an [Entity].
 ## Gameplay state lives in the ECS entity child added by subclasses.
 class_name HumanBase
-extends CharacterBody2D
+extends BiologicalBodyBase
 
 
 #region Constants

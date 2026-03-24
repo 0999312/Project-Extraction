@@ -71,9 +71,7 @@ func _setup_ecs_entity() -> void:
 	if pos_comp:
 		pos_comp.world_position = global_position
 
-	# Register with the active GECS World.
-	if ECS.world:
-		ECS.world.add_entity(_ecs_entity)
+	register_ecs_entity(_ecs_entity)
 
 #endregion ECS Bridge Setup
 

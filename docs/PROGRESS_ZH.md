@@ -1,5 +1,29 @@
 # Project Extraction — 开发进度
 
+## 更新 6 — DemoGame ECS 场景对齐、生物基类重构与文档同步
+
+### 变更内容
+
+- **DemoGame 场景/运行时对齐 GECS 场景内 World 模式**：
+  - `demo_game_runtime.gd` 现在绑定 `DemoGame.tscn` 中已有的 `World` 节点，不再运行时创建第二个 World。
+  - 系统节点引用改为 `World/Systems/*`，并移除运行时重挂载系统节点的做法。
+  - 系统注册改为幂等（仅在缺失时 `add_system`），与 GECS 推荐场景组织一致。
+  - 涉及文件：`scenes/game_scene/pe_scene/DemoGame.tscn`、`scripts/ecs/gameplay/demo_game_runtime.gd`。
+- **统一玩家/人类敌人/非人类敌人的生物体基类**：
+  - 新增 `e_biological_body_base.gd`，作为生物角色共享的 Body↔ECS 桥接基类。
+  - 统一封装 ECS 实体注册与 `ECS.world_changed` 延迟注册流程，支持 World 晚于角色创建的时序。
+  - `HumanBase` 与 `NonHumanEnemyBody` 统一继承 `BiologicalBodyBase`；玩家/人类敌人/非人类敌人使用同一注册路径。
+  - 涉及文件：`e_biological_body_base.gd`、`e_human_base.gd`、`e_player.gd`、`e_human_enemy_body.gd`、`e_non_human_enemy_body.gd`。
+- **Demo 场景中体现三类生物实体**：
+  - 在 `DemoGame.tscn` 中加入 `HumanEnemyBody` 与 `NonHumanEnemyBody` 实例，使玩家/人类敌人/非人类敌人在同一游戏场景与 ECS 运行流程中可见。
+- **音效移除项核查**：
+  - 全仓库审计音频资源引用，确认不存在指向已删除音效文件的遗留调用。
+  - 当前战斗音频（`handgun_shoot`、`reload`、`mag_empty`）及已注册的游戏音频文件均存在。
+- **技术栈文档同步**：
+  - 同步更新架构说明，反映当前音频/本地化初始化流与生物体基类场景契约。
+
+---
+
 ## 更新 5 — 抛射物精灵碰撞、音频运行时联动、注册表调试输出
 
 ### 变更内容

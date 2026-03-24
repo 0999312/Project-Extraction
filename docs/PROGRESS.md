@@ -1,5 +1,29 @@
 # Project Extraction — Progress
 
+## Update 6 — DemoGame ECS Scene Alignment, Biological Base Refactor, and Documentation Sync
+
+### Changes
+
+- **DemoGame scene/runtime aligned with GECS world-in-scene pattern**:
+  - `demo_game_runtime.gd` now binds to the existing `World` node from `DemoGame.tscn` instead of creating a second runtime world.
+  - System references now use `World/Systems/*` paths and avoid reparenting scene systems at runtime.
+  - System registration is now idempotent (`add_system` only when missing), matching GECS recommended scene setup.
+  - Files: `scenes/game_scene/pe_scene/DemoGame.tscn`, `scripts/ecs/gameplay/demo_game_runtime.gd`.
+- **Biological actor base class unified for Player / HumanEnemy / NonHumanEnemy**:
+  - Added `e_biological_body_base.gd` as a shared body-bridge base for biological actors.
+  - Centralized ECS entity registration with deferred `ECS.world_changed` handling to support delayed world assignment.
+  - `HumanBase` and `NonHumanEnemyBody` now inherit from `BiologicalBodyBase`; player/human/non-human body scripts now share the same registration path.
+  - Files: `e_biological_body_base.gd`, `e_human_base.gd`, `e_player.gd`, `e_human_enemy_body.gd`, `e_non_human_enemy_body.gd`.
+- **Demo scene now visibly includes all three biological categories**:
+  - Added `HumanEnemyBody` and `NonHumanEnemyBody` instances to `DemoGame.tscn` so Player / Human Enemy / Non-Human Enemy are all present in the game scene and ECS runtime flow.
+- **Audio cleanup verification for removed files/calls**:
+  - Audited repository audio path references and confirmed no stale calls to deleted audio assets remain.
+  - Current combat audio references (`handgun_shoot`, `reload`, `mag_empty`) and registered gameplay audio files are present on disk.
+- **Tech stack documentation synchronized**:
+  - Updated architecture notes to reflect current audio/localization bootstrap flow and the biological base scene contract.
+
+---
+
 ## Update 5 — Projectile Sprite Collision, Audio Runtime Wiring, Registry Debug
 
 ### Changes
