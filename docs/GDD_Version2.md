@@ -258,7 +258,7 @@ We explicitly separate gameplay content by how it should be implemented for perf
   - `is_open`
 - Interaction validates inventory requirements, then updates animation and collision state directly.
 
-### 6.6 Traders (Fixed Interaction Points; NOT roaming actors)
+### 6.6 Traders (Fixed Interaction Points; not roaming actors)
 As requested: **no merchant actors**.
 - Traders are **interaction stations** in safehouse:
   - Node: `TraderTerminal` / `ShopCounter`

@@ -1,7 +1,7 @@
 # Project Extraction — Tech Stack & Architecture v0.3 (EN)
 
 **Date:** 2026-03-16  
-**Goal:** Define the concrete technical stack and how MSF (registry/tags/events/I18n) + scene/node-driven gameplay + Maaack Template integrate, including gameplay-content-specific implementations, safehouse home system, and raid map generation workflow.
+**Goal:** Define the concrete technical stack and how MSF (registry/tags/events/i18n) + scene/node-driven gameplay + Maaack Template integrate, including gameplay-content-specific implementations, safehouse home system, and raid map generation workflow.
 
 ---
 
