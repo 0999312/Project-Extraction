@@ -49,7 +49,7 @@ static func get_projectile_definition(projectile_id: String) -> Dictionary:
 	var registry := _get_projectile_registry()
 	if registry == null:
 		return {}
-	var entry := registry.get_entry(resource_location)
+	var entry : Dictionary = registry.get_entry(resource_location)
 	return entry.duplicate(true) if entry is Dictionary else {}
 
 
@@ -63,7 +63,7 @@ static func instantiate_projectile(projectile_id: String, overrides: Dictionary 
 	if not (script_resource is GDScript):
 		push_error("[ProjectileCatalog] Projectile script is invalid: %s" % script_path)
 		return null
-	var projectile := (script_resource as GDScript).new()
+	var projectile : Projectile = (script_resource as GDScript).new()
 	if not (projectile is Projectile):
 		push_error("[ProjectileCatalog] Projectile script did not instantiate a Projectile: %s" % script_path)
 		return null

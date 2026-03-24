@@ -22,6 +22,6 @@ func _on_setting_changed(value: Variant) -> void:
 
 func _get_localized_titles() -> Array[String]:
 	var localized: Array[String] = []
-	for key in LANGUAGE_TITLE_KEYS:
-		localized.append(tr(key))
+	for langkey in LANGUAGE_TITLE_KEYS:
+		localized.append(tr(langkey))
 	return localized

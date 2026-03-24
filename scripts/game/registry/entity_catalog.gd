@@ -44,7 +44,7 @@ static func get_entity_definition(entity_id: String) -> Dictionary:
 	var registry := _get_entity_registry()
 	if registry == null:
 		return {}
-	var entry := registry.get_entry(resource_location)
+	var entry : Dictionary = registry.get_entry(resource_location)
 	return entry.duplicate(true) if entry is Dictionary else {}
 
 
@@ -58,7 +58,7 @@ static func instantiate_entity(entity_id: String, node_name: String = "") -> Nod
 	if not (packed_scene is PackedScene):
 		push_error("[EntityCatalog] Scene is not a PackedScene: %s" % scene_path)
 		return null
-	var instance := packed_scene.instantiate()
+	var instance : Node = packed_scene.instantiate()
 	if instance != null and not node_name.is_empty():
 		instance.name = node_name
 	return instance

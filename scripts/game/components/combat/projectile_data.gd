@@ -52,7 +52,7 @@ func _compute_collision_radius_from_sprite(path: String) -> float:
 		return 4.0
 	var texture := ResourceLoader.load(path, "Texture2D", ResourceLoader.CACHE_MODE_REUSE)
 	if texture is Texture2D:
-		var size := texture.get_size()
+		var size : Vector2= texture.get_size()
 		if size.x > 0.0 and size.y > 0.0:
 			var radius := maxf(1.0, maxf(size.x, size.y) * 0.5)
 			_collision_radius_cache[path] = radius
