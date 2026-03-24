@@ -32,7 +32,7 @@ const GRAPH_MIN_FPS = 10
 const GRAPH_MAX_FPS = 160
 const GRAPH_MIN_FRAMETIME = 1.0 / GRAPH_MIN_FPS
 const GRAPH_MAX_FRAMETIME = 1.0 / GRAPH_MAX_FPS
-const GROUP_COUNT_REFRESH_INTERVAL := 0.25
+const GROUP_COUNT_REFRESH_INTERVAL_SECONDS := 0.25
 
 ## Debug menu display style.
 enum Style {
@@ -101,6 +101,8 @@ func _ready() -> void:
 	total_graph.draw.connect(_total_graph_draw)
 	cpu_graph.draw.connect(_cpu_graph_draw)
 	gpu_graph.draw.connect(_gpu_graph_draw)
+	_refresh_group_counts()
+	_group_count_refresh_remaining = GROUP_COUNT_REFRESH_INTERVAL_SECONDS
 
 	fps_history.resize(HISTORY_NUM_FRAMES)
 	frame_history_total.resize(HISTORY_NUM_FRAMES)
@@ -353,13 +355,17 @@ func _gpu_graph_draw() -> void:
 	gpu_graph.draw_polyline(gpu_polyline, frame_time_gradient.sample(remap(1000.0 / frametime_gpu_avg, GRAPH_MIN_FPS, GRAPH_MAX_FPS, 0.0, 1.0)), 1.0)
 
 
+func _refresh_group_counts() -> void:
+	_cached_actor_count = get_tree().get_nodes_in_group("actors").size()
+	_cached_projectile_count = get_tree().get_nodes_in_group("projectiles").size()
+
+
 func _process(delta: float) -> void:
 	if visible:
 		_group_count_refresh_remaining -= delta
 		if _group_count_refresh_remaining <= 0.0:
-			_cached_actor_count = get_tree().get_nodes_in_group("actors").size()
-			_cached_projectile_count = get_tree().get_nodes_in_group("projectiles").size()
-			_group_count_refresh_remaining = GROUP_COUNT_REFRESH_INTERVAL
+			_refresh_group_counts()
+			_group_count_refresh_remaining = GROUP_COUNT_REFRESH_INTERVAL_SECONDS
 
 		fps_graph.queue_redraw()
 		total_graph.queue_redraw()
