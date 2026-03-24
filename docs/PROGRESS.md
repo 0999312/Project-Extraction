@@ -1,5 +1,31 @@
 # Project Extraction — Progress
 
+## Update 5 — Projectile Sprite Collision, Audio Runtime Wiring, Registry Debug
+
+### Changes
+
+- **Projectile sprite configurability and sprite-based collision radius**:
+  - Added configurable projectile sprite path to combat/projectile data.
+  - Default projectile sprite is now `res://assets/game/textures/projectiles/bullet.png`.
+  - Projectile collision radius is derived from the configured sprite size at runtime.
+  - Projectile motion now performs lightweight ECS collision checks against living hostile entities using segment-to-point distance with sprite-derived radius.
+  - Files: `c_combat_state.gd`, `c_projectile_data.gd`, `s_combat_fire_system.gd`, `s_projectile_motion_system.gd`.
+- **SoundManager runtime linkage with existing audio config**:
+  - Added catalog helpers to fetch registered streams and play registered music directly from registry entries.
+  - Opening scene now auto-plays main menu music from startup registry entries.
+  - Loading screen now auto-plays gameplay music from gameplay registry entries before the game scene loads.
+  - Menu UI sound controller is now wired to registry-configured UI streams so focused/select and pressed/click interactions play expected SFX.
+  - Files: `audio_catalog.gd`, `opening.gd`, `loading_screen.gd`.
+- **Fix for `Condition "found" is true. Returning: Ref()` path**:
+  - Added defensive registry existence checks before `RegistryManager.get_registry(...)` access in audio catalog helpers.
+  - Added explicit error logging when registry resolution fails.
+  - File: `audio_catalog.gd`.
+- **Registry debug output after load**:
+  - After startup/gameplay registration, debug output now prints registry key and summarized entry content (category, phase, path, files, stream paths).
+  - File: `audio_catalog.gd`.
+
+---
+
 ## Update 4 — Video Settings & Anti-Aliasing Removal
 
 ### Changes
