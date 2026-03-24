@@ -1,6 +1,9 @@
-# API Overview (Current ECS + Input Integration)
+# API Overview (Current Input, Runtime, and Audio Integration)
 
-## scripts/ecs/input/player_input_context.gd
+- The current playable runtime is scene/node-driven and no longer depends on GECS or gdUnit4.
+- The current gameplay runtime script tree now lives under `scripts/game/`.
+
+## `player_input_context.gd`
 
 - `class_name PlayerInputContext : GUIDEMappingContext`
 - Provides GUIDE action mappings:
@@ -12,21 +15,22 @@
   - `pe_fire_mode_toggle` (`BOOL`)
   - `pe_sprint` (`BOOL`)
 
-## scripts/ecs/input/guide_input_runtime.gd
+## `guide_input_runtime.gd`
 
 - `class_name GuideInputRuntime`
 - Static runtime API:
   - `ensure_initialized()`
   - `get_context() -> GUIDEMappingContext`
   - `get_action(name: StringName) -> GUIDEAction`
+  - `get_action_axis_2d(name: StringName) -> Vector2`
   - `get_actions() -> Dictionary`
   - `get_remapper() -> GUIDERemapper`
+  - `is_action_triggered(name: StringName) -> bool`
   - `apply_remapping_config(config: GUIDERemappingConfig) -> void`
 
-## scripts/ecs/input/guide_input_options_menu.gd
+## `guide_input_options_menu.gd`
 
-- GUIDE-based remap UI controller used by:
-  - `scenes/menus/options_menu/input/guide_input_options_menu.tscn`
+- GUIDE-based remap UI controller used by `guide_input_options_menu.tscn`.
 - Supports:
   - keybinding table view (`Action` rows × `Keyboard` / `Mouse` / `Gamepad` columns)
   - clear movement direction text rows (`Move Up` / `Move Down` / `Move Left` / `Move Right`)
@@ -35,7 +39,7 @@
   - clear binding
   - reset defaults
 
-## scripts/ecs/entities/gameplay/e_player.gd
+## `player.gd`
 
 ### Input-facing behavior
 
@@ -43,18 +47,15 @@
   - movement vector (`pe_move`)
   - sprint hold (`pe_sprint`)
   - aiming axis (`pe_aim_axis`)
-  - fire + ADS flags pushed to `C_CombatState`
+  - fire + ADS flags pushed into current combat/runtime state
 
-### ECS bridge methods
+### Runtime-facing helpers
 
-- `get_ecs_entity() -> BaseEntity`
-- `is_alive() -> bool`
-- `get_health() -> C_Health`
-- `get_inventory_ref() -> C_InventoryRef`
+- Exposes player-alive checks and accessors for current health / inventory / combat-related state used by gameplay scripts.
 
-## scripts/ecs/components/combat/c_combat_state.gd
+## `combat_state.gd`
 
-Added fields:
+Fields include:
 
 - `wants_fire: bool`
 - `wants_reload: bool`
@@ -67,110 +68,121 @@ Added fields:
 - `recoil_recovery_per_sec: float`
 - `fire_mode: FireMode` (`SAFE` / `SEMI` / `AUTO`)
 - `pellets_per_shot: int`
-- `projectile_speed: float`
-- `projectile_max_distance: float`
+- `projectile_definition_id: String`
 - `ads_distance: float`
-- `attack_damage: float`
 - `ammo_max` / `ammo_current` + reload state (`is_reloading`, `reload_progress`, `reload_duration_sec`)
 
-## scripts/ecs/components/combat/c_aim_state.gd
+## `aim_state.gd`
 
-Added field:
+Field includes:
 
 - `precision_multiplier: float`
 
-## scripts/ecs/components/combat/c_projectile_data.gd
+## `projectile_data.gd`
 
-Added field:
+Fields include:
 
 - `spread_deviation_rad: float`
 - `max_distance: float`
 - `remaining_distance: float`
 - `base_damage` / `base_speed` for attenuation curve
 
-## scripts/ecs/projectiles/e_base_projectile.gd
+## `projectile.gd`
 
-- `setup(direction, dmg, pen, owner_id, wpn_id)` now applies `spread_deviation_rad` rotation before velocity assignment.
+- `setup(direction, dmg, pen, owner_id, wpn_id)` applies `spread_deviation_rad` rotation before velocity assignment.
+- Intended as the node-driven projectile runtime setup entry point used by the projectile registry/catalog flow.
 
-## scripts/ecs/systems/s_combat_fire_system.gd
+## `entity_registry.gd` / `entity_catalog.gd`
 
-- `class_name S_CombatFireSystem : System`
-- Query: entities with `C_CombatState`, `C_AimState`, `C_Position`, `C_Faction`
-- Per tick:
+- `EntityRegistry` stores registry-backed entity definitions.
+- `EntityCatalog` provides:
+  - `ensure_registry()`
+  - `get_entity_definition(entity_id: String) -> Dictionary`
+  - `instantiate_entity(entity_id: String, node_name: String = "") -> Node`
+- Current built-in entity definitions:
+  - `game:entity/player`
+  - `game:entity/human_enemy`
+  - `game:entity/non_human_enemy`
+
+## `projectile_registry.gd` / `projectile_catalog.gd`
+
+- `ProjectileRegistry` stores registry-backed projectile definitions.
+- `ProjectileCatalog` provides:
+  - `ensure_registry()`
+  - `get_projectile_definition(projectile_id: String) -> Dictionary`
+  - `instantiate_projectile(projectile_id: String, overrides: Dictionary = {}) -> Projectile`
+- Current built-in projectile definitions:
+  - `game:projectile/bullet`
+  - `game:projectile/creature_bolt`
+
+## `combat_fire_runtime.gd`
+
+- Handles per-tick combat processing for actors with combat/aim/position/faction data.
+- Responsibilities include:
   - cooldown + recoil recovery
-  - fire-mode handling (`SAFE`/`SEMI`/`AUTO`)
-  - player manual reload trigger (`pe_reload`) and NPC auto reload when empty mag
-  - empty-mag reminder SFX (`res://assets/game/sounds/ui/cancel.mp3`)
-  - if fire requested and available ammo/cooldown, spawn projectile(s)
-  - apply hipfire vs ADS spread + recoil spread
-  - supports per-shot pellet count (`pellets_per_shot`)
-  - decrement ammo, set cooldown, add recoil
+  - fire-mode handling (`SAFE` / `SEMI` / `AUTO`)
+  - manual reload trigger and non-player auto reload when magazine is empty
+  - empty-mag reminder SFX
+  - projectile spawn through `ProjectileCatalog.instantiate_projectile(...)` when fire is requested and ammo/cooldown rules allow it
+  - hipfire vs ADS spread + recoil spread
+  - per-shot pellet count support
 
-## scripts/ecs/systems/s_projectile_motion_system.gd
+## `projectile_motion_runtime.gd`
 
-- `class_name S_ProjectileMotionSystem : System`
-- Query: entities with `C_ProjectileData`, `C_Position`
 - Advances projectile age/position and removes expired projectiles.
 - Applies distance-based attenuation using `remaining_distance / max_distance`:
   - gradual damage decay
   - gradual speed decay
-  - projectile expires when distance is exhausted.
+  - projectile expiry when travel distance is exhausted
 
-## scripts/ecs/gameplay/demo_game_runtime.gd
+## `demo_game_runtime.gd`
 
-- Bootstraps runtime `World` under demo scene.
-- Assigns `ECS.world`.
-- Registers and processes:
-  - `S_CombatFireSystem`
-  - `S_ProjectileMotionSystem`
-- Polls GUIDE `pe_pause` action and opens `PauseMenuController` in `DemoGame`.
-- Applies ADS camera follow offset toward crosshair direction by writing
-  `PhantomCamera2D.follow_offset` while aiming.
+- Coordinates demo-scene gameplay processing.
+- Uses combat and projectile processing helpers directly from the scene runtime.
+- Instantiates the playable runtime actors from `EntityCatalog` using spawn markers inside `DemoGame.tscn`.
+- Polls GUIDE `pe_pause` through `GuideInputRuntime` helpers and opens `PauseMenuController` in `DemoGame`.
+- Applies ADS camera follow offset toward crosshair direction by writing `PhantomCamera2D.follow_offset` while aiming.
 
-## scripts/ecs/game_state.gd
+## `game_state.gd`
 
-Added game loop phase API:
+Game loop phase API:
 
 - `enum GamePhase { HOMESTEAD, DEPLOY, RAID, EXTRACT }`
 - `set_game_phase(phase: GamePhase) -> void`
 - `get_game_phase() -> GamePhase`
 
-## scripts/audio/audio_registry.gd
+## `audio_registry.gd`
 
 - `class_name AudioRegistry : RegistryBase`
 - Registry entry type: `Dictionary`
 - Supports selecting entries by load phase:
   - `get_entries_for_phase(load_phase: String) -> Dictionary`
 
-## scripts/audio/audio_registry_bootstrap.gd
-
-> **REMOVED** — Replaced by `scenes/opening/opening.gd` (startup audio)
-> and `scenes/loading_screen/loading_screen.gd` (gameplay audio).
-
-## scenes/opening/opening.gd
+## `opening.gd`
 
 - Extends the Maaacks template Opening scene.
 - Handles localization initialization: loads i18n JSON translations, applies configured language.
 - Handles startup audio registration: registers `AudioRegistry` via `RegistryManager`, loads startup audio groups from `AudioCatalog.STARTUP_AUDIO_GROUPS`.
-- Exposes `set_language(code)`, `get_supported_languages()`, `register_gameplay_audio()`.
+- Configures menu UI sound players from registry-loaded streams.
+- Auto-plays main menu music through `AudioCatalog.play_registered_music(...)`.
 
-## scenes/loading_screen/loading_screen.gd
+## `loading_screen.gd`
 
 - Extends `LoadingScreen` (Maaacks template).
-- Registers gameplay-phase audio groups on `_ready()`:
-  - `game:audio/game` from `res://assets/game/sounds/sounds`
-  - `game:audio/environment` from `res://assets/game/sounds/music`
+- Registers gameplay-phase audio groups on `_ready()`.
+- Starts gameplay music before the game scene loads.
 
-## scripts/audio/audio_catalog.gd
+## `audio_catalog.gd`
 
 - Defines startup/gameplay audio registration config.
 - Uses folder + filename arrays per category.
+- Provides helpers for:
+  - ensuring the audio registry exists
+  - registering startup/gameplay groups
+  - resolving a registered stream by category / preferred filename
+  - playing registered music through `SoundManager`
 
-## scripts/localization/localization_bootstrap.gd
-
-> **REMOVED** — Replaced by `scenes/opening/opening.gd`.
-
-## scenes/menus/options_menu/game/language_option_control.gd
+## `language_option_control.gd`
 
 - `ListOptionControl` for language switching in `game_options`.
 - Supported values: `en`, `zh`
