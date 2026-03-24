@@ -1,5 +1,31 @@
 # Project Extraction — 开发进度
 
+## 更新 5 — 抛射物精灵碰撞、音频运行时联动、注册表调试输出
+
+### 变更内容
+
+- **抛射物精灵可配置与基于精灵图的碰撞半径**：
+  - 为战斗/抛射物数据增加可配置的抛射物精灵路径。
+  - 抛射物默认精灵图设为 `res://assets/game/textures/projectiles/bullet.png`。
+  - 运行时根据配置精灵图尺寸自动计算抛射物碰撞半径。
+  - 抛射物运动系统增加轻量 ECS 碰撞检测：对存活且敌对目标做线段到点距离检测（使用精灵半径）。
+  - 涉及文件：`c_combat_state.gd`、`c_projectile_data.gd`、`s_combat_fire_system.gd`、`s_projectile_motion_system.gd`。
+- **SoundManager 与现有音频配置联动**：
+  - 在音频目录中增加“按注册表获取音频流”和“按注册表播放音乐”辅助方法。
+  - Opening 场景现在会基于启动阶段注册表条目自动播放主菜单音乐。
+  - LoadingScreen 场景现在会基于游戏阶段注册表条目在进入游戏前自动播放游戏音乐。
+  - 菜单 UI 音效控制器已绑定到注册表中的 UI 音频流，菜单聚焦/选中与点击可播放对应音效。
+  - 涉及文件：`audio_catalog.gd`、`opening.gd`、`loading_screen.gd`。
+- **修复 `Condition \"found\" is true. Returning: Ref()` 相关路径**：
+  - 在音频目录辅助方法中，调用 `RegistryManager.get_registry(...)` 前增加注册表存在性防护检查。
+  - 注册表解析失败时输出显式错误日志。
+  - 涉及文件：`audio_catalog.gd`。
+- **注册表加载后调试输出**：
+  - 启动阶段/游戏阶段注册后，调试日志会输出注册表键和条目摘要（分类、阶段、路径、文件列表、音频路径列表）。
+  - 涉及文件：`audio_catalog.gd`。
+
+---
+
 ## 更新 4 — 视频设置配置 & 移除抗锯齿
 
 ### 变更内容

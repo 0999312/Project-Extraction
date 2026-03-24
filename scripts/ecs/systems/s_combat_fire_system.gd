@@ -70,6 +70,7 @@ func process(entities: Array[Entity], components: Array, delta: float) -> void:
 				combat.projectile_lifetime,
 				combat.projectile_max_distance
 			)
+			projectile_data.configure_sprite(combat.projectile_sprite_path)
 			projectile_data.spread_deviation_rad = deg_to_rad(_compute_spread_offset_degrees(combat, aim))
 			projectile.add_components([projectile_pos, projectile_data])
 			ECS.world.add_entity(projectile)

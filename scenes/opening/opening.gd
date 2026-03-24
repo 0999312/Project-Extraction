@@ -21,6 +21,8 @@ const SUPPORTED_LANGUAGES := ["en", "zh"]
 func _ready() -> void:
 	_init_localization()
 	AudioCatalog.ensure_registry_and_register(AudioCatalog.STARTUP_AUDIO_GROUPS)
+	_configure_ui_audio()
+	AudioCatalog.play_registered_music("music", "main_menu.mp3")
 	super._ready()
 
 
@@ -63,5 +65,40 @@ func _normalize_language(language_code: String) -> String:
 	if normalized in SUPPORTED_LANGUAGES:
 		return normalized
 	return DEFAULT_LANGUAGE
+
+
+func _configure_ui_audio() -> void:
+	if ProjectUISoundController == null:
+		return
+	for child in ProjectUISoundController.get_children():
+		if child is AudioStreamPlayer:
+			child.queue_free()
+	var select_stream := AudioCatalog.get_registered_stream("ui", "select.mp3")
+	var click_stream := AudioCatalog.get_registered_stream("ui", "click.mp3")
+	ProjectUISoundController.button_focused_player = _create_ui_audio_player(ProjectUISoundController, select_stream, "ButtonFocused")
+	ProjectUISoundController.button_pressed_player = _create_ui_audio_player(ProjectUISoundController, click_stream, "ButtonPressed")
+	ProjectUISoundController.tab_selected_player = _create_ui_audio_player(ProjectUISoundController, select_stream, "TabSelected")
+	ProjectUISoundController.tab_changed_player = _create_ui_audio_player(ProjectUISoundController, select_stream, "TabChanged")
+	if ProjectUISoundController.root_node != null:
+		_connect_ui_sounds_recursive(ProjectUISoundController, ProjectUISoundController.root_node)
+
+
+func _create_ui_audio_player(controller: UISoundController, stream: AudioStream, name_suffix: String) -> AudioStreamPlayer:
+	if stream == null:
+		return null
+	var player := AudioStreamPlayer.new()
+	player.stream = stream
+	player.bus = controller.audio_bus
+	player.name = "%sAudioStreamPlayer" % name_suffix
+	controller.add_child(player)
+	return player
+
+
+func _connect_ui_sounds_recursive(controller: UISoundController, node: Node, depth: int = 0) -> void:
+	if depth >= UISoundController.MAX_DEPTH:
+		return
+	controller.connect_ui_sounds(node)
+	for child in node.get_children():
+		_connect_ui_sounds_recursive(controller, child, depth + 1)
 
 #endregion Localization

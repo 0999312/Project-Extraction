@@ -9,3 +9,4 @@ extends LoadingScreen
 func _ready() -> void:
 	super._ready()
 	AudioCatalog.register_gameplay_audio()
+	AudioCatalog.play_registered_music("environment", "game_scene.mp3")
