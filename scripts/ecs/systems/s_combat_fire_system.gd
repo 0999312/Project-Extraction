@@ -11,8 +11,15 @@ const AI_RELOAD_FACTIONS := [
 	C_Faction.FactionType.NON_HUMAN_ENEMY,
 ]
 
+var _shoot_sfx: AudioStream
+var _reload_sfx: AudioStream
+var _empty_mag_sfx: AudioStream
+
 func setup() -> void:
 	randomize()
+	_shoot_sfx = load(SHOOT_SFX_PATH)
+	_reload_sfx = load(RELOAD_SFX_PATH)
+	_empty_mag_sfx = load(EMPTY_MAG_SFX_PATH)
 
 func query() -> QueryBuilder:
 	return q.with_all([C_CombatState, C_AimState, C_Position, C_Faction]).iterate([C_CombatState, C_AimState, C_Position, C_Faction])
@@ -147,23 +154,20 @@ func _cycle_fire_mode(combat: C_CombatState) -> void:
 func _play_empty_mag_if_needed(combat: C_CombatState) -> void:
 	if combat.empty_mag_sfx_cooldown > 0.0:
 		return
-	var sfx: AudioStream = load(EMPTY_MAG_SFX_PATH)
-	if sfx != null:
-		SoundManager.play_sound(sfx)
+	if _empty_mag_sfx != null:
+		SoundManager.play_sound(_empty_mag_sfx)
 	combat.empty_mag_sfx_cooldown = EMPTY_MAG_SFX_MIN_INTERVAL
 	print("[DEBUG][CombatFire] EMPTY_MAG sfx played")
 
 
 func _play_shoot_sfx() -> void:
-	var sfx: AudioStream = load(SHOOT_SFX_PATH)
-	if sfx != null:
-		SoundManager.play_sound(sfx)
+	if _shoot_sfx != null:
+		SoundManager.play_sound(_shoot_sfx)
 
 
 func _play_reload_sfx() -> void:
-	var sfx: AudioStream = load(RELOAD_SFX_PATH)
-	if sfx != null:
-		SoundManager.play_sound(sfx)
+	if _reload_sfx != null:
+		SoundManager.play_sound(_reload_sfx)
 
 
 func deps() -> Dictionary:

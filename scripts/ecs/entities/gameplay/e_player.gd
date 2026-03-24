@@ -36,6 +36,8 @@ const BASE_SPEED: float = 200.0
 const BASE_SPRINT_SPEED: float = 320.0
 ## Stamina consumed per second while sprinting.
 const STAMINA_SPRINT_COST_PER_SEC: float = 15.0
+## Minimum squared move input length to count as intentional movement.
+const MOVE_INPUT_EPSILON: float = 0.01
 const GUIDE_ACTION_MOVE := &"pe_move"
 const GUIDE_ACTION_AIM_AXIS := &"pe_aim_axis"
 const GUIDE_ACTION_FIRE := &"pe_fire"
@@ -170,7 +172,7 @@ func _get_aim_direction() -> Vector2:
 ## Consumes stamina while sprinting; disables sprint when exhausted.
 ## Directly modifies [C_Stamina] fields — no logic methods on the component.
 func _handle_sprint_stamina(delta: float) -> void:
-	if not is_sprinting or move_input.length_squared() < 0.01:
+	if not is_sprinting or move_input.length_squared() < MOVE_INPUT_EPSILON:
 		return
 	var stamina: C_Stamina = _ecs_entity.get_component(C_Stamina)
 	if stamina == null:
@@ -276,8 +278,8 @@ func _poll_guide_input() -> void:
 	if _using_gamepad_aim:
 		aim_direction = stick_aim.normalized()
 	# DEBUG: log movement and sprint changes
-	var started_move := prev_move.length_squared() < 0.01 and move_input.length_squared() >= 0.01
-	var stopped_move := prev_move.length_squared() >= 0.01 and move_input.length_squared() < 0.01
+	var started_move := prev_move.length_squared() < MOVE_INPUT_EPSILON and move_input.length_squared() >= MOVE_INPUT_EPSILON
+	var stopped_move := prev_move.length_squared() >= MOVE_INPUT_EPSILON and move_input.length_squared() < MOVE_INPUT_EPSILON
 	if started_move:
 		print("[DEBUG][Player] MOVE started | dir=(%.2f,%.2f) speed=%.0f" % [
 			move_input.x, move_input.y, _get_current_speed()])
