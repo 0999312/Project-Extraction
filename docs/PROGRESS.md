@@ -1,5 +1,27 @@
 # Project Extraction — Progress
 
+## Update 11 — Crosshair Node, Relaxed Mouse Cursor, and ADS Camera Follow-Target Switch
+
+### Changes
+
+- **Added runtime crosshair/mouse node with three visual states**:
+  - relaxed state (UI interaction): `assets/game/textures/ui/mouse.png`
+  - hip-fire state: `assets/game/textures/ui/crosshair_normal.png`
+  - ADS state: `assets/game/textures/ui/crosshair_aiming.png`
+- **Applied origin/centering rules by state**:
+  - relaxed mouse sprite is not centered (top-left origin)
+  - hip-fire / ADS crosshair sprites are centered
+- **Reworked camera follow behavior around ADS**:
+  - ADS now switches phantom-camera follow target to crosshair instead of player.
+  - Crosshair ADS position is clamped by `CombatState.ads_distance`; camera no longer follows beyond that range.
+  - Leaving ADS switches follow target back to player.
+- **Added weapon aiming-time parameter for smooth follow-target switching**:
+  - Added `CombatState.aim_transition_sec`.
+  - Camera follow-target transition smoothing now uses this parameter through phantom-camera damping.
+- **Updated docs to match the new crosshair/camera runtime behavior**.
+
+---
+
 ## Update 10 — Runtime Naming Cleanup, Entity Registry, and Projectile Registry
 
 ### Changes

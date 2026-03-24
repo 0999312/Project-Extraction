@@ -1,5 +1,27 @@
 # Project Extraction — 开发进度
 
+## 更新 11 — 准星节点、放松态鼠标与 ADS 镜头跟随目标切换
+
+### 变更内容
+
+- **新增运行时鼠标/准星节点与三种视觉状态**：
+  - 放松状态（UI 交互）：`assets/game/textures/ui/mouse.png`
+  - 腰射状态：`assets/game/textures/ui/crosshair_normal.png`
+  - ADS 瞄准状态：`assets/game/textures/ui/crosshair_aiming.png`
+- **按状态应用原点/居中规则**：
+  - 放松态鼠标精灵不居中（左上角原点）
+  - 腰射 / ADS 准星精灵居中
+- **重写 ADS 相关镜头跟随逻辑**：
+  - ADS 时将 phantom-camera 跟随目标从玩家切换为准星。
+  - ADS 准星位置受 `CombatState.ads_distance` 限制，超出范围后镜头不再继续向外跟随。
+  - 退出 ADS（进入腰射）后跟随目标切回玩家。
+- **新增“瞄准时间”枪械属性用于平滑切换**：
+  - 新增 `CombatState.aim_transition_sec`。
+  - 镜头跟随目标切换的平滑时长通过该参数驱动 phantom-camera damping。
+- **同步更新文档以匹配新的准星/镜头运行时行为**。
+
+---
+
 ## 更新 10 — 运行时命名清理、实体注册表与抛射物注册表
 
 ### 变更内容
