@@ -143,12 +143,13 @@ Fields include:
 - Instantiates the playable runtime actors from `EntityCatalog` using spawn markers inside `DemoGame.tscn`.
 - Polls GUIDE `pe_pause` through `GuideInputRuntime` helpers and opens `PauseMenuController` in `DemoGame`.
 - Manages a runtime `CrosshairNode` with three visual modes:
-  - relaxed/UI interaction: `assets/game/textures/ui/mouse.png` (top-left origin, not centered)
+  - relaxed/UI interaction: node hidden (`visible = false`); system cursor takes over
   - hip-fire: `assets/game/textures/ui/crosshair_normal.png` (centered)
   - ADS: `assets/game/textures/ui/crosshair_aiming.png` (centered)
-- During ADS, camera follow target switches from player to crosshair and crosshair movement is clamped by `CombatState.ads_distance`.
-- When leaving ADS, camera follow target switches back to player.
+- Crosshair always follows the mouse freely; `CombatState.ads_distance` only limits the camera follow target (an invisible `CameraAimTarget` node), not the crosshair itself.
+- During ADS, camera follow target switches to the distance-clamped `CameraAimTarget`; leaving ADS switches back to player.
 - Follow-target switching smoothness is controlled through phantom-camera damping using `CombatState.aim_transition_sec`.
+- During ADS, an `AdsVignetteOverlay` darkens the viewport outside a crosshair-sized circle (configurable, default enabled).
 
 ## `game_state.gd`
 

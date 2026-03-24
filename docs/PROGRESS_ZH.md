@@ -1,5 +1,29 @@
 # Project Extraction — 开发进度
 
+## 更新 12 — 准星放松态隐藏、ADS 自由鼠标跟随、ADS 暗角蒙版与 UI 按钮音效修正
+
+### 变更内容
+
+- **准星放松状态改为隐藏节点，不再切换纹理**：
+  - 放松（暂停 / UI）状态下将准星 `visible` 设为 `false`。
+  - 移除了 `mouse.png` 纹理切换；暂停菜单启用系统光标时由系统光标接管显示。
+- **ADS 时准星自由跟随鼠标**：
+  - 移除了准星位置的 `ads_distance` 限制；无论腰射还是 ADS，准星始终跟随鼠标。
+  - 新增不可见的 `CameraAimTarget` 节点，其位置受 `CombatState.ads_distance` 约束。
+  - ADS 时 phantom-camera 跟随目标切换为 `CameraAimTarget`（而非准星），使镜头受距离限制但准星不受限。
+- **新增 ADS 暗角蒙版效果**：
+  - 新增 `AdsVignetteOverlay`（CanvasLayer），使用 Shader 驱动的全屏 `ColorRect`。
+  - 一个透明圆形区域（默认半径 32 px，与 64 × 64 准星精灵匹配）随准星屏幕位置移动。
+  - 圆形外区域变暗（默认 50 % 黑色）；可通过 `enabled`、`radius_px`、`darkness`、`softness_px` 属性配置。
+  - 效果默认开启，ADS 时自动激活。
+  - Shader 文件：`resources/shaders/ads_vignette.gdshader`。
+- **UI 按钮点击改为播放 `select.mp3`，不再播放 `click.mp3`**：
+  - `opening.gd` 将 `button_pressed_player` 绑定到 `select.mp3`，与 `button_focused_player` 一致。
+  - `cancel.mp3` 仍在音频目录中注册为占位项；注册表内容未更改。
+- **同步更新文档以匹配新的准星/镜头/蒙版/音频行为**。
+
+---
+
 ## 更新 11 — 准星节点、放松态鼠标与 ADS 镜头跟随目标切换
 
 ### 变更内容
