@@ -1,5 +1,29 @@
 # Project Extraction — Progress
 
+## Update 12 — Crosshair Relaxed-State Hidden, Free-Mouse ADS, ADS Vignette, and UI Button SFX Fix
+
+### Changes
+
+- **Crosshair relaxed state now hides the node instead of swapping texture**:
+  - Relaxed (paused / UI) state sets `visible = false` on the crosshair sprite.
+  - Removed the `mouse.png` texture swap; the system cursor takes over when the pause menu makes it visible.
+- **Crosshair follows the mouse freely during ADS**:
+  - Removed the `ads_distance` clamping from crosshair position; crosshair always tracks the mouse in both hip-fire and ADS.
+  - Introduced a separate invisible `CameraAimTarget` node whose position is clamped by `CombatState.ads_distance`.
+  - Phantom-camera follow target now switches to `CameraAimTarget` (not the crosshair) during ADS, so the camera is distance-limited while the crosshair is not.
+- **Added ADS vignette darkening overlay**:
+  - New `AdsVignetteOverlay` (CanvasLayer) with a shader-driven full-screen `ColorRect`.
+  - A circular transparent hole (default 32 px radius, matching the 64 × 64 crosshair sprite) follows the crosshair screen position.
+  - Area outside the circle is dimmed (default 50 % black); configurable via `enabled`, `radius_px`, `darkness`, and `softness_px` properties.
+  - Effect is enabled by default and automatically activates during ADS.
+  - Shader file: `resources/shaders/ads_vignette.gdshader`.
+- **UI button press now plays `select.mp3` instead of `click.mp3`**:
+  - `opening.gd` wires `button_pressed_player` to `select.mp3`, matching `button_focused_player`.
+  - `cancel.mp3` remains registered in the audio catalog as a placeholder; the registry contents are unchanged.
+- **Updated docs to match the new crosshair/camera/vignette/audio behavior**.
+
+---
+
 ## Update 11 — Crosshair Node, Relaxed Mouse Cursor, and ADS Camera Follow-Target Switch
 
 ### Changes
