@@ -1,7 +1,7 @@
 # Project Extraction — Tech Stack & Architecture v0.3 (EN)
 
 **Date:** 2026-03-16  
-**Goal:** Define the concrete technical stack and how MSF (registry/tags/events/I18n) + GECS (ECS) + Maaack Template integrate, including entity-type-specific implementations, safehouse home system, and raid map generation workflow.
+**Goal:** Define the concrete technical stack and how MSF (registry/tags/events/I18n) + scene/node-driven gameplay + Maaack Template integrate, including gameplay-content-specific implementations, safehouse home system, and raid map generation workflow.
 
 ---
 
@@ -20,11 +20,11 @@
   - **EventBus** for decoupled events (and cancellation / signal bridging).
   - **I18n** JSON-based localization.
 
-### 1.3 ECS Runtime
-- **csprance/gecs (GECS)**
-  - Entities are Nodes holding component Resources; systems query + process entities.
-  - QueryBuilder supports fluent queries, property filters, relationships, and `iterate()` fast paths.
-  - CommandBuffer enables safe deferred structural changes.
+### 1.3 Gameplay Runtime Pattern
+- **Scene / Node-driven gameplay runtime**
+  - Player, enemies, doors, and interaction points live as scene nodes with local state objects.
+  - High-frequency logic (projectiles, combat updates, AI decisions) is handled by focused gameplay scripts and manager services.
+  - Pooling and chunk activation remain the main performance tools.
 
 ### 1.4 Input
 - **godotneers/G.U.I.D.E**
@@ -59,23 +59,23 @@
 
 ---
 
-## 2) Project Architecture (Performance-First, Hybrid ECS + Nodes)
+## 2) Project Architecture (Performance-First, Data-Driven Nodes)
 
 ### 2.1 Core Principle
-**Simulation is data-driven and registry-addressable; presentation is node-driven.**  
+**Gameplay logic is data-driven and registry-addressable; runtime actors remain scene/node-driven.**  
 No gameplay system should rely on hardcoded strings; use `ResourceLocation` everywhere.
 
 ### 2.2 Layers
 1. **Content Layer (MSF)**
    - Registries: items, tags, POIs, loot tables, quests, dialogues, tech, home modules, raid templates.
-2. **Simulation Layer (GECS)**
-   - ECS world processes high-frequency and high-count logic:
+2. **Gameplay Logic Layer**
+   - State objects, manager services, AI brains, and pooled runtime processors handle:
      - AI, projectiles, status effects, loot roll decisions, quest state transitions.
 3. **Presentation Layer (Godot Nodes)**
-   - Player body, sprites, VFX, UI, camera, scene fragments.
-4. **Bridge Layer (Autoload services)**
-   - InputBridge, AudioBridge, UIBridge, SceneFlowBridge, CameraBridge
-   - Bridges are the ONLY place allowed to call plugin APIs.
+   - Player body, enemy bodies, sprites, VFX, UI, camera, scene fragments.
+4. **Service Bridge Layer**
+   - InputBridge, AudioBridge, UIBridge, SceneFlowBridge, CameraBridge.
+   - Bridges isolate plugin-specific APIs from the rest of gameplay code.
 
 ---
 
@@ -115,8 +115,8 @@ MSF demo uses `ItemInfo` with `scene/script`. For this project:
 - `GridInventory { width, height, placements }`
 
 **World drop runtime:**
-- ECS entity `E_ItemDrop` with component `C_ItemStack` referencing `item_id` and count.
-- Optional Node view for sprite pickup prompt.
+- World pickup node carrying `item_id`, count, and optional display metadata.
+- Optional lightweight prompt / highlight view for pickup feedback.
 
 ### 4.2 POI Definitions
 POI registry entries include:
@@ -139,45 +139,40 @@ Loot table entries should be registry-driven:
 
 ---
 
-## 5) Entity Type Implementations (Per Requirement)
+## 5) Gameplay Content Implementations (Per Requirement)
 
-### 5.1 Player (Node + ECS Hybrid)
+### 5.1 Player (CharacterBody2D + Runtime State)
 - Node: `CharacterBody2D` for movement/collision and animations.
-- ECS: authoritative gameplay state and combat decisions.
-- Implementation note: player body extends `HumanBase` (which extends
-  `BiologicalBodyBase`) and owns a child ECS entity bridge.
+- Local runtime state stores health, stamina, inventory reference, weapon state, and active effects.
+- Input writes directly into player state; camera/UI/animation read from the same runtime data.
 
-**Sync path:**
-- Node → ECS: position/aim
-- ECS → Node: status effects, weapon state, camera shake events
+### 5.2 Enemies (Body Script + AI Brain)
+- Enemy scenes own their movement, hit reactions, and interaction hooks.
+- AI state, targeting, and weapon usage are managed by enemy-local brains or shared behavior helpers.
+- Human enemies can keep the shared `HumanBase` aim-pivot rig; non-human enemies can keep full-body aiming while still following the same biological actor base contract.
 
-### 5.2 Enemies (ECS-first)
-- ECS handles AI state, targeting, weapon usage, health.
-- Node view is minimal and can be chunk-activated/deactivated.
-- Human enemies use the shared `HumanBase` aim-pivot rig; non-human enemies use
-  full-body aiming and both now share `BiologicalBodyBase` registration logic.
+### 5.3 Projectiles (Pooled Runtime Objects)
+- Projectile manager updates positions, performs hit checks, and applies damage/results.
+- Visual tracers and impact effects are pooled to avoid unnecessary scene churn.
 
-### 5.6 Biological Body Base Scene Contract
-- Shared base script: `scripts/ecs/entities/gameplay/e_biological_body_base.gd`.
-- Responsibilities:
-  - Register child ECS entity into active GECS world.
-  - Defer registration through `ECS.world_changed` when world assignment is late.
-- Derived bodies:
-  - `HumanBase` (player + human enemy).
-  - `NonHumanEnemyBody` (non-human enemy full-body rotation).
-
-### 5.3 Projectiles (ECS-only)
-- ECS updates positions, performs hit checks, applies damage events.
-- Pool VFX and avoid per-projectile Nodes.
-
-### 5.4 Containers (Lazy ECS state)
+### 5.4 Containers (Lazy Local State)
 - Containers are POI fragment nodes for interaction triggers.
-- ECS container-state entity created or activated on first interaction.
+- Container state is created or hydrated on first interaction, keeping deferred loot behavior without preloading all container contents.
 
-### 5.5 Traders (Fixed Interaction Points; Not Entities)
+### 5.5 Traders (Fixed Interaction Points; Not roaming actors)
 - Traders are safehouse **interaction terminals** (Nodes).
 - Trader behavior is data-driven via `trader_id: RL` and registry definitions.
-- No NPC merchant ECS entity exists.
+- No roaming merchant actor is required.
+
+### 5.6 Biological Body Base Scene Contract
+- Shared base script remains useful as a runtime contract for biological actors.
+- Responsibilities:
+  - centralize shared initialization
+  - provide delayed setup when dependent runtime references are not ready yet
+  - standardize health/damage/aim anchor behavior across derived bodies
+- Derived bodies:
+  - `HumanBase` (player + human enemy)
+  - `NonHumanEnemyBody` (non-human enemy full-body rotation)
 
 ---
 
@@ -231,7 +226,7 @@ All expansions are RL-defined so saves remain stable.
   - activate enemy spawns
   - enable container interaction
 - When chunk becomes inactive:
-  - sleep AI systems for entities outside radius
+  - pause or simplify enemy brain updates outside the active radius
   - unload heavy visuals if safe
 
 ---
@@ -257,11 +252,11 @@ Missing RL fallback:
 
 ## 9) Bridges (Integration Contracts)
 
-- **InputBridge:** G.U.I.D.E → MSF EventBus command events → ECS consumes
-- **AudioBridge:** ECS `PlaySfxEvent` → @nathanhoad/godot_sound_manager
+- **InputBridge:** G.U.I.D.E → runtime input commands / state updates for scene actors
+- **AudioBridge:** UI/gameplay code → `AudioCatalog` / `SoundManager`
 - **SceneFlowBridge:** extraction/death requests → Maaack Scene Loader transitions
-- **UIBridge:** ECS state → UI updates (event-driven)
-- **CameraBridge:** ECS hit/explosion events → phantom-camera trauma/shake
+- **UIBridge:** runtime state → UI updates (event-driven where appropriate)
+- **CameraBridge:** hit/explosion/gameplay events → phantom-camera trauma/shake
 
 ---
 
@@ -274,7 +269,7 @@ Missing RL fallback:
 - [ ] Implement container deferred loot roll system
 - [ ] Implement safehouse home system modules + build/upgrade + automation graph
 - [ ] Implement multi-slot save + versioning/migration
-- [ ] Implement ECS bridges and entity-type-specific pipelines
+- [ ] Implement scene/node runtime pipelines and content-type-specific processing flows
 
 ---
 

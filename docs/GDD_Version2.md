@@ -22,7 +22,7 @@ All IDs in design and implementation use **Minecraft-Style-Framework `ResourceLo
 - tags
 - event bus events
 - save data references
-- ECS spawn instructions
+- runtime spawn instructions
 
 **Example IDs:**
 - `core:registry/item` (registry type RL reference)
@@ -111,7 +111,7 @@ Effects are tag-driven: `game:tag/med_bandage`, `game:tag/med_painkiller`, etc.
 
 ## 5) Data & Content Implementation (Concrete)
 
-This section describes how “items, entities, POIs, etc.” exist in the game in a way compatible with MSF registries + GECS ECS.
+This section describes how “items, actors, POIs, etc.” exist in the game in a way compatible with MSF registries and a scene/node-driven runtime.
 
 ### 5.1 Registries (ResourceLocation-driven)
 Recommended registry types (retrieved via `RegistryManager.get_registry(type_name)` in MSF):
@@ -122,7 +122,7 @@ Recommended registry types (retrieved via `RegistryManager.get_registry(type_nam
 - `core:quest` → Quest definitions
 - `core:dialogue` → Dialogue definitions
 - `core:scene` → Scene template definitions (safehouse/raid templates)
-- `core:entity_archetype` → ECS archetype spawn definitions (mapping layer)
+- `core:spawn_profile` → runtime spawn definitions for actors, loot markers, and encounter presets
 
 > Note: MSF `Tag` stores `registry_type: ResourceLocation` and entries as RL strings. Tags must point to the correct registry type RL (e.g., `core:item`).
 
@@ -172,7 +172,7 @@ Items in inventory should be **pure data**, not Nodes, for performance and save 
   - occupied cells map → stack id/index
   - per-stack placement (`x`, `y`, `rotated`)
 
-**World drops:** when an item is dropped, spawn a **world pickup entity** (see 6.2) referencing `item_id`.
+**World drops:** when an item is dropped, spawn a **world pickup node** referencing `item_id` and display data.
 
 ### 5.4 POI Data Model (Open World + Fragments)
 POI registry entries include:
@@ -186,68 +186,92 @@ POI registry entries include:
 
 ---
 
-## 6) Entities: Different Technical Implementations (Per Requirement)
+## 6) Gameplay Content: Different Runtime Implementations (Per Requirement)
 
-We explicitly separate entity types by how they should be implemented for performance and development speed.
+We explicitly separate gameplay content by how it should be implemented for performance, readability, and development speed.
 
-### 6.1 Player (Hybrid: Node-driven body + ECS state)
+### 6.1 Player (CharacterBody2D + Local State Object)
 **Implementation:**
-- Godot Node: `CharacterBody2D` (movement, collision, animation)
-- ECS Entity: holds authoritative “gameplay state” components:
-  - health/stamina/bleed/pain
+- Godot Node: `CharacterBody2D` (movement, collision, animation, interaction origin).
+- Runtime state: a `PlayerState` data object or Resource stored on the player script:
+  - health / stamina / bleed / pain
   - inventory reference
   - weapon state
   - quest state reference
-- A **Player Bridge** syncs:
-  - Node position → ECS `C_Position`
-  - ECS effects → Node animations/VFX/camera shake
+- Input is written directly into the player runtime state each physics frame.
+- Animation / VFX / camera offset read the same state locally.
 
-**Why hybrid?**
-- Fast iteration for feel/physics while keeping scalable ECS logic for combat/status/loot.
+**Why this approach?**
+- Keeps moment-to-moment control responsive.
+- Avoids a second gameplay abstraction layer for the only actor the player directly owns.
 
-### 6.2 Enemies (ECS-first, Node-light)
+### 6.2 Enemies (Node-driven Bodies + Data-driven AI Brains)
 **Implementation:**
-- ECS entities for AI, navigation intent, combat, health, status.
-- Optional lightweight Node “view” for sprite + hit flash.
-- If pathfinding uses Godot navigation, use a **service**:
-  - ECS requests path for entity (batched)
-  - Node service returns path points
-  - ECS follows points (no per-enemy NavigationAgent2D initially)
+- Enemy scenes remain visible gameplay actors with their own body scripts.
+- Each enemy owns an `EnemyState` structure:
+  - health / alertness / target reference / weapon state / current tactic
+- Decision-making is handled by a lightweight AI brain/state machine per enemy type.
+- Pathfinding can still be centralized through a shared navigation service:
+  - enemy requests path updates
+  - service returns path points
+  - enemy script follows those points
 
-**Why ECS-first?**
-- Many enemies active simultaneously; chunk activation and AI LOD become straightforward.
+**Why this approach?**
+- Easier to iterate on enemy feel, animation, and hit reactions.
+- Still supports chunk activation and AI LOD by enabling/disabling enemy brains or reducing update frequency.
 
-### 6.3 Projectiles (ECS-only with pooling)
+### 6.3 Projectiles (Pooled Runtime Objects)
 **Implementation:**
-- ECS entity per projectile:
-  - position, velocity, lifetime, damage, penetration
-- Collision via:
-  - lightweight raycast queries against physics space (batched) OR
-  - simplified grid collision for walls + occasional physics query for actors
+- Projectiles are spawned from a pooled manager or lightweight projectile scene list.
+- Each projectile stores:
+  - position
+  - velocity
+  - lifetime / remaining distance
+  - damage / penetration
+  - owner reference or faction marker
+- A projectile manager updates active projectiles each frame and performs collision checks.
+- Visual tracers remain optional and should also be pooled.
 
-**No Node per bullet** unless needed for tracer visuals; use pooled VFX.
+**Why this approach?**
+- Maintains high projectile throughput without requiring a separate gameplay framework.
+- Fits the current game scale and keeps debugging straightforward.
 
-### 6.4 Loot Containers (Mostly ECS + Node marker)
+### 6.4 Loot Containers (Scene Markers + Lazy State)
 **Implementation options:**
-- Static container Node in POI scene (Area2D + sprite) with an attached RL (`container_id`)
-- On interaction, create/activate an ECS “container state entity”:
-  - rolled flag, generated item list, lock state
-- This avoids thousands of container ECS entities upfront.
+- Static container Node in POI scene (`Area2D` + sprite + interaction prompt) with `container_id`.
+- On first interaction, create or initialize local container state:
+  - rolled flag
+  - generated item list
+  - lock state
+- Generated contents remain attached to the container node or a local save payload.
 
-### 6.5 Doors/Locks (Node physics + ECS state)
-- Doors in POI fragments are Nodes for collision toggling/animation
-- ECS tracks lock state + key requirements:
-  - `required_key_tag` or `required_key_item_id` (RL)
-- Interactions trigger Node animation & collision changes.
+**Why this approach?**
+- Preserves deferred loot generation for performance.
+- Avoids creating thousands of runtime objects before the player interacts with them.
 
-### 6.6 Traders (Fixed Interaction Points; NOT entities)
-As requested: **no merchant entities**.
+### 6.5 Doors / Locks (Animated Nodes + State Records)
+**Implementation:**
+- Doors in POI fragments are Nodes for collision toggling and animation.
+- Each door stores local state:
+  - `is_locked`
+  - `required_key_tag` or `required_key_item_id`
+  - `is_open`
+- Interaction validates inventory requirements, then updates animation and collision state directly.
+
+### 6.6 Traders (Fixed Interaction Points; NOT roaming actors)
+As requested: **no merchant actors**.
 - Traders are **interaction stations** in safehouse:
   - Node: `TraderTerminal` / `ShopCounter`
   - Data: `trader_id: ResourceLocation`
 - Trading UI pulls from registry-defined trader inventory rules:
   - inventory lists by tags + refresh timers
   - barter rules referencing item IDs/tags
+
+### 6.7 Shared Biological Actor Base
+A shared biological actor base is still useful, but only as a scene/runtime contract:
+- common health / death / damage response hooks
+- delayed setup when runtime references are not ready yet
+- shared aiming anchor conventions for player / human enemy / non-human enemy bodies
 
 ---
 
