@@ -18,6 +18,12 @@
 class_name C_CombatState
 extends Component
 
+enum FireMode {
+	SAFE,
+	SEMI,
+	AUTO,
+}
+
 ## ResourceLocation string of the currently equipped weapon item.
 ## Empty string = no weapon equipped (unarmed / default melee).
 @export var equipped_weapon_id: String = ""
@@ -32,9 +38,17 @@ extends Component
 @export var is_aiming: bool = false
 ## [code]true[/code] while the fire input is held.
 @export var wants_fire: bool = false
+## [code]true[/code] on the frame a reload action is requested.
+@export var wants_reload: bool = false
+## [code]true[/code] on the frame fire mode switch is requested.
+@export var wants_fire_mode_toggle: bool = false
+## Previous frame fire input state for fire-mode edge handling.
+@export var was_fire_pressed_last_frame: bool = false
 
 ## Seconds until the next ranged shot is allowed. Decremented by CombatSystem.
 @export var fire_cooldown: float = 0.0
+## Seconds between shots for AUTO/SEMI firing.
+@export var fire_interval: float = 0.14
 
 ## Seconds until the next melee strike is allowed. Decremented by CombatSystem.
 @export var melee_cooldown: float = 0.0
@@ -47,6 +61,13 @@ extends Component
 @export var is_reloading: bool = false
 ## Reload progress (0–1). Written by CombatSystem each frame during reload.
 @export var reload_progress: float = 0.0
+## Reload duration in seconds.
+@export var reload_duration_sec: float = 1.5
+## Empty-mag reminder SFX cooldown to avoid audio spam.
+@export var empty_mag_sfx_cooldown: float = 0.0
+
+## Current fire mode (safe / semi / auto).
+@export var fire_mode: FireMode = FireMode.SEMI
 
 ## Recoil accumulator used by CombatSystem to increase spread during sustained fire.
 @export var recoil_accum: float = 0.0
@@ -60,6 +81,21 @@ extends Component
 @export var recoil_per_shot: float = 0.6
 ## Recoil recovery per second.
 @export var recoil_recovery_per_sec: float = 2.0
+
+## Weapon attack damage per projectile.
+@export var attack_damage: float = 20.0
+## Weapon projectile speed (pixels per second).
+@export var projectile_speed: float = 850.0
+## Weapon projectile maximum travel distance (pixels).
+@export var projectile_max_distance: float = 1400.0
+## Projectile armor penetration value.
+@export var projectile_penetration: float = 0.0
+## Projectile life upper bound (seconds).
+@export var projectile_lifetime: float = 2.0
+## Aim camera offset distance while ADS.
+@export var ads_distance: float = 170.0
+## Number of projectiles emitted per single shot.
+@export var pellets_per_shot: int = 1
 
 
 ## Convenience constructor. All fields start at safe defaults.

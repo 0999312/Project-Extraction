@@ -21,9 +21,17 @@ extends Component
 
 ## Scalar speed used to rebuild [member velocity] from a direction vector.
 @export var speed: float = 600.0
+## Original speed at spawn for distance attenuation curve.
+@export var base_speed: float = 600.0
+## Remaining travel distance in pixels before this projectile expires.
+@export var remaining_distance: float = 1400.0
+## Original max distance used to compute distance-based decay.
+@export var max_distance: float = 1400.0
 
 ## Flat damage applied on first valid hit.
 @export var damage: float = 20.0
+## Original damage at spawn for distance attenuation curve.
+@export var base_damage: float = 20.0
 
 ## Armor penetration value compared against the target's armor rating.
 ## Excess penetration above the armor value converts to a damage bonus.
@@ -52,8 +60,12 @@ extends Component
 
 ## Convenience constructor.
 ## Usage: [code]C_ProjectileData.new(600.0, 20.0, 0.0, 2.0)[/code]
-func _init(spd: float = 600.0, dmg: float = 20.0, pen: float = 0.0, life: float = 2.0) -> void:
+func _init(spd: float = 600.0, dmg: float = 20.0, pen: float = 0.0, life: float = 2.0, max_dist: float = 1400.0) -> void:
 	speed = spd
+	base_speed = spd
 	damage = dmg
+	base_damage = dmg
 	penetration = pen
 	lifetime = life
+	max_distance = max_dist
+	remaining_distance = max_dist

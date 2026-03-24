@@ -40,6 +40,8 @@ const GUIDE_ACTION_MOVE := &"pe_move"
 const GUIDE_ACTION_AIM_AXIS := &"pe_aim_axis"
 const GUIDE_ACTION_FIRE := &"pe_fire"
 const GUIDE_ACTION_AIM_HOLD := &"pe_aim_hold"
+const GUIDE_ACTION_RELOAD := &"pe_reload"
+const GUIDE_ACTION_FIRE_MODE_TOGGLE := &"pe_fire_mode_toggle"
 const GUIDE_ACTION_SPRINT := &"pe_sprint"
 
 #endregion Constants
@@ -66,6 +68,8 @@ var is_sprinting: bool = false
 ## Registered with the GECS World during [method _ready].
 var _ecs_entity: BaseEntity = null
 var _using_gamepad_aim: bool = false
+var _reload_pressed_last_frame: bool = false
+var _fire_mode_pressed_last_frame: bool = false
 
 #endregion Private Variables
 
@@ -192,6 +196,12 @@ func _sync_input_to_ecs() -> void:
 	if combat:
 		combat.is_aiming = _is_action_triggered(GUIDE_ACTION_AIM_HOLD)
 		combat.wants_fire = _is_action_triggered(GUIDE_ACTION_FIRE)
+		var reload_pressed := _is_action_triggered(GUIDE_ACTION_RELOAD)
+		combat.wants_reload = reload_pressed and not _reload_pressed_last_frame
+		_reload_pressed_last_frame = reload_pressed
+		var fire_mode_pressed := _is_action_triggered(GUIDE_ACTION_FIRE_MODE_TOGGLE)
+		combat.wants_fire_mode_toggle = fire_mode_pressed and not _fire_mode_pressed_last_frame
+		_fire_mode_pressed_last_frame = fire_mode_pressed
 
 
 ## Reads [C_Velocity.velocity] and drives [method CharacterBody2D.move_and_slide].
