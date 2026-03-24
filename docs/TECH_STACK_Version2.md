@@ -37,6 +37,10 @@
 - **ramokz/phantom-camera**
   - Follow, smoothing, constraints, trauma/shake.
   - Controlled via a camera bridge from simulation events.
+  - Current gameplay runtime switches follow target between player and crosshair at runtime:
+    - ADS: camera follows crosshair (distance-clamped by weapon ADS distance)
+    - hip-fire / relaxed: camera follows player
+  - Follow-target switch smoothing is parameterized by weapon aiming time (`CombatState.aim_transition_sec`).
 
 ### 1.6 Scene Loading / Switching
 - **Maaack Scene Loader** (preferred with Maaack template ecosystem)

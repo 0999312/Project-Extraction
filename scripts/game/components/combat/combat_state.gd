@@ -34,6 +34,7 @@ enum FireMode {
 @export var recoil_recovery_per_sec: float = 2.0
 @export var projectile_definition_id: String = DEFAULT_PROJECTILE_DEFINITION_ID
 @export var ads_distance: float = 170.0
+@export var aim_transition_sec: float = 0.14
 @export var pellets_per_shot: int = 1
 
 func _init() -> void:

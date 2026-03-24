@@ -70,6 +70,7 @@ Fields include:
 - `pellets_per_shot: int`
 - `projectile_definition_id: String`
 - `ads_distance: float`
+- `aim_transition_sec: float` (camera follow target switch smoothing duration)
 - `ammo_max` / `ammo_current` + reload state (`is_reloading`, `reload_progress`, `reload_duration_sec`)
 
 ## `aim_state.gd`
@@ -141,7 +142,13 @@ Fields include:
 - Uses combat and projectile processing helpers directly from the scene runtime.
 - Instantiates the playable runtime actors from `EntityCatalog` using spawn markers inside `DemoGame.tscn`.
 - Polls GUIDE `pe_pause` through `GuideInputRuntime` helpers and opens `PauseMenuController` in `DemoGame`.
-- Applies ADS camera follow offset toward crosshair direction by writing `PhantomCamera2D.follow_offset` while aiming.
+- Manages a runtime `CrosshairNode` with three visual modes:
+  - relaxed/UI interaction: `assets/game/textures/ui/mouse.png` (top-left origin, not centered)
+  - hip-fire: `assets/game/textures/ui/crosshair_normal.png` (centered)
+  - ADS: `assets/game/textures/ui/crosshair_aiming.png` (centered)
+- During ADS, camera follow target switches from player to crosshair and crosshair movement is clamped by `CombatState.ads_distance`.
+- When leaving ADS, camera follow target switches back to player.
+- Follow-target switching smoothness is controlled through phantom-camera damping using `CombatState.aim_transition_sec`.
 
 ## `game_state.gd`
 

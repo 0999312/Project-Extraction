@@ -9,6 +9,10 @@ extends Node2D
 var _player: Player = null
 var _human_enemy: HumanEnemy = null
 var _non_human_enemy: NonHumanEnemy = null
+var _crosshair: CrosshairNode = null
+var _camera_following_crosshair: bool = false
+var _default_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
+var _last_camera_transition_sec: float = -1.0
 
 var _combat_fire_system := CombatFireRuntime.new()
 var _projectile_motion_system := ProjectileMotionRuntime.new()
@@ -16,12 +20,17 @@ var _projectiles: Node2D = null
 var _pause_pressed_last_frame: bool = false
 
 const GUIDE_ACTION_PAUSE := &"pe_pause"
-const AIM_CAMERA_LERP_SPEED := 9.0
+const GUIDE_ACTION_AIM_AXIS_OPTIONAL := &"pe_aim_axis"
+const AIM_AXIS_EPSILON := 0.0001
+const HIP_FIRE_AXIS_DISTANCE_RATIO := 0.6
+const MIN_HIP_FIRE_AXIS_DISTANCE := 32.0
+const MIN_AIM_TRANSITION_SEC := 0.01
 
 func _ready() -> void:
 	EntityCatalog.ensure_registry()
 	ProjectileCatalog.ensure_registry()
 	_spawn_runtime_entities()
+	_setup_crosshair()
 	_projectiles = get_node_or_null("Projectiles")
 	if _projectiles == null:
 		_projectiles = Node2D.new()
@@ -30,8 +39,12 @@ func _ready() -> void:
 	_combat_fire_system.setup()
 	process_physics_priority = 100
 	_assign_enemy_targets()
+	_default_mouse_mode = Input.mouse_mode
+	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	print("[DEBUG][DemoGame] _ready | actors=%d" % _get_runtime_actors().size())
 
+func _exit_tree() -> void:
+	Input.set_mouse_mode(_default_mouse_mode)
 
 func _spawn_runtime_entities() -> void:
 	_player = _spawn_registered_entity(EntityCatalog.PLAYER, _player_spawn.global_position, "Player") as Player
@@ -53,9 +66,9 @@ func _spawn_registered_entity(entity_id: String, spawn_position: Vector2, node_n
 func _physics_process(delta: float) -> void:
 	_assign_enemy_targets()
 	_poll_pause_input()
+	_update_crosshair_and_camera_target()
 	_combat_fire_system.process(_get_runtime_actors(), _projectiles, delta)
 	_projectile_motion_system.process(_projectiles, _get_runtime_actors(), delta)
-	_update_aim_camera_offset(delta)
 
 func _get_runtime_actors() -> Array:
 	var actors: Array = []
@@ -76,16 +89,54 @@ func _poll_pause_input() -> void:
 		_pause_menu_controller.pause()
 	_pause_pressed_last_frame = is_triggered
 
-func _update_aim_camera_offset(delta: float) -> void:
+func _setup_crosshair() -> void:
+	_crosshair = CrosshairNode.new()
+	_crosshair.name = "Crosshair"
+	add_child(_crosshair)
+
+func _update_crosshair_and_camera_target() -> void:
+	if _crosshair == null:
+		return
 	if _player == null or _phantom_camera_2d == null:
 		return
 	var combat: CombatState = _player.get_combat_state()
 	if combat == null:
 		return
-	var target_offset := Vector2.ZERO
-	if combat.is_aiming:
-		var to_mouse := _player.get_global_mouse_position() - _player.global_position
-		var aim_dir := to_mouse.normalized() if to_mouse.length_squared() > 0.0001 else Vector2.RIGHT
-		target_offset = aim_dir * combat.ads_distance
-	var current_offset: Vector2 = _phantom_camera_2d.follow_offset
-	_phantom_camera_2d.follow_offset = current_offset.lerp(target_offset, clampf(delta * AIM_CAMERA_LERP_SPEED, 0.0, 1.0))
+	var aim_axis := GuideInputRuntime.get_action_axis_2d(GUIDE_ACTION_AIM_AXIS_OPTIONAL)
+	var using_aim_axis := aim_axis.length_squared() > AIM_AXIS_EPSILON
+	var relaxed := _is_relaxed_state()
+	if relaxed:
+		_crosshair.set_mode(CrosshairNode.Mode.RELAXED)
+	else:
+		_crosshair.set_mode(CrosshairNode.Mode.ADS if combat.is_aiming else CrosshairNode.Mode.HIP_FIRE)
+	if using_aim_axis:
+		var normalized_aim_axis := aim_axis.normalized()
+		var calculated_hip_fire_distance := maxf(MIN_HIP_FIRE_AXIS_DISTANCE, combat.ads_distance * HIP_FIRE_AXIS_DISTANCE_RATIO)
+		var effective_crosshair_distance := combat.ads_distance if combat.is_aiming else calculated_hip_fire_distance
+		_crosshair.global_position = _player.global_position + normalized_aim_axis * effective_crosshair_distance
+	else:
+		_crosshair.update_position(_player.global_position, combat.is_aiming, combat.ads_distance)
+	var should_follow_crosshair := combat.is_aiming and not relaxed
+	if should_follow_crosshair != _camera_following_crosshair:
+		_camera_following_crosshair = should_follow_crosshair
+		_phantom_camera_2d.follow_target = _crosshair if should_follow_crosshair else _player
+	var transition_sec := maxf(MIN_AIM_TRANSITION_SEC, combat.aim_transition_sec)
+	if _last_camera_transition_sec != transition_sec:
+		_last_camera_transition_sec = transition_sec
+		_phantom_camera_2d.follow_damping = true
+		_phantom_camera_2d.follow_damping_value = Vector2(transition_sec, transition_sec)
+	_phantom_camera_2d.follow_offset = Vector2.ZERO
+	_update_player_aim_from_crosshair(using_aim_axis)
+
+func _update_player_aim_from_crosshair(using_aim_axis: bool) -> void:
+	if _player == null or _crosshair == null:
+		return
+	var aim: AimState = _player.get_aim_state()
+	if aim == null:
+		return
+	if using_aim_axis:
+		return
+	aim.aim_direction = _crosshair.get_effective_aim_direction(_player.global_position, aim.aim_direction)
+
+func _is_relaxed_state() -> bool:
+	return get_tree().paused
