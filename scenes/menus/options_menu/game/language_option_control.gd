@@ -3,6 +3,7 @@ extends ListOptionControl
 
 const LANGUAGE_VALUES := ["en", "zh"]
 const LANGUAGE_TITLE_KEYS := ["ui.options.language.english", "ui.options.language.chinese_simplified"]
+const LANGUAGE_SETTING_KEY := "Language"
 
 
 func _ready() -> void:
@@ -14,7 +15,9 @@ func _ready() -> void:
 func _on_setting_changed(value: Variant) -> void:
 	super._on_setting_changed(value)
 	if value is int and value >= 0 and value < LANGUAGE_VALUES.size():
-		LocalizationBootstrap.set_language(LANGUAGE_VALUES[value])
+		var lang_code := LANGUAGE_VALUES[value]
+		I18NManager.set_language(lang_code)
+		PlayerConfig.set_config(AppSettings.GAME_SECTION, LANGUAGE_SETTING_KEY, lang_code)
 
 
 func _get_localized_titles() -> Array[String]:

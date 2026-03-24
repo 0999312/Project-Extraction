@@ -14,7 +14,6 @@ const AIM_CAMERA_LERP_SPEED := 9.0
 
 
 func _ready() -> void:
-	AudioRegistryBootstrap.register_gameplay_audio()
 	_world = World.new()
 	_world.name = "RuntimeWorld"
 	add_child(_world)
