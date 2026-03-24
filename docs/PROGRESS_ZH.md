@@ -1,5 +1,28 @@
 # Project Extraction — 开发进度
 
+## 更新 4 — 视频设置配置 & 移除抗锯齿
+
+### 变更内容
+
+- **配置了 `video_options_menu_with_extras`**，使视频设置能正确作用于游戏：
+  - 全屏、分辨率、垂直同步设置已通过 `AppConfig` → `AppSettings.set_video_from_config()` 在启动时正确应用，运行时则通过基类 `video_options_menu.gd` 中的信号连接处理器实时生效。
+  - 保留了镜头抖动选项（当前隐藏），留待后续功能启用。
+- **移除了抗锯齿（MSAA）配置**：项目使用 `gl_compatibility` 渲染器，MSAA 支持有限；已移除该选项及其运行时应用逻辑。
+- **修复了视频设置本地化缺失**：
+  - 在 `ui_text.en.json` 和 `ui_text.zh.json` 中添加了缺失的 `"V-Sync :"` 翻译键。
+  - 添加了垂直同步下拉菜单选项标题翻译：禁用 / 启用 / 自适应 / 三重缓冲。
+  - 添加了镜头抖动下拉菜单选项标题翻译：正常 / 减少 / 最低 / 无（预留未来使用）。
+  - 移除了已废弃的 `"Anti-Aliasing :"` / `"抗锯齿："` 翻译条目。
+
+### 本次删除内容（更新 4）
+
+| 删除的文件 | 删除原因 |
+|---|---|
+| `scenes/game_scene/configurable_sub_viewport.gd` (+.uid) | 用于将 MSAA 抗锯齿设置应用到 SubViewport；因项目使用 `gl_compatibility` 渲染器，随抗锯齿选项一并移除 |
+| `video_options_menu_with_extras.tscn` 中的 AntiAliasingControl 节点 | 按需求移除抗锯齿 UI 控件 |
+
+---
+
 ## 更新 3 — 移除 Bootstrap 自动加载 & 代码清理
 
 ### 变更内容

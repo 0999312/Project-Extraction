@@ -1,5 +1,28 @@
 # Project Extraction — Progress
 
+## Update 4 — Video Settings & Anti-Aliasing Removal
+
+### Changes
+
+- **Configured `video_options_menu_with_extras`** for correct video settings application:
+  - Fullscreen, Resolution, and V-Sync settings already correctly applied at startup via `AppConfig` → `AppSettings.set_video_from_config()` and at runtime via signal-connected handlers in the base `video_options_menu.gd`.
+  - CameraShake option preserved (hidden) for future feature activation.
+- **Removed Anti-Aliasing (MSAA) configuration**: The project uses the `gl_compatibility` renderer where MSAA support is limited; removed the option and its runtime application logic.
+- **Fixed video settings localization**:
+  - Added missing `"V-Sync :"` translation key to both `ui_text.en.json` and `ui_text.zh.json`.
+  - Added V-Sync dropdown option title translations: Disabled / Enabled / Adaptive / Mailbox.
+  - Added Camera Shake dropdown option title translations: Normal / Reduced / Minimal / None (for future use).
+  - Removed obsolete `"Anti-Aliasing :"` translation entries.
+
+### Deletions (Update 4)
+
+| Deleted File | Reason |
+|---|---|
+| `scenes/game_scene/configurable_sub_viewport.gd` (+.uid) | Applied MSAA anti-aliasing settings to SubViewport; removed with Anti-Aliasing option since project uses `gl_compatibility` renderer |
+| AntiAliasingControl node in `video_options_menu_with_extras.tscn` | Anti-Aliasing UI control removed per requirements |
+
+---
+
 ## Update 3 — Bootstrap Removal & Cleanup
 
 ### Changes
