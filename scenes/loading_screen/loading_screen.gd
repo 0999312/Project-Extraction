@@ -7,5 +7,4 @@ extends LoadingScreen
 
 
 func _ready() -> void:
-	super._ready()
 	AudioCatalog.register_gameplay_audio()

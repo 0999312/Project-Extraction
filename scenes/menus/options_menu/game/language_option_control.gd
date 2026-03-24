@@ -15,7 +15,7 @@ func _ready() -> void:
 func _on_setting_changed(value: Variant) -> void:
 	super._on_setting_changed(value)
 	if value is int and value >= 0 and value < LANGUAGE_VALUES.size():
-		var lang_code := LANGUAGE_VALUES[value]
+		var lang_code = LANGUAGE_VALUES[value] 
 		I18NManager.set_language(lang_code)
 		PlayerConfig.set_config(AppSettings.GAME_SECTION, LANGUAGE_SETTING_KEY, lang_code)
 

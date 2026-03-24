@@ -95,4 +95,5 @@ func _load_material(path:String) -> void:
 	%SpatialShaderTypeCaches.add_child(material_shower)
 
 func _ready() -> void:
+	AudioCatalog.register_gameplay_audio()
 	SceneLoader._background_loading = true

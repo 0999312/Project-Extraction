@@ -10,7 +10,6 @@ const TAB_TITLE_KEYS := [
 
 
 func _ready() -> void:
-	super._ready()
 	_localize_tab_titles()
 
 
