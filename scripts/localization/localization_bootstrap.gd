@@ -4,7 +4,7 @@ const EN_TRANSLATION := "res://resources/i18n/ui_text.en.json"
 const ZH_TRANSLATION := "res://resources/i18n/ui_text.zh.json"
 const DEFAULT_LANGUAGE := "en"
 const LANGUAGE_SETTING_KEY := "Language"
-const SUPPORTED_LANGUAGES := PackedStringArray(["en", "zh"])
+var SUPPORTED_LANGUAGES := PackedStringArray(["en", "zh"])
 
 
 func _ready() -> void:
