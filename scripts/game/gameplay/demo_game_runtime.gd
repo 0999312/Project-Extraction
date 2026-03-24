@@ -21,6 +21,9 @@ var _pause_pressed_last_frame: bool = false
 const GUIDE_ACTION_PAUSE := &"pe_pause"
 const GUIDE_ACTION_AIM_AXIS := &"pe_aim_axis"
 const AIM_AXIS_EPSILON := 0.0001
+const HIP_FIRE_AXIS_DISTANCE_RATIO := 0.6
+const MIN_HIP_FIRE_AXIS_DISTANCE := 32.0
+const MIN_AIM_TRANSITION_SEC := 0.01
 
 func _ready() -> void:
 	EntityCatalog.ensure_registry()
@@ -106,7 +109,7 @@ func _update_crosshair_and_camera_target() -> void:
 		_crosshair.set_mode(CrosshairNode.Mode.ADS if combat.is_aiming else CrosshairNode.Mode.HIP_FIRE)
 	if _is_using_aim_axis():
 		var aim_axis := GuideInputRuntime.get_action_axis_2d(GUIDE_ACTION_AIM_AXIS).normalized()
-		var stick_distance := combat.ads_distance if combat.is_aiming else maxf(32.0, combat.ads_distance * 0.6)
+		var stick_distance := combat.ads_distance if combat.is_aiming else maxf(MIN_HIP_FIRE_AXIS_DISTANCE, combat.ads_distance * HIP_FIRE_AXIS_DISTANCE_RATIO)
 		_crosshair.global_position = _player.global_position + aim_axis * stick_distance
 	else:
 		_crosshair.update_position(_player.global_position, combat.is_aiming, combat.ads_distance)
@@ -114,7 +117,7 @@ func _update_crosshair_and_camera_target() -> void:
 	if should_follow_crosshair != _camera_following_crosshair:
 		_camera_following_crosshair = should_follow_crosshair
 		_phantom_camera_2d.follow_target = _crosshair if should_follow_crosshair else _player
-	var transition_sec := maxf(0.01, combat.aim_transition_sec)
+	var transition_sec := maxf(MIN_AIM_TRANSITION_SEC, combat.aim_transition_sec)
 	_phantom_camera_2d.follow_damping = true
 	_phantom_camera_2d.follow_damping_value = Vector2(transition_sec, transition_sec)
 	_phantom_camera_2d.follow_offset = Vector2.ZERO

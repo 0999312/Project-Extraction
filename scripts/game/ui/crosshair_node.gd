@@ -72,8 +72,11 @@ func _load_textures() -> void:
 	_ads_texture = _load_texture(ADS_TEXTURE_PATH)
 
 func _load_texture(path: String) -> Texture2D:
+	if not ResourceLoader.exists(path):
+		push_warning("CrosshairNode texture file not found: %s" % path)
+		return null
 	var loaded := load(path)
 	if loaded is Texture2D:
 		return loaded as Texture2D
-	push_warning("CrosshairNode texture missing or invalid: %s" % path)
+	push_warning("CrosshairNode texture is not a Texture2D resource: %s" % path)
 	return null
