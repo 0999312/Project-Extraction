@@ -1,5 +1,7 @@
 # API Overview (Current Input, Runtime, and Audio Integration)
 
+- The current playable runtime is scene/node-driven and no longer depends on GECS or gdUnit4.
+
 ## `player_input_context.gd`
 
 - `class_name PlayerInputContext : GUIDEMappingContext`
@@ -87,7 +89,7 @@ Fields include:
 ## `e_base_projectile.gd`
 
 - `setup(direction, dmg, pen, owner_id, wpn_id)` applies `spread_deviation_rad` rotation before velocity assignment.
-- Intended as the projectile runtime setup entry point.
+- Intended as the node-driven projectile runtime setup entry point.
 
 ## `s_combat_fire_system.gd`
 
@@ -112,7 +114,7 @@ Fields include:
 ## `demo_game_runtime.gd`
 
 - Coordinates demo-scene gameplay processing.
-- Registers/uses combat and projectile processing scripts.
+- Uses combat and projectile processing helpers directly from the scene runtime.
 - Polls GUIDE `pe_pause` action and opens `PauseMenuController` in `DemoGame`.
 - Applies ADS camera follow offset toward crosshair direction by writing `PhantomCamera2D.follow_offset` while aiming.
 

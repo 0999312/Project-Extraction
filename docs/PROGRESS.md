@@ -1,5 +1,23 @@
 # Project Extraction — Progress
 
+## Update 8 — Node-Driven Runtime Rewrite, Plugin Removal, and Documentation Cleanup
+
+### Changes
+
+- **Rebuilt the playable DemoGame flow without ECS runtime dependencies**:
+  - Reworked the player, biological actor base, human enemy, non-human enemy, projectile, combat-processing, and projectile-processing scripts to use node-owned runtime state instead of a world/entity/system framework.
+  - `DemoGame.tscn` no longer depends on `World`, `World/Systems/*`, or GECS runtime nodes.
+- **Preserved menu, loading, input, camera, and audio integration**:
+  - Kept GUIDE input polling, pause-menu flow, phantom-camera aim offset, and audio playback wired into the rewritten runtime.
+  - Updated the debug menu runtime counters to report actor/projectile counts without querying an ECS world.
+- **Removed plugins and project configuration that are no longer used**:
+  - Removed `addons/gecs` and its project/editor-plugin references.
+  - Removed `addons/gdUnit4` and its project/editor-plugin references.
+- **Synchronized docs with the new code reality**:
+  - Updated progress/API/architecture notes so the documented runtime direction matches the current codebase after plugin removal.
+
+---
+
 ## Update 7 — Documentation Replan, Audio Registry Docs, and Decision to Abandon ECS Architecture
 
 ### Changes

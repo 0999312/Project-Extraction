@@ -25,6 +25,7 @@
   - Player, enemies, doors, and interaction points live as scene nodes with local state objects.
   - High-frequency logic (projectiles, combat updates, AI decisions) is handled by focused gameplay scripts and manager services.
   - Pooling and chunk activation remain the main performance tools.
+  - The project no longer depends on GECS or gdUnit4.
 
 ### 1.4 Input
 - **godotneers/G.U.I.D.E**
