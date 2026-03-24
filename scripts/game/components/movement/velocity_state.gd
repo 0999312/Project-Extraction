@@ -1,4 +1,4 @@
-class_name C_Velocity
+class_name VelocityState
 extends Resource
 
 @export var velocity: Vector2 = Vector2.ZERO

@@ -1,4 +1,4 @@
-class_name C_Health
+class_name HealthState
 extends Resource
 
 @export var current_hp: float = 100.0

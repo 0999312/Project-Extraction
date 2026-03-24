@@ -1,5 +1,5 @@
 class_name Player
-extends HumanBase
+extends HumanActor
 
 const BASE_SPEED: float = 200.0
 const BASE_SPRINT_SPEED: float = 320.0
@@ -40,16 +40,17 @@ func _physics_process(delta: float) -> void:
 	sync_runtime_position()
 
 func _setup_runtime_state() -> void:
-	health = C_Health.new(100.0)
-	stamina_state = C_Stamina.new(100.0, 10.0)
-	status_effects = C_StatusEffects.new()
-	position_state = C_Position.new(global_position)
-	velocity_state = C_Velocity.new(BASE_SPEED)
-	combat_state = C_CombatState.new()
-	inventory_ref = C_InventoryRef.new()
-	faction_state = C_Faction.new(C_Faction.FactionType.PLAYER)
-	aim_state = C_AimState.new()
+	health = HealthState.new(100.0)
+	stamina_state = StaminaState.new(100.0, 10.0)
+	status_effects = StatusEffectsState.new()
+	position_state = PositionState.new(global_position)
+	velocity_state = VelocityState.new(BASE_SPEED)
+	combat_state = CombatState.new()
+	inventory_ref = InventoryState.new()
+	faction_state = FactionState.new(FactionState.FactionType.PLAYER)
+	aim_state = AimState.new()
 	combat_state.equipped_weapon_id = "game:item/weapon/pistol"
+	combat_state.projectile_definition_id = ProjectileCatalog.BULLET
 	combat_state.ammo_max = 15
 	combat_state.ammo_current = 15
 
@@ -93,7 +94,7 @@ func _sync_input_to_runtime() -> void:
 		if combat_state.is_aiming != prev_aiming:
 			print("[DEBUG][Player] AIM %s | dir=(%.2f,%.2f)" % ["ON" if combat_state.is_aiming else "OFF", aim_direction.x, aim_direction.y])
 		if combat_state.wants_fire and not prev_fire:
-			print("[DEBUG][Player] FIRE pressed | aiming=%s ammo=%d/%d mode=%s" % [combat_state.is_aiming, combat_state.ammo_current, combat_state.ammo_max, C_CombatState.FireMode.keys()[combat_state.fire_mode]])
+			print("[DEBUG][Player] FIRE pressed | aiming=%s ammo=%d/%d mode=%s" % [combat_state.is_aiming, combat_state.ammo_current, combat_state.ammo_max, CombatState.FireMode.keys()[combat_state.fire_mode]])
 		if combat_state.wants_reload:
 			print("[DEBUG][Player] RELOAD requested | ammo=%d/%d" % [combat_state.ammo_current, combat_state.ammo_max])
 		if combat_state.wants_fire_mode_toggle:

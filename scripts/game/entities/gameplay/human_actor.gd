@@ -1,5 +1,5 @@
-class_name HumanBase
-extends BiologicalBodyBase
+class_name HumanActor
+extends BiologicalActor
 
 const AIM_EPSILON: float = 0.0001
 
@@ -27,7 +27,7 @@ func _get_aim_direction() -> Vector2:
 
 func attach_weapon(weapon_node: Node2D) -> void:
 	if _right_hand == null:
-		push_error("HumanBase.attach_weapon: RightHand node not found.")
+		push_error("HumanActor.attach_weapon: RightHand node not found.")
 		return
 	for child in _right_hand.get_children():
 		child.queue_free()
@@ -35,7 +35,7 @@ func attach_weapon(weapon_node: Node2D) -> void:
 
 func attach_left_hand_item(item_node: Node2D) -> void:
 	if _left_hand == null:
-		push_error("HumanBase.attach_left_hand_item: LeftHand node not found.")
+		push_error("HumanActor.attach_left_hand_item: LeftHand node not found.")
 		return
 	for child in _left_hand.get_children():
 		child.queue_free()

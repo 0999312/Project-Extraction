@@ -1,5 +1,25 @@
 # Project Extraction — Progress
 
+## Update 10 — Runtime Naming Cleanup, Entity Registry, and Projectile Registry
+
+### Changes
+
+- **Removed the most visible ECS-era naming from the active gameplay runtime**:
+  - Renamed runtime state/resources away from `C_*` naming to neutral names such as `CombatState`, `ProjectileData`, `HealthState`, `FactionState`, and `AIState`.
+  - Renamed runtime processors away from `S_*` naming to `CombatFireRuntime` and `ProjectileMotionRuntime`.
+  - Renamed actor / projectile files and scene definitions away from `e_*` naming (`player.gd`, `human_enemy.gd`, `non_human_enemy.gd`, `projectile.gd`, `player.tscn`, etc.).
+- **Added an entity registry for runtime actor definitions and instantiation**:
+  - Added `EntityRegistry` + `EntityCatalog` to register current entity definitions (`player`, `human_enemy`, `non_human_enemy`).
+  - Updated `DemoGame` to instantiate its runtime actors from the entity registry instead of placing the actor scenes directly in `DemoGame.tscn`.
+- **Added a projectile registry for projectile definitions and firing flow**:
+  - Added `ProjectileRegistry` + `ProjectileCatalog` to register projectile definitions such as the standard bullet and creature projectile.
+  - Reworked combat firing so projectile spawning now goes through `ProjectileCatalog.instantiate_projectile(...)`.
+  - Simplified `CombatState` so projectile configuration is addressed by `projectile_definition_id` rather than duplicating projectile stat fields per actor.
+- **Updated documentation to match the registry-based runtime flow**:
+  - Synchronized API / architecture / progress docs with the new naming, entity registry, projectile registry, and runtime instantiation flow.
+
+---
+
 ## Update 9 — Script Layout Cleanup, Runtime Helper Reuse, and Documentation Sync
 
 ### Changes
@@ -8,7 +28,7 @@
   - Renamed the stale `scripts/ecs/` tree to `scripts/game/` so the directory structure now reflects the current node-driven gameplay runtime.
   - Updated scene/script references to the new runtime paths.
 - **Applied low-risk code-design cleanup in the active runtime**:
-  - Moved repeated actor movement and target-resolution helpers into `BiologicalBodyBase`.
+  - Moved repeated actor movement and target-resolution helpers into `BiologicalActor`.
   - Added reusable GUIDE polling helpers in `guide_input_runtime.gd`.
   - Simplified `Player`, enemy body scripts, demo runtime pause polling, and the GUIDE options menu to reuse those helpers instead of duplicating the same logic.
 - **Synchronized docs with the new script layout**:
@@ -58,11 +78,11 @@
   - Runtime references stay inside the scene tree and initialization is idempotent when the same scene is entered repeatedly.
   - Files: `DemoGame.tscn`, `demo_game_runtime.gd`.
 - **Biological actor base class unified for Player / HumanEnemy / NonHumanEnemy**:
-  - Added `e_biological_body_base.gd` as a shared base for biological actor setup.
+  - Added `biological_actor.gd` as a shared base for biological actor setup.
   - Centralized delayed runtime hookup and shared initialization so player / human enemy / non-human enemy body scripts follow the same setup path.
-  - Files: `e_biological_body_base.gd`, `e_human_base.gd`, `e_player.gd`, `e_human_enemy_body.gd`, `e_non_human_enemy_body.gd`.
+  - Files: `biological_actor.gd`, `human_actor.gd`, `player.gd`, `human_enemy.gd`, `non_human_enemy.gd`.
 - **Demo scene now visibly includes all three biological categories**:
-  - Added `HumanEnemyBody` and `NonHumanEnemyBody` instances to `DemoGame.tscn` so Player / Human Enemy / Non-Human Enemy are all present in the same playable scene flow.
+  - Added `HumanEnemy` and `NonHumanEnemy` instances to `DemoGame.tscn` so Player / Human Enemy / Non-Human Enemy are all present in the same playable scene flow.
 - **Audio cleanup verification for removed files/calls**:
   - Audited repository audio path references and confirmed no stale calls to deleted audio assets remain.
   - Current combat audio references (`handgun_shoot`, `reload`, `mag_empty`) and registered gameplay audio files are present on disk.
@@ -80,7 +100,7 @@
   - Default projectile sprite is now `res://assets/game/textures/projectiles/bullet.png`.
   - Projectile collision radius is derived from the configured sprite size at runtime.
   - Projectile motion now performs lightweight runtime collision checks against living hostile targets using segment-to-point distance with sprite-derived radius.
-  - Files: `c_combat_state.gd`, `c_projectile_data.gd`, `s_combat_fire_system.gd`, `s_projectile_motion_system.gd`.
+  - Files: `combat_state.gd`, `projectile_data.gd`, `combat_fire_runtime.gd`, `projectile_motion_runtime.gd`.
 - **SoundManager runtime linkage with existing audio config**:
   - Added catalog helpers to fetch registered streams and play registered music directly from registry entries.
   - Opening scene now auto-plays main menu music from startup registry entries.
@@ -166,9 +186,9 @@
   - Added player reload input and reload processing state.
   - Added non-player auto reload behavior on empty magazine.
   - Added empty magazine reminder SFX playback.
-  - Files: `s_combat_fire_system.gd`, `c_combat_state.gd`, `player_input_context.gd`, `e_player.gd`.
+  - Files: `combat_fire_runtime.gd`, `combat_state.gd`, `player_input_context.gd`, `player.gd`.
 - Implemented projectile distance attenuation and distance-based expiry:
-  - `c_projectile_data.gd`, `s_projectile_motion_system.gd`.
+  - `projectile_data.gd`, `projectile_motion_runtime.gd`.
 - Added aiming camera follow offset (crosshair-follow style while ADS):
   - `demo_game_runtime.gd`.
 - Extended input/keybinding/i18n for combat controls:
@@ -190,10 +210,10 @@
 - Added GUIDE-based options keybinding panel:
   - `guide_input_options_menu.tscn`, `guide_input_options_menu.gd`, `master_options_menu_with_tabs.tscn`.
 - Implemented player input flow (movement / aiming / shooting):
-  - `e_player.gd`.
+  - `player.gd`.
 - Implemented aiming + shooting processing with recoil and hipfire/ADS precision:
-  - `s_combat_fire_system.gd`, `s_projectile_motion_system.gd`, `e_base_projectile.gd`.
-  - `c_combat_state.gd`, `c_projectile_data.gd`, `c_aim_state.gd`.
+  - `combat_fire_runtime.gd`, `projectile_motion_runtime.gd`, `projectile.gd`.
+  - `combat_state.gd`, `projectile_data.gd`, `aim_state.gd`.
 - Added Demo runtime gameplay bootstrap and per-frame processing:
   - `demo_game_runtime.gd`, `DemoGame.tscn`.
 - Added lightweight game global phase state:

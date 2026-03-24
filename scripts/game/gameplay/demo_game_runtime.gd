@@ -1,13 +1,17 @@
 extends Node2D
 
+@onready var _player_spawn: Marker2D = $PlayerSpawn
+@onready var _human_enemy_spawn: Marker2D = $HumanEnemySpawn
+@onready var _non_human_enemy_spawn: Marker2D = $NonHumanEnemySpawn
 @onready var _pause_menu_controller: Node = $PauseMenuController
-@onready var _player: Player = $Player
 @onready var _phantom_camera_2d = $PhantomCamera2D
-@onready var _human_enemy: HumanEnemyBody = $HumanEnemyBody
-@onready var _non_human_enemy: NonHumanEnemyBody = $NonHumanEnemyBody
 
-var _combat_fire_system := S_CombatFireSystem.new()
-var _projectile_motion_system := S_ProjectileMotionSystem.new()
+var _player: Player = null
+var _human_enemy: HumanEnemy = null
+var _non_human_enemy: NonHumanEnemy = null
+
+var _combat_fire_system := CombatFireRuntime.new()
+var _projectile_motion_system := ProjectileMotionRuntime.new()
 var _projectiles: Node2D = null
 var _pause_pressed_last_frame: bool = false
 
@@ -15,6 +19,9 @@ const GUIDE_ACTION_PAUSE := &"pe_pause"
 const AIM_CAMERA_LERP_SPEED := 9.0
 
 func _ready() -> void:
+	EntityCatalog.ensure_registry()
+	ProjectileCatalog.ensure_registry()
+	_spawn_runtime_entities()
 	_projectiles = get_node_or_null("Projectiles")
 	if _projectiles == null:
 		_projectiles = Node2D.new()
@@ -24,6 +31,24 @@ func _ready() -> void:
 	process_physics_priority = 100
 	_assign_enemy_targets()
 	print("[DEBUG][DemoGame] _ready | actors=%d" % _get_runtime_actors().size())
+
+
+func _spawn_runtime_entities() -> void:
+	_player = _spawn_registered_entity(EntityCatalog.PLAYER, _player_spawn.global_position, "Player") as Player
+	_human_enemy = _spawn_registered_entity(EntityCatalog.HUMAN_ENEMY, _human_enemy_spawn.global_position, "HumanEnemy") as HumanEnemy
+	_non_human_enemy = _spawn_registered_entity(EntityCatalog.NON_HUMAN_ENEMY, _non_human_enemy_spawn.global_position, "NonHumanEnemy") as NonHumanEnemy
+	if _phantom_camera_2d != null and _player != null:
+		_phantom_camera_2d.follow_target = _player
+
+
+func _spawn_registered_entity(entity_id: String, spawn_position: Vector2, node_name: String) -> Node:
+	var entity := EntityCatalog.instantiate_entity(entity_id, node_name)
+	if entity == null:
+		return null
+	add_child(entity)
+	if entity is Node2D:
+		entity.global_position = spawn_position
+	return entity
 
 func _physics_process(delta: float) -> void:
 	_assign_enemy_targets()
@@ -35,7 +60,7 @@ func _physics_process(delta: float) -> void:
 func _get_runtime_actors() -> Array:
 	var actors: Array = []
 	for node in get_tree().get_nodes_in_group("actors"):
-		if node is BiologicalBodyBase:
+		if node is BiologicalActor:
 			actors.append(node)
 	return actors
 
@@ -54,7 +79,7 @@ func _poll_pause_input() -> void:
 func _update_aim_camera_offset(delta: float) -> void:
 	if _player == null or _phantom_camera_2d == null:
 		return
-	var combat: C_CombatState = _player.get_combat_state()
+	var combat: CombatState = _player.get_combat_state()
 	if combat == null:
 		return
 	var target_offset := Vector2.ZERO

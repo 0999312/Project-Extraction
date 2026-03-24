@@ -1,4 +1,4 @@
-class_name C_Faction
+class_name FactionState
 extends Resource
 
 enum FactionType {

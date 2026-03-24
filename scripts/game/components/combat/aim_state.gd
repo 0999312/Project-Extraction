@@ -1,4 +1,4 @@
-class_name C_AimState
+class_name AimState
 extends Resource
 
 @export var aim_direction: Vector2 = Vector2.RIGHT

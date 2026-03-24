@@ -1,4 +1,4 @@
-class_name C_InventoryRef
+class_name InventoryState
 extends Resource
 
 @export var inventory: Resource = null

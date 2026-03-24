@@ -1,4 +1,4 @@
-class_name S_ProjectileMotionSystem
+class_name ProjectileMotionRuntime
 extends RefCounted
 
 const PROJECTILE_RADIUS_SCALE := 0.75
@@ -7,10 +7,10 @@ func process(projectile_parent: Node, actors: Array, delta: float) -> void:
 	if projectile_parent == null:
 		return
 	for projectile_variant in projectile_parent.get_children():
-		if not (projectile_variant is BaseProjectile):
+		if not (projectile_variant is Projectile):
 			continue
-		var projectile: BaseProjectile = projectile_variant
-		var proj: C_ProjectileData = projectile.projectile_data
+		var projectile: Projectile = projectile_variant
+		var proj: ProjectileData = projectile.projectile_data
 		if proj == null:
 			projectile.queue_free()
 			continue
@@ -35,13 +35,13 @@ func process(projectile_parent: Node, actors: Array, delta: float) -> void:
 		if proj.age >= proj.lifetime or proj.remaining_distance <= 0.0:
 			projectile.on_expire()
 
-func _find_hit_target(projectile: BaseProjectile, current_position: Vector2, previous_position: Vector2, actors: Array) -> BiologicalBodyBase:
+func _find_hit_target(projectile: Projectile, current_position: Vector2, previous_position: Vector2, actors: Array) -> BiologicalActor:
 	var owner_id := projectile.owner_actor_id
 	var radius := maxf(1.0, projectile.projectile_data.collision_radius * PROJECTILE_RADIUS_SCALE)
 	for actor_variant in actors:
-		if not (actor_variant is BiologicalBodyBase):
+		if not (actor_variant is BiologicalActor):
 			continue
-		var actor: BiologicalBodyBase = actor_variant
+		var actor: BiologicalActor = actor_variant
 		if not actor.is_alive():
 			continue
 		if owner_id == actor.get_actor_id():

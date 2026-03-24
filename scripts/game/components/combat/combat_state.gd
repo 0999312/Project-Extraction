@@ -1,5 +1,7 @@
-class_name C_CombatState
+class_name CombatState
 extends Resource
+
+const DEFAULT_PROJECTILE_DEFINITION_ID := "game:projectile/bullet"
 
 enum FireMode {
 	SAFE,
@@ -18,7 +20,7 @@ enum FireMode {
 @export var fire_cooldown: float = 0.0
 @export var fire_interval: float = 0.14
 @export var melee_cooldown: float = 0.0
-@export var target_entity_id: String = ""
+@export var target_actor_id: String = ""
 @export var is_reloading: bool = false
 @export var reload_progress: float = 0.0
 @export var reload_duration_sec: float = 1.5
@@ -30,12 +32,7 @@ enum FireMode {
 @export var recoil_spread_per_accum_deg: float = 2.0
 @export var recoil_per_shot: float = 0.6
 @export var recoil_recovery_per_sec: float = 2.0
-@export var attack_damage: float = 20.0
-@export var projectile_speed: float = 850.0
-@export var projectile_max_distance: float = 1400.0
-@export var projectile_penetration: float = 0.0
-@export var projectile_lifetime: float = 2.0
-@export_file("*.png", "*.webp", "*.jpg", "*.jpeg") var projectile_sprite_path: String = "res://assets/game/textures/projectiles/bullet.png"
+@export var projectile_definition_id: String = DEFAULT_PROJECTILE_DEFINITION_ID
 @export var ads_distance: float = 170.0
 @export var pellets_per_shot: int = 1
 

@@ -1,4 +1,4 @@
-class_name C_ProjectileData
+class_name ProjectileData
 extends Resource
 
 const DEFAULT_SPRITE_PATH := "res://assets/game/textures/projectiles/bullet.png"
@@ -15,7 +15,7 @@ static var _collision_radius_cache: Dictionary = {}
 @export var penetration: float = 0.0
 @export var lifetime: float = 2.0
 @export var age: float = 0.0
-@export var owner_entity_id: String = ""
+@export var owner_actor_id: String = ""
 @export var weapon_id: String = ""
 @export var has_hit: bool = false
 @export var spread_deviation_rad: float = 0.0

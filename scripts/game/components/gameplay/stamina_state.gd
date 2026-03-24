@@ -1,4 +1,4 @@
-class_name C_Stamina
+class_name StaminaState
 extends Resource
 
 @export var max_stamina: float = 100.0

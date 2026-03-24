@@ -1,6 +1,6 @@
-; Non-Human Enemy entity scene  —  e_non_human_enemy.tscn
+; Non-Human Enemy entity scene  —  non_human_enemy.tscn
 ;
-; Root:   NonHumanEnemyBody (CharacterBody2D, this class)
+; Root:   NonHumanEnemy (CharacterBody2D, this class)
 ; Children:
 ;   CollisionShape2D  – circle hitbox (radius 12; suits the round/alien body)
 ;   BodySprite        – Sprite2D body visual (rapid_1.png placeholder)
@@ -11,17 +11,17 @@
 ;
 ; Aim direction:
 ;   The body script updates aim direction toward the current target each frame.
-;   NonHumanEnemyBody._update_body_rotation() sets self.rotation = that angle,
+;   NonHumanEnemy._update_body_rotation() sets self.rotation = that angle,
 ;   so the sprite and collision shape both face the target simultaneously.
 ;
 ; Variant selection:
 ;   Set the [variant] @export property in the Inspector (SWARMER/CHARGER/DRONE/BLOB).
-;   NonHumanEnemyBody._setup_runtime_state() applies the selected variant stats.
+;   NonHumanEnemy._setup_runtime_state() applies the selected variant stats.
 ;   Default = SWARMER.
 
 [gd_scene format=3 uid="uid://nhe_non_human_enemy_scene_1"]
 
-[ext_resource type="Script" path="res://scripts/game/entities/enemies/e_non_human_enemy_body.gd" id="1_nhebdy"]
+[ext_resource type="Script" path="res://scripts/game/entities/enemies/non_human_enemy.gd" id="1_nhebdy"]
 [ext_resource type="Texture2D" uid="uid://dj1mqbkr1efcy" path="res://assets/game/textures/entities/enemy_mob/rapid/rapid_1.png" id="2_rapid"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_nhe"]
@@ -30,7 +30,7 @@ radius = 12.0
 ; ── Root ──────────────────────────────────────────────────────────────────────
 ; The variant export controls which enemy preset is created at runtime.
 ; Change it in the Inspector to spawn a different non-human enemy type.
-[node name="NonHumanEnemyBody" type="CharacterBody2D"]
+[node name="NonHumanEnemy" type="CharacterBody2D"]
 script = ExtResource("1_nhebdy")
 
 ; ── Physics hitbox ────────────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
-class_name HumanEnemyBody
-extends HumanBase
+class_name HumanEnemy
+extends HumanActor
 
 var _target_actor: Player = null
 
@@ -18,17 +18,18 @@ func _physics_process(delta: float) -> void:
 	sync_runtime_position()
 
 func _setup_runtime_state() -> void:
-	health = C_Health.new(80.0)
-	stamina_state = C_Stamina.new(80.0, 5.0)
-	status_effects = C_StatusEffects.new()
-	position_state = C_Position.new(global_position)
-	velocity_state = C_Velocity.new(160.0, 600.0, 500.0)
-	combat_state = C_CombatState.new()
-	inventory_ref = C_InventoryRef.new()
-	faction_state = C_Faction.new(C_Faction.FactionType.HUMAN_ENEMY)
-	ai_state = C_AIState.new(280.0, 200.0)
-	aim_state = C_AimState.new()
+	health = HealthState.new(80.0)
+	stamina_state = StaminaState.new(80.0, 5.0)
+	status_effects = StatusEffectsState.new()
+	position_state = PositionState.new(global_position)
+	velocity_state = VelocityState.new(160.0, 600.0, 500.0)
+	combat_state = CombatState.new()
+	inventory_ref = InventoryState.new()
+	faction_state = FactionState.new(FactionState.FactionType.HUMAN_ENEMY)
+	ai_state = AIState.new(280.0, 200.0)
+	aim_state = AimState.new()
 	combat_state.equipped_weapon_id = "game:item/weapon/pistol"
+	combat_state.projectile_definition_id = ProjectileCatalog.BULLET
 	combat_state.ammo_max = 12
 	combat_state.ammo_current = 12
 
@@ -50,7 +51,7 @@ func _update_simple_ai(delta: float) -> void:
 		combat_state.wants_fire = false
 		combat_state.is_aiming = false
 		if ai_state != null:
-			ai_state.behavior = C_AIState.AIBehavior.IDLE
+			ai_state.behavior = AIState.AIBehavior.IDLE
 		return
 	var to_target := player.global_position - global_position
 	if to_target.length_squared() > AIM_EPSILON:
@@ -60,20 +61,20 @@ func _update_simple_ai(delta: float) -> void:
 		ai_state.state_timer += delta
 	var distance := to_target.length()
 	if ai_state != null and distance <= ai_state.attack_radius:
-		ai_state.behavior = C_AIState.AIBehavior.ATTACK
+		ai_state.behavior = AIState.AIBehavior.ATTACK
 		if velocity_state != null:
 			velocity_state.velocity = Vector2.ZERO
 		combat_state.is_aiming = true
 		combat_state.wants_fire = true
 	elif ai_state != null and distance <= ai_state.detection_radius:
-		ai_state.behavior = C_AIState.AIBehavior.CHASE
+		ai_state.behavior = AIState.AIBehavior.CHASE
 		if velocity_state != null:
 			velocity_state.velocity = to_target.normalized() * minf(velocity_state.max_speed, 70.0)
 		combat_state.is_aiming = true
 		combat_state.wants_fire = false
 	else:
 		if ai_state != null:
-			ai_state.behavior = C_AIState.AIBehavior.IDLE
+			ai_state.behavior = AIState.AIBehavior.IDLE
 		if velocity_state != null:
 			velocity_state.velocity = Vector2.ZERO
 		combat_state.is_aiming = false

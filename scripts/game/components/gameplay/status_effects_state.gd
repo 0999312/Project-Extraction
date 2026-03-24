@@ -1,4 +1,4 @@
-class_name C_StatusEffects
+class_name StatusEffectsState
 extends Resource
 
 @export var bleed_light: bool = false

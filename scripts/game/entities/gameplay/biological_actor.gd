@@ -1,23 +1,23 @@
-class_name BiologicalBodyBase
+class_name BiologicalActor
 extends CharacterBody2D
 
 var actor_id: String = ""
-var health: C_Health = null
-var stamina_state: C_Stamina = null
-var status_effects: C_StatusEffects = null
-var position_state: C_Position = null
-var velocity_state: C_Velocity = null
-var combat_state: C_CombatState = null
-var inventory_ref: C_InventoryRef = null
-var faction_state: C_Faction = null
-var aim_state: C_AimState = null
-var ai_state: C_AIState = null
+var health: HealthState = null
+var stamina_state: StaminaState = null
+var status_effects: StatusEffectsState = null
+var position_state: PositionState = null
+var velocity_state: VelocityState = null
+var combat_state: CombatState = null
+var inventory_ref: InventoryState = null
+var faction_state: FactionState = null
+var aim_state: AimState = null
+var ai_state: AIState = null
 
 func _ready() -> void:
 	actor_id = "%s_%s" % [name.to_lower(), str(get_instance_id())]
 	add_to_group("actors")
 	if position_state == null:
-		position_state = C_Position.new(global_position)
+		position_state = PositionState.new(global_position)
 	sync_runtime_position()
 
 func sync_runtime_position() -> void:
@@ -42,34 +42,34 @@ func resolve_first_group_node(current_target: Node, group_name: StringName) -> N
 func get_actor_id() -> String:
 	return actor_id
 
-func get_health() -> C_Health:
+func get_health() -> HealthState:
 	return health
 
-func get_stamina_state() -> C_Stamina:
+func get_stamina_state() -> StaminaState:
 	return stamina_state
 
-func get_status_effects() -> C_StatusEffects:
+func get_status_effects() -> StatusEffectsState:
 	return status_effects
 
-func get_position_state() -> C_Position:
+func get_position_state() -> PositionState:
 	return position_state
 
-func get_velocity_state() -> C_Velocity:
+func get_velocity_state() -> VelocityState:
 	return velocity_state
 
-func get_combat_state() -> C_CombatState:
+func get_combat_state() -> CombatState:
 	return combat_state
 
-func get_inventory_ref() -> C_InventoryRef:
+func get_inventory_ref() -> InventoryState:
 	return inventory_ref
 
-func get_faction_state() -> C_Faction:
+func get_faction_state() -> FactionState:
 	return faction_state
 
-func get_aim_state() -> C_AimState:
+func get_aim_state() -> AimState:
 	return aim_state
 
-func get_ai_state() -> C_AIState:
+func get_ai_state() -> AIState:
 	return ai_state
 
 func is_alive() -> bool:
@@ -92,15 +92,15 @@ func on_death(_killer_id: String = "") -> void:
 			shape.disabled = true
 	modulate = Color(1.0, 1.0, 1.0, 0.55)
 
-func is_hostile_to(other: BiologicalBodyBase) -> bool:
+func is_hostile_to(other: BiologicalActor) -> bool:
 	if other == null or faction_state == null or other.faction_state == null:
 		return false
 	match faction_state.faction:
-		C_Faction.FactionType.PLAYER:
-			return other.faction_state.faction in [C_Faction.FactionType.HUMAN_ENEMY, C_Faction.FactionType.NON_HUMAN_ENEMY]
-		C_Faction.FactionType.HUMAN_ENEMY:
-			return other.faction_state.faction == C_Faction.FactionType.PLAYER
-		C_Faction.FactionType.NON_HUMAN_ENEMY:
-			return other.faction_state.faction in [C_Faction.FactionType.PLAYER, C_Faction.FactionType.HUMAN_ENEMY]
+		FactionState.FactionType.PLAYER:
+			return other.faction_state.faction in [FactionState.FactionType.HUMAN_ENEMY, FactionState.FactionType.NON_HUMAN_ENEMY]
+		FactionState.FactionType.HUMAN_ENEMY:
+			return other.faction_state.faction == FactionState.FactionType.PLAYER
+		FactionState.FactionType.NON_HUMAN_ENEMY:
+			return other.faction_state.faction in [FactionState.FactionType.PLAYER, FactionState.FactionType.HUMAN_ENEMY]
 		_:
 			return false

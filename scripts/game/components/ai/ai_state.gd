@@ -1,4 +1,4 @@
-class_name C_AIState
+class_name AIState
 extends Resource
 
 enum AIBehavior {

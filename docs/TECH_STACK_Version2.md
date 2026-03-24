@@ -24,6 +24,7 @@
 - **Scene / Node-driven gameplay runtime**
   - Player, enemies, doors, and interaction points live as scene nodes with local state objects.
   - High-frequency logic (projectiles, combat updates, AI decisions) is handled by focused gameplay scripts and manager services.
+  - Runtime entity definitions and projectile definitions are now registered through dedicated gameplay registries before instantiation.
   - Pooling and chunk activation remain the main performance tools.
   - The project no longer depends on GECS or gdUnit4.
 
@@ -71,8 +72,10 @@ No gameplay system should rely on hardcoded strings; use `ResourceLocation` ever
    - Registries: items, tags, POIs, loot tables, quests, dialogues, tech, home modules, raid templates.
 2. **Gameplay Logic Layer**
    - State objects, manager services, AI brains, and pooled runtime processors handle:
-     - AI, projectiles, status effects, loot roll decisions, quest state transitions.
+      - AI, projectiles, status effects, loot roll decisions, quest state transitions.
    - Runtime scripts are organized under `scripts/game/` rather than the removed ECS-era path layout.
+   - Runtime naming now uses actor/state/runtime terminology instead of historical `C_` / `S_` / `e_` prefixes.
+   - `EntityCatalog` / `EntityRegistry` and `ProjectileCatalog` / `ProjectileRegistry` provide registry-backed instantiation for actors and projectiles.
 3. **Presentation Layer (Godot Nodes)**
    - Player body, enemy bodies, sprites, VFX, UI, camera, scene fragments.
 4. **Service Bridge Layer**
@@ -151,7 +154,7 @@ Loot table entries should be registry-driven:
 ### 5.2 Enemies (Body Script + AI Brain)
 - Enemy scenes own their movement, hit reactions, and interaction hooks.
 - AI state, targeting, and weapon usage are managed by enemy-local brains or shared behavior helpers.
-- Human enemies can keep the shared `HumanBase` aim-pivot rig; non-human enemies can keep full-body aiming while still following the same biological actor base contract.
+- Human enemies can keep the shared `HumanActor` aim-pivot rig; non-human enemies can keep full-body aiming while still following the same biological actor base contract.
 
 ### 5.3 Projectiles (Pooled Runtime Objects)
 - Projectile manager updates positions, performs hit checks, and applies damage/results.
@@ -173,8 +176,8 @@ Loot table entries should be registry-driven:
   - provide delayed setup when dependent runtime references are not ready yet
   - standardize health/damage/aim anchor behavior across derived bodies
 - Derived bodies:
-  - `HumanBase` (player + human enemy)
-  - `NonHumanEnemyBody` (non-human enemy full-body rotation)
+  - `HumanActor` (player + human enemy)
+  - `NonHumanEnemy` (non-human enemy full-body rotation)
 
 ---
 

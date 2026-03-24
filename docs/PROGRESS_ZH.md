@@ -1,5 +1,25 @@
 # Project Extraction — 开发进度
 
+## 更新 10 — 运行时命名清理、实体注册表与抛射物注册表
+
+### 变更内容
+
+- **移除了当前玩法运行时里最明显的 ECS 时代命名痕迹**：
+  - 将 `C_*` 风格的运行时状态/资源统一整理为中性命名，例如 `CombatState`、`ProjectileData`、`HealthState`、`FactionState`、`AIState`。
+  - 将 `S_*` 风格的处理器整理为 `CombatFireRuntime` 与 `ProjectileMotionRuntime`。
+  - 将 `e_*` 风格的实体/抛射物脚本与场景定义整理为 `player.gd`、`human_enemy.gd`、`non_human_enemy.gd`、`projectile.gd`、`player.tscn` 等形式。
+- **为运行时角色定义与实例化新增实体注册表**：
+  - 新增 `EntityRegistry` 与 `EntityCatalog`，注册当前实体定义（`player`、`human_enemy`、`non_human_enemy`）。
+  - 调整 `DemoGame`，改为通过实体注册表实例化运行时角色，而不是在 `DemoGame.tscn` 中直接摆放角色场景实例。
+- **为抛射物定义与射击流程新增抛射物注册表**：
+  - 新增 `ProjectileRegistry` 与 `ProjectileCatalog`，注册标准子弹与生物抛射物等定义。
+  - 将射击流程改为通过 `ProjectileCatalog.instantiate_projectile(...)` 生成抛射物。
+  - 将 `CombatState` 中原本分散的抛射物数值改为 `projectile_definition_id` 形式，通过定义表寻址。
+- **同步更新文档以匹配注册表化后的运行时流程**：
+  - 更新 API / 架构 / 进度文档，使其与新的命名、实体注册表、抛射物注册表和运行时实例化流程保持一致。
+
+---
+
 ## 更新 9 — 脚本目录整理、运行时辅助复用与文档同步
 
 ### 变更内容
@@ -8,7 +28,7 @@
   - 将已经不再准确的 `scripts/ecs/` 目录整体重命名为 `scripts/game/`，使目录结构与当前基于节点的玩法运行时保持一致。
   - 同步更新场景与脚本中的运行时路径引用。
 - **对当前可安全优化的代码设计做了低风险整理**：
-  - 将重复出现的角色移动与目标解析辅助逻辑下沉到 `BiologicalBodyBase`。
+  - 将重复出现的角色移动与目标解析辅助逻辑下沉到 `BiologicalActor`。
   - 在 `guide_input_runtime.gd` 中补充可复用的 GUIDE 输入查询辅助方法。
   - 简化 `Player`、敌人身体脚本、Demo 运行时暂停输入轮询，以及 GUIDE 输入选项菜单中的重复逻辑。
 - **同步整理文档**：
@@ -58,11 +78,11 @@
   - 运行时引用保持在场景树内部，并且重复进入同一场景时初始化行为保持幂等。
   - 涉及文件：`DemoGame.tscn`、`demo_game_runtime.gd`。
 - **统一玩家 / 人类敌人 / 非人类敌人的生物体基类**：
-  - 新增 `e_biological_body_base.gd`，作为生物角色共享的初始化基类。
+  - 新增 `biological_actor.gd`，作为生物角色共享的初始化基类。
   - 统一封装延迟运行时挂接与共享初始化流程，使玩家 / 人类敌人 / 非人类敌人的身体脚本走同一套初始化路径。
-  - 涉及文件：`e_biological_body_base.gd`、`e_human_base.gd`、`e_player.gd`、`e_human_enemy_body.gd`、`e_non_human_enemy_body.gd`。
+  - 涉及文件：`biological_actor.gd`、`human_actor.gd`、`player.gd`、`human_enemy.gd`、`non_human_enemy.gd`。
 - **Demo 场景中体现三类生物角色**：
-  - 在 `DemoGame.tscn` 中加入 `HumanEnemyBody` 与 `NonHumanEnemyBody` 实例，使玩家 / 人类敌人 / 非人类敌人都能在同一可玩场景流程中出现。
+  - 在 `DemoGame.tscn` 中加入 `HumanEnemy` 与 `NonHumanEnemy` 实例，使玩家 / 人类敌人 / 非人类敌人都能在同一可玩场景流程中出现。
 - **音效移除项核查**：
   - 全仓库审计音频资源引用，确认不存在指向已删除音效文件的遗留调用。
   - 当前战斗音频（`handgun_shoot`、`reload`、`mag_empty`）及已注册的游戏音频文件均存在。
@@ -80,7 +100,7 @@
   - 抛射物默认精灵图设为 `res://assets/game/textures/projectiles/bullet.png`。
   - 运行时根据配置精灵图尺寸自动计算抛射物碰撞半径。
   - 抛射物运动流程现在会基于精灵半径，对存活且敌对的目标执行轻量级运行时碰撞检测。
-  - 涉及文件：`c_combat_state.gd`、`c_projectile_data.gd`、`s_combat_fire_system.gd`、`s_projectile_motion_system.gd`。
+  - 涉及文件：`combat_state.gd`、`projectile_data.gd`、`combat_fire_runtime.gd`、`projectile_motion_runtime.gd`。
 - **SoundManager 与现有音频配置联动**：
   - 在音频目录中增加“按注册表获取音频流”和“按注册表播放音乐”辅助方法。
   - Opening 场景现在会基于启动阶段注册表条目自动播放主菜单音乐。
@@ -166,9 +186,9 @@
   - 新增玩家换弹输入和换弹处理状态。
   - 新增非玩家空弹匣自动换弹行为。
   - 新增空弹匣提示音效播放。
-  - 文件：`s_combat_fire_system.gd`、`c_combat_state.gd`、`player_input_context.gd`、`e_player.gd`。
+  - 文件：`combat_fire_runtime.gd`、`combat_state.gd`、`player_input_context.gd`、`player.gd`。
 - 实现弹丸距离衰减和基于距离的过期机制：
-  - `c_projectile_data.gd`、`s_projectile_motion_system.gd`。
+  - `projectile_data.gd`、`projectile_motion_runtime.gd`。
 - 新增瞄准镜头跟随偏移（ADS 时准星跟随风格）：
   - `demo_game_runtime.gd`。
 - 扩展输入/按键绑定/国际化以支持战斗控制：
@@ -190,10 +210,10 @@
 - 新增 GUIDE 按键绑定选项面板：
   - `guide_input_options_menu.tscn`、`guide_input_options_menu.gd`、`master_options_menu_with_tabs.tscn`。
 - 实现玩家操作流程（移动 / 瞄准 / 射击）：
-  - `e_player.gd`。
+  - `player.gd`。
 - 实现瞄准 + 射击处理流程（含后坐力和腰射/ADS 精度差异）：
-  - `s_combat_fire_system.gd`、`s_projectile_motion_system.gd`、`e_base_projectile.gd`。
-  - `c_combat_state.gd`、`c_projectile_data.gd`、`c_aim_state.gd`。
+  - `combat_fire_runtime.gd`、`projectile_motion_runtime.gd`、`projectile.gd`。
+  - `combat_state.gd`、`projectile_data.gd`、`aim_state.gd`。
 - 新增 Demo 游戏处理引导和逐帧运行流程：
   - `demo_game_runtime.gd`、`DemoGame.tscn`。
 - 新增轻量级游戏全局阶段状态：

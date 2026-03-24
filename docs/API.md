@@ -39,7 +39,7 @@
   - clear binding
   - reset defaults
 
-## `e_player.gd`
+## `player.gd`
 
 ### Input-facing behavior
 
@@ -53,7 +53,7 @@
 
 - Exposes player-alive checks and accessors for current health / inventory / combat-related state used by gameplay scripts.
 
-## `c_combat_state.gd`
+## `combat_state.gd`
 
 Fields include:
 
@@ -68,19 +68,17 @@ Fields include:
 - `recoil_recovery_per_sec: float`
 - `fire_mode: FireMode` (`SAFE` / `SEMI` / `AUTO`)
 - `pellets_per_shot: int`
-- `projectile_speed: float`
-- `projectile_max_distance: float`
+- `projectile_definition_id: String`
 - `ads_distance: float`
-- `attack_damage: float`
 - `ammo_max` / `ammo_current` + reload state (`is_reloading`, `reload_progress`, `reload_duration_sec`)
 
-## `c_aim_state.gd`
+## `aim_state.gd`
 
 Field includes:
 
 - `precision_multiplier: float`
 
-## `c_projectile_data.gd`
+## `projectile_data.gd`
 
 Fields include:
 
@@ -89,12 +87,35 @@ Fields include:
 - `remaining_distance: float`
 - `base_damage` / `base_speed` for attenuation curve
 
-## `e_base_projectile.gd`
+## `projectile.gd`
 
 - `setup(direction, dmg, pen, owner_id, wpn_id)` applies `spread_deviation_rad` rotation before velocity assignment.
-- Intended as the node-driven projectile runtime setup entry point.
+- Intended as the node-driven projectile runtime setup entry point used by the projectile registry/catalog flow.
 
-## `s_combat_fire_system.gd`
+## `entity_registry.gd` / `entity_catalog.gd`
+
+- `EntityRegistry` stores registry-backed entity definitions.
+- `EntityCatalog` provides:
+  - `ensure_registry()`
+  - `get_entity_definition(entity_id: String) -> Dictionary`
+  - `instantiate_entity(entity_id: String, node_name: String = "") -> Node`
+- Current built-in entity definitions:
+  - `game:entity/player`
+  - `game:entity/human_enemy`
+  - `game:entity/non_human_enemy`
+
+## `projectile_registry.gd` / `projectile_catalog.gd`
+
+- `ProjectileRegistry` stores registry-backed projectile definitions.
+- `ProjectileCatalog` provides:
+  - `ensure_registry()`
+  - `get_projectile_definition(projectile_id: String) -> Dictionary`
+  - `instantiate_projectile(projectile_id: String, overrides: Dictionary = {}) -> Projectile`
+- Current built-in projectile definitions:
+  - `game:projectile/bullet`
+  - `game:projectile/creature_bolt`
+
+## `combat_fire_runtime.gd`
 
 - Handles per-tick combat processing for actors with combat/aim/position/faction data.
 - Responsibilities include:
@@ -102,11 +123,11 @@ Fields include:
   - fire-mode handling (`SAFE` / `SEMI` / `AUTO`)
   - manual reload trigger and non-player auto reload when magazine is empty
   - empty-mag reminder SFX
-  - projectile spawn when fire is requested and ammo/cooldown rules allow it
+  - projectile spawn through `ProjectileCatalog.instantiate_projectile(...)` when fire is requested and ammo/cooldown rules allow it
   - hipfire vs ADS spread + recoil spread
   - per-shot pellet count support
 
-## `s_projectile_motion_system.gd`
+## `projectile_motion_runtime.gd`
 
 - Advances projectile age/position and removes expired projectiles.
 - Applies distance-based attenuation using `remaining_distance / max_distance`:
@@ -118,6 +139,7 @@ Fields include:
 
 - Coordinates demo-scene gameplay processing.
 - Uses combat and projectile processing helpers directly from the scene runtime.
+- Instantiates the playable runtime actors from `EntityCatalog` using spawn markers inside `DemoGame.tscn`.
 - Polls GUIDE `pe_pause` through `GuideInputRuntime` helpers and opens `PauseMenuController` in `DemoGame`.
 - Applies ADS camera follow offset toward crosshair direction by writing `PhantomCamera2D.follow_offset` while aiming.
 

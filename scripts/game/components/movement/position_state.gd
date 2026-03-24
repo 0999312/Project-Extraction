@@ -1,4 +1,4 @@
-class_name C_Position
+class_name PositionState
 extends Resource
 
 @export var world_position: Vector2 = Vector2.ZERO

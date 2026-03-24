@@ -123,6 +123,8 @@ Recommended registry types (retrieved via `RegistryManager.get_registry(type_nam
 - `core:dialogue` → Dialogue definitions
 - `core:scene` → Scene template definitions (safehouse/raid templates)
 - `core:spawn_profile` → runtime spawn definitions for actors, loot markers, and encounter presets
+- `core:entity` → runtime entity definitions used to instantiate gameplay actor scenes by `ResourceLocation`
+- `core:projectile` → projectile definitions used to instantiate projectile runtime objects by `ResourceLocation`
 
 > Note: MSF `Tag` stores `registry_type: ResourceLocation` and entries as RL strings. Tags must point to the correct registry type RL (e.g., `core:item`).
 
@@ -201,6 +203,7 @@ We explicitly separate gameplay content by how it should be implemented for perf
 - Input is written directly into the player runtime state each physics frame.
 - Animation / VFX / camera offset read the same state locally.
 - In the current project layout, these runtime scripts live under `scripts/game/`.
+- The playable demo instantiates the player through an entity registry entry rather than hardcoding the player scene directly inside the demo scene.
 
 **Why this approach?**
 - Keeps moment-to-moment control responsive.
@@ -217,6 +220,7 @@ We explicitly separate gameplay content by how it should be implemented for perf
   - service returns path points
   - enemy script follows those points
 - Shared runtime helpers should be reused for repeated movement/target-resolution behavior instead of re-implementing them per actor script.
+- Enemy scene definitions should also be resolved through the entity registry so gameplay scenes can swap or spawn actor definitions by ID.
 
 **Why this approach?**
 - Easier to iterate on enemy feel, animation, and hit reactions.
@@ -225,6 +229,7 @@ We explicitly separate gameplay content by how it should be implemented for perf
 ### 6.3 Projectiles (Pooled Runtime Objects)
 **Implementation:**
 - Projectiles are spawned from a pooled manager or lightweight projectile scene list.
+- Projectile definitions are registered by ID and instantiated through a projectile registry/catalog layer.
 - Each projectile stores:
   - position
   - velocity
