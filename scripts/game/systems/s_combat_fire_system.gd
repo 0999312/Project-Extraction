@@ -1,7 +1,7 @@
 class_name S_CombatFireSystem
 extends RefCounted
 
-const BaseProjectileScript := preload("res://scripts/ecs/projectiles/e_base_projectile.gd")
+const BaseProjectileScript := preload("res://scripts/game/projectiles/e_base_projectile.gd")
 const EMPTY_MAG_SFX_MIN_INTERVAL := 0.35
 const AI_RELOAD_FACTIONS := [
 	C_Faction.FactionType.HUMAN_ENEMY,

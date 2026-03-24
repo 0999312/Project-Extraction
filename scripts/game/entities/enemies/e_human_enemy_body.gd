@@ -14,7 +14,7 @@ func _physics_process(delta: float) -> void:
 	if not is_alive():
 		return
 	_update_simple_ai(delta)
-	_apply_runtime_movement()
+	apply_velocity_movement()
 	sync_runtime_position()
 
 func _setup_runtime_state() -> void:
@@ -45,7 +45,8 @@ func _update_simple_ai(delta: float) -> void:
 	combat_state.wants_reload = false
 	combat_state.wants_fire_mode_toggle = false
 	if player == null or not player.is_alive():
-		velocity_state.velocity = Vector2.ZERO
+		if velocity_state != null:
+			velocity_state.velocity = Vector2.ZERO
 		combat_state.wants_fire = false
 		combat_state.is_aiming = false
 		if ai_state != null:
@@ -60,30 +61,28 @@ func _update_simple_ai(delta: float) -> void:
 	var distance := to_target.length()
 	if ai_state != null and distance <= ai_state.attack_radius:
 		ai_state.behavior = C_AIState.AIBehavior.ATTACK
-		velocity_state.velocity = Vector2.ZERO
+		if velocity_state != null:
+			velocity_state.velocity = Vector2.ZERO
 		combat_state.is_aiming = true
 		combat_state.wants_fire = true
 	elif ai_state != null and distance <= ai_state.detection_radius:
 		ai_state.behavior = C_AIState.AIBehavior.CHASE
-		velocity_state.velocity = to_target.normalized() * minf(velocity_state.max_speed, 70.0)
+		if velocity_state != null:
+			velocity_state.velocity = to_target.normalized() * minf(velocity_state.max_speed, 70.0)
 		combat_state.is_aiming = true
 		combat_state.wants_fire = false
 	else:
 		if ai_state != null:
 			ai_state.behavior = C_AIState.AIBehavior.IDLE
-		velocity_state.velocity = Vector2.ZERO
+		if velocity_state != null:
+			velocity_state.velocity = Vector2.ZERO
 		combat_state.is_aiming = false
 		combat_state.wants_fire = false
 
-func _apply_runtime_movement() -> void:
-	if velocity_state != null:
-		velocity = velocity_state.velocity
-	move_and_slide()
-
 func _resolve_target_actor() -> Player:
-	if is_instance_valid(_target_actor):
-		return _target_actor
-	var found := get_tree().get_first_node_in_group("player")
+	var found := resolve_first_group_node(_target_actor, &"player")
 	if found is Player:
 		_target_actor = found
+	else:
+		_target_actor = null
 	return _target_actor

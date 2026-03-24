@@ -200,6 +200,7 @@ We explicitly separate gameplay content by how it should be implemented for perf
   - quest state reference
 - Input is written directly into the player runtime state each physics frame.
 - Animation / VFX / camera offset read the same state locally.
+- In the current project layout, these runtime scripts live under `scripts/game/`.
 
 **Why this approach?**
 - Keeps moment-to-moment control responsive.
@@ -215,6 +216,7 @@ We explicitly separate gameplay content by how it should be implemented for perf
   - enemy requests path updates
   - service returns path points
   - enemy script follows those points
+- Shared runtime helpers should be reused for repeated movement/target-resolution behavior instead of re-implementing them per actor script.
 
 **Why this approach?**
 - Easier to iterate on enemy feel, animation, and hit reactions.

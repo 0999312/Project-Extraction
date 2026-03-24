@@ -1,5 +1,21 @@
 # Project Extraction — Progress
 
+## Update 9 — Script Layout Cleanup, Runtime Helper Reuse, and Documentation Sync
+
+### Changes
+
+- **Reorganized runtime scripts to match the post-ECS architecture**:
+  - Renamed the stale `scripts/ecs/` tree to `scripts/game/` so the directory structure now reflects the current node-driven gameplay runtime.
+  - Updated scene/script references to the new runtime paths.
+- **Applied low-risk code-design cleanup in the active runtime**:
+  - Moved repeated actor movement and target-resolution helpers into `BiologicalBodyBase`.
+  - Added reusable GUIDE polling helpers in `guide_input_runtime.gd`.
+  - Simplified `Player`, enemy body scripts, demo runtime pause polling, and the GUIDE options menu to reuse those helpers instead of duplicating the same logic.
+- **Synchronized docs with the new script layout**:
+  - Updated architecture/API/progress notes so the documented script organization and helper responsibilities match the current codebase.
+
+---
+
 ## Update 8 — Node-Driven Runtime Rewrite, Plugin Removal, and Documentation Cleanup
 
 ### Changes

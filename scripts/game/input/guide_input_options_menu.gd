@@ -11,12 +11,13 @@ var _row_to_column_config: Dictionary = {}
 var _selected_item: TreeItem
 var _selected_config_item
 var _formatter: GUIDEInputFormatter
+var _remapper: GUIDERemapper
 var _is_rebinding: bool = false
 
 
 func _ready() -> void:
 	GuideInputRuntime.ensure_initialized()
-	_formatter = GUIDEInputFormatter.for_context(GuideInputRuntime.get_context(), 20)
+	_refresh_runtime_helpers()
 	_tree.hide_root = true
 	_tree.columns = 4
 	_tree.column_titles_visible = true
@@ -38,8 +39,7 @@ func _build_table() -> void:
 	_row_to_column_config.clear()
 	_tree.clear()
 	var root := _tree.create_item()
-	var remapper := GuideInputRuntime.get_remapper()
-	var remappable_items: Array = remapper.get_remappable_items()
+	var remappable_items: Array = _remapper.get_remappable_items()
 	var move_items_by_index: Dictionary = {}
 	var action_rows: Dictionary = {}
 	for item in remappable_items:
@@ -88,11 +88,15 @@ func _add_table_row(root: TreeItem, label_key: String, columns: Dictionary) -> v
 
 
 func _format_binding(item) -> String:
-	var remapper := GuideInputRuntime.get_remapper()
-	var binding: GUIDEInput = remapper.get_bound_input_or_null(item)
+	var binding: GUIDEInput = _remapper.get_bound_input_or_null(item)
 	if binding == null:
 		return tr("ui.input.unbound")
 	return _formatter.input_as_text(binding)
+
+
+func _refresh_runtime_helpers() -> void:
+	_remapper = GuideInputRuntime.get_remapper()
+	_formatter = GUIDEInputFormatter.for_context(GuideInputRuntime.get_context(), 20)
 
 
 func _refresh_buttons() -> void:
@@ -130,9 +134,8 @@ func _on_rebind_pressed() -> void:
 func _on_clear_pressed() -> void:
 	if _selected_config_item == null:
 		return
-	var remapper := GuideInputRuntime.get_remapper()
-	remapper.set_bound_input(_selected_config_item, null)
-	GuideInputRuntime.apply_remapping_config(remapper.get_mapping_config())
+	_remapper.set_bound_input(_selected_config_item, null)
+	GuideInputRuntime.apply_remapping_config(_remapper.get_mapping_config())
 	_status_label.text = tr("ui.input.cleared")
 	_build_table()
 
@@ -140,6 +143,7 @@ func _on_clear_pressed() -> void:
 func _on_reset_pressed() -> void:
 	GuideInputRuntime.apply_remapping_config(GUIDERemappingConfig.new())
 	GuideInputRuntime.ensure_initialized()
+	_refresh_runtime_helpers()
 	_status_label.text = tr("ui.input.restored_defaults")
 	_build_table()
 
@@ -152,9 +156,8 @@ func _on_input_detected(input: GUIDEInput) -> void:
 	if input == null:
 		_status_label.text = tr("ui.input.rebind_cancelled")
 		return
-	var remapper := GuideInputRuntime.get_remapper()
-	remapper.set_bound_input(_selected_config_item, input)
-	GuideInputRuntime.apply_remapping_config(remapper.get_mapping_config())
+	_remapper.set_bound_input(_selected_config_item, input)
+	GuideInputRuntime.apply_remapping_config(_remapper.get_mapping_config())
 	_status_label.text = tr("ui.input.bound_action").format([tr(_selected_config_item.display_name)])
 	_build_table()
 
@@ -164,8 +167,7 @@ func _on_tree_item_activated() -> void:
 
 
 func _get_device_column(item) -> int:
-	var remapper := GuideInputRuntime.get_remapper()
-	var input: GUIDEInput = remapper.get_default_input(item)
+	var input: GUIDEInput = _remapper.get_default_input(item)
 	if input is GUIDEInputKey:
 		return 1
 	if input is GUIDEInputMouseButton:

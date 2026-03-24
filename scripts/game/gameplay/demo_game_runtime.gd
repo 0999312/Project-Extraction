@@ -46,10 +46,7 @@ func _assign_enemy_targets() -> void:
 		_non_human_enemy.set_target_actor(_player)
 
 func _poll_pause_input() -> void:
-	var action: GUIDEAction = GuideInputRuntime.get_action(GUIDE_ACTION_PAUSE)
-	if action == null:
-		return
-	var is_triggered := action.is_triggered()
+	var is_triggered := GuideInputRuntime.is_action_triggered(GUIDE_ACTION_PAUSE)
 	if is_triggered and not _pause_pressed_last_frame and _pause_menu_controller != null:
 		_pause_menu_controller.pause()
 	_pause_pressed_last_frame = is_triggered

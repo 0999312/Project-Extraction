@@ -36,8 +36,8 @@ func _physics_process(delta: float) -> void:
 	_poll_guide_input()
 	_handle_sprint_stamina(delta)
 	_sync_input_to_runtime()
-	_apply_movement()
-	_sync_runtime_position()
+	apply_velocity_movement()
+	sync_runtime_position()
 
 func _setup_runtime_state() -> void:
 	health = C_Health.new(100.0)
@@ -82,12 +82,12 @@ func _sync_input_to_runtime() -> void:
 	if combat_state != null:
 		var prev_aiming := combat_state.is_aiming
 		var prev_fire := combat_state.wants_fire
-		combat_state.is_aiming = _is_action_triggered(GUIDE_ACTION_AIM_HOLD)
-		combat_state.wants_fire = _is_action_triggered(GUIDE_ACTION_FIRE)
-		var reload_pressed := _is_action_triggered(GUIDE_ACTION_RELOAD)
+		combat_state.is_aiming = GuideInputRuntime.is_action_triggered(GUIDE_ACTION_AIM_HOLD)
+		combat_state.wants_fire = GuideInputRuntime.is_action_triggered(GUIDE_ACTION_FIRE)
+		var reload_pressed := GuideInputRuntime.is_action_triggered(GUIDE_ACTION_RELOAD)
 		combat_state.wants_reload = reload_pressed and not _reload_pressed_last_frame
 		_reload_pressed_last_frame = reload_pressed
-		var fire_mode_pressed := _is_action_triggered(GUIDE_ACTION_FIRE_MODE_TOGGLE)
+		var fire_mode_pressed := GuideInputRuntime.is_action_triggered(GUIDE_ACTION_FIRE_MODE_TOGGLE)
 		combat_state.wants_fire_mode_toggle = fire_mode_pressed and not _fire_mode_pressed_last_frame
 		_fire_mode_pressed_last_frame = fire_mode_pressed
 		if combat_state.is_aiming != prev_aiming:
@@ -100,11 +100,6 @@ func _sync_input_to_runtime() -> void:
 			print("[DEBUG][Player] FIRE_MODE_TOGGLE requested")
 	if aim_state != null:
 		aim_state.aim_direction = _get_aim_direction()
-
-func _apply_movement() -> void:
-	if velocity_state != null:
-		velocity = velocity_state.velocity
-	move_and_slide()
 
 func _get_current_speed() -> float:
 	var selected_speed := BASE_SPRINT_SPEED if is_sprinting else BASE_SPEED
@@ -119,9 +114,9 @@ func _get_current_speed() -> float:
 func _poll_guide_input() -> void:
 	var prev_move := move_input
 	var prev_sprint := is_sprinting
-	move_input = _get_action_axis_2d(GUIDE_ACTION_MOVE).limit_length(1.0)
-	is_sprinting = _is_action_triggered(GUIDE_ACTION_SPRINT) and (stamina_state == null or not stamina_state.is_exhausted)
-	var stick_aim := _get_action_axis_2d(GUIDE_ACTION_AIM_AXIS)
+	move_input = GuideInputRuntime.get_action_axis_2d(GUIDE_ACTION_MOVE).limit_length(1.0)
+	is_sprinting = GuideInputRuntime.is_action_triggered(GUIDE_ACTION_SPRINT) and (stamina_state == null or not stamina_state.is_exhausted)
+	var stick_aim := GuideInputRuntime.get_action_axis_2d(GUIDE_ACTION_AIM_AXIS)
 	_using_gamepad_aim = stick_aim.length_squared() > AIM_EPSILON
 	if _using_gamepad_aim:
 		aim_direction = stick_aim.normalized()
@@ -133,13 +128,3 @@ func _poll_guide_input() -> void:
 		print("[DEBUG][Player] MOVE stopped")
 	if is_sprinting != prev_sprint:
 		print("[DEBUG][Player] SPRINT %s" % ("ON" if is_sprinting else "OFF"))
-
-func _get_action_axis_2d(name: StringName) -> Vector2:
-	var action: GUIDEAction = GuideInputRuntime.get_action(name)
-	if action == null:
-		return Vector2.ZERO
-	return action.value_axis_2d
-
-func _is_action_triggered(name: StringName) -> bool:
-	var action: GUIDEAction = GuideInputRuntime.get_action(name)
-	return action != null and action.is_triggered()

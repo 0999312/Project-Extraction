@@ -40,6 +40,16 @@ static func get_remapper() -> GUIDERemapper:
 	return _remapper
 
 
+static func get_action_axis_2d(name: StringName) -> Vector2:
+	var action := get_action(name)
+	return action.value_axis_2d if action != null else Vector2.ZERO
+
+
+static func is_action_triggered(name: StringName) -> bool:
+	var action := get_action(name)
+	return action != null and action.is_triggered()
+
+
 static func apply_remapping_config(config: GUIDERemappingConfig) -> void:
 	_remapping_config = config if config != null else GUIDERemappingConfig.new()
 	if _remapper != null:

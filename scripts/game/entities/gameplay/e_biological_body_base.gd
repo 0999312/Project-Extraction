@@ -26,6 +26,19 @@ func sync_runtime_position() -> void:
 		if aim_state != null:
 			position_state.facing_angle = aim_state.aim_direction.angle()
 
+
+func apply_velocity_movement() -> void:
+	if velocity_state != null:
+		velocity = velocity_state.velocity
+	move_and_slide()
+
+
+func resolve_first_group_node(current_target: Node, group_name: StringName) -> Node:
+	if is_instance_valid(current_target):
+		return current_target
+	var found := get_tree().get_first_node_in_group(group_name)
+	return found if found is Node else null
+
 func get_actor_id() -> String:
 	return actor_id
 

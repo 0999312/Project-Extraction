@@ -2,7 +2,7 @@ class_name GameState
 extends Resource
 
 const STATE_NAME : String = "GameState"
-const FILE_PATH = "res://scripts/ecs/game_state.gd"
+const FILE_PATH = "res://scripts/game/game_state.gd"
 
 enum GamePhase {
 	HOMESTEAD,

@@ -1,6 +1,7 @@
 # API Overview (Current Input, Runtime, and Audio Integration)
 
 - The current playable runtime is scene/node-driven and no longer depends on GECS or gdUnit4.
+- The current gameplay runtime script tree now lives under `scripts/game/`.
 
 ## `player_input_context.gd`
 
@@ -21,8 +22,10 @@
   - `ensure_initialized()`
   - `get_context() -> GUIDEMappingContext`
   - `get_action(name: StringName) -> GUIDEAction`
+  - `get_action_axis_2d(name: StringName) -> Vector2`
   - `get_actions() -> Dictionary`
   - `get_remapper() -> GUIDERemapper`
+  - `is_action_triggered(name: StringName) -> bool`
   - `apply_remapping_config(config: GUIDERemappingConfig) -> void`
 
 ## `guide_input_options_menu.gd`
@@ -115,7 +118,7 @@ Fields include:
 
 - Coordinates demo-scene gameplay processing.
 - Uses combat and projectile processing helpers directly from the scene runtime.
-- Polls GUIDE `pe_pause` action and opens `PauseMenuController` in `DemoGame`.
+- Polls GUIDE `pe_pause` through `GuideInputRuntime` helpers and opens `PauseMenuController` in `DemoGame`.
 - Applies ADS camera follow offset toward crosshair direction by writing `PhantomCamera2D.follow_offset` while aiming.
 
 ## `game_state.gd`

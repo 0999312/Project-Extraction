@@ -72,6 +72,7 @@ No gameplay system should rely on hardcoded strings; use `ResourceLocation` ever
 2. **Gameplay Logic Layer**
    - State objects, manager services, AI brains, and pooled runtime processors handle:
      - AI, projectiles, status effects, loot roll decisions, quest state transitions.
+   - Runtime scripts are organized under `scripts/game/` rather than the removed ECS-era path layout.
 3. **Presentation Layer (Godot Nodes)**
    - Player body, enemy bodies, sprites, VFX, UI, camera, scene fragments.
 4. **Service Bridge Layer**
