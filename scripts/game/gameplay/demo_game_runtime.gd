@@ -139,7 +139,7 @@ func _update_crosshair_and_camera_target() -> void:
 		if _camera_aim_target != null:
 			_phantom_camera_2d.follow_target = _camera_aim_target if should_follow_crosshair else _player
 		else:
-			_phantom_camera_2d.follow_target = _crosshair if should_follow_crosshair else _player
+			_phantom_camera_2d.follow_target = _crosshair as Node2D if should_follow_crosshair else _player
 	var transition_sec := maxf(MIN_AIM_TRANSITION_SEC, combat.aim_transition_sec)
 	if _last_camera_transition_sec != transition_sec:
 		_last_camera_transition_sec = transition_sec

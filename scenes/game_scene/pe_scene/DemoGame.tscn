@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://vxha7ywwiikg"]
 
-[ext_resource type="TileSet" uid="uid://71caum7va6qv" path="res://assets/game/tiles/tileset_demo.tres" id="1_ateyy"]
+[ext_resource type="TileSet" uid="uid://71caum7va6qv" path="res://assets/game/tiles/tileset_ground.tres" id="1_ateyy"]
 [ext_resource type="Script" uid="uid://cv8ggtohrl5ux" path="res://scripts/game/gameplay/demo_game_runtime.gd" id="5_demo_runtime"]
 [ext_resource type="Script" uid="uid://bd046eokvcnu2" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="6_8x55q"]
 [ext_resource type="Script" uid="uid://bhexx6mj1xv3q" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_2d.gd" id="7_nlmfi"]
@@ -38,7 +38,6 @@ position = Vector2(577, 378)
 position = Vector2(705, 377)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1276063257]
-top_level = true
 position = Vector2(374, 377)
 
 [node name="PhantomCameraHost" type="Node" parent="Camera2D" unique_id=508011638]
