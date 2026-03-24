@@ -30,6 +30,9 @@ var _rect: ColorRect = null
 var _material: ShaderMaterial = null
 
 func _ready() -> void:
+	# Layer 1 renders above the default 2D canvas (layer 0) so the darkening
+	# overlay covers the game world.  The crosshair sprite sits inside the
+	# transparent hole and remains visible.
 	layer = 1
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build_overlay()
