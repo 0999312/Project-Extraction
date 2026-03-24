@@ -10,6 +10,8 @@ var _player: Player = null
 var _human_enemy: HumanEnemy = null
 var _non_human_enemy: NonHumanEnemy = null
 var _crosshair: CrosshairNode = null
+var _camera_aim_target: Node2D = null
+var _ads_vignette: AdsVignetteOverlay = null
 var _camera_following_crosshair: bool = false
 var _default_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
 var _last_camera_transition_sec: float = -1.0
@@ -22,6 +24,7 @@ var _pause_pressed_last_frame: bool = false
 const GUIDE_ACTION_PAUSE := &"pe_pause"
 const GUIDE_ACTION_AIM_AXIS_OPTIONAL := &"pe_aim_axis"
 const AIM_AXIS_EPSILON := 0.0001
+const AIM_DISTANCE_EPSILON := 0.0001
 const HIP_FIRE_AXIS_DISTANCE_RATIO := 0.6
 const MIN_HIP_FIRE_AXIS_DISTANCE := 32.0
 const MIN_AIM_TRANSITION_SEC := 0.01
@@ -93,6 +96,13 @@ func _setup_crosshair() -> void:
 	_crosshair = CrosshairNode.new()
 	_crosshair.name = "Crosshair"
 	add_child(_crosshair)
+	_camera_aim_target = Node2D.new()
+	_camera_aim_target.name = "CameraAimTarget"
+	_camera_aim_target.top_level = true
+	add_child(_camera_aim_target)
+	_ads_vignette = AdsVignetteOverlay.new()
+	_ads_vignette.name = "AdsVignetteOverlay"
+	add_child(_ads_vignette)
 
 func _update_crosshair_and_camera_target() -> void:
 	if _crosshair == null:
@@ -116,10 +126,20 @@ func _update_crosshair_and_camera_target() -> void:
 		_crosshair.global_position = _player.global_position + normalized_aim_axis * effective_crosshair_distance
 	else:
 		_crosshair.update_position(_player.global_position, combat.is_aiming, combat.ads_distance)
+	if _camera_aim_target != null:
+		var to_crosshair := _crosshair.global_position - _player.global_position
+		var max_distance := maxf(0.0, combat.ads_distance)
+		if max_distance > 0.0 and to_crosshair.length_squared() > AIM_DISTANCE_EPSILON:
+			_camera_aim_target.global_position = _player.global_position + to_crosshair.limit_length(max_distance)
+		else:
+			_camera_aim_target.global_position = _crosshair.global_position
 	var should_follow_crosshair := combat.is_aiming and not relaxed
 	if should_follow_crosshair != _camera_following_crosshair:
 		_camera_following_crosshair = should_follow_crosshair
-		_phantom_camera_2d.follow_target = _crosshair if should_follow_crosshair else _player
+		if _camera_aim_target != null:
+			_phantom_camera_2d.follow_target = _camera_aim_target if should_follow_crosshair else _player
+		else:
+			_phantom_camera_2d.follow_target = _crosshair if should_follow_crosshair else _player
 	var transition_sec := maxf(MIN_AIM_TRANSITION_SEC, combat.aim_transition_sec)
 	if _last_camera_transition_sec != transition_sec:
 		_last_camera_transition_sec = transition_sec
@@ -127,6 +147,7 @@ func _update_crosshair_and_camera_target() -> void:
 		_phantom_camera_2d.follow_damping_value = Vector2(transition_sec, transition_sec)
 	_phantom_camera_2d.follow_offset = Vector2.ZERO
 	_update_player_aim_from_crosshair(using_aim_axis)
+	_update_ads_vignette(combat.is_aiming and not relaxed)
 
 func _update_player_aim_from_crosshair(using_aim_axis: bool) -> void:
 	if _player == null or _crosshair == null:
@@ -137,6 +158,16 @@ func _update_player_aim_from_crosshair(using_aim_axis: bool) -> void:
 	if using_aim_axis:
 		return
 	aim.aim_direction = _crosshair.get_effective_aim_direction(_player.global_position, aim.aim_direction)
+
+func _update_ads_vignette(active: bool) -> void:
+	if _ads_vignette == null:
+		return
+	_ads_vignette.set_active(active)
+	if active and _crosshair != null:
+		var viewport := get_viewport()
+		if viewport != null:
+			var screen_pos := viewport.get_canvas_transform() * _crosshair.global_position
+			_ads_vignette.update_center(screen_pos)
 
 func _is_relaxed_state() -> bool:
 	return get_tree().paused

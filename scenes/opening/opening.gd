@@ -74,9 +74,8 @@ func _configure_ui_audio() -> void:
 		if child is AudioStreamPlayer:
 			child.queue_free()
 	var select_stream := AudioCatalog.get_registered_stream("ui", "select.mp3")
-	var click_stream := AudioCatalog.get_registered_stream("ui", "click.mp3")
 	ProjectUISoundController.button_focused_player = _create_ui_audio_player(ProjectUISoundController, select_stream, "ButtonFocused")
-	ProjectUISoundController.button_pressed_player = _create_ui_audio_player(ProjectUISoundController, click_stream, "ButtonPressed")
+	ProjectUISoundController.button_pressed_player = _create_ui_audio_player(ProjectUISoundController, select_stream, "ButtonPressed")
 	ProjectUISoundController.tab_selected_player = _create_ui_audio_player(ProjectUISoundController, select_stream, "TabSelected")
 	ProjectUISoundController.tab_changed_player = _create_ui_audio_player(ProjectUISoundController, select_stream, "TabChanged")
 	if ProjectUISoundController.root_node != null:
