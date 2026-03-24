@@ -1,12 +1,12 @@
 extends Node2D
 
-@onready var _combat_fire_system: S_CombatFireSystem = $CombatFireSystem
-@onready var _projectile_motion_system: S_ProjectileMotionSystem = $ProjectileMotionSystem
+@onready var _world: World = $World
+@onready var _combat_fire_system: S_CombatFireSystem = $World/Systems/CombatFireSystem
+@onready var _projectile_motion_system: S_ProjectileMotionSystem = $World/Systems/ProjectileMotionSystem
 @onready var _pause_menu_controller: Node = $PauseMenuController
 @onready var _player: Player = $Player
 @onready var _phantom_camera_2d = $PhantomCamera2D
 
-var _world: World
 var _systems_registered: bool = false
 var _pause_pressed_last_frame: bool = false
 const GUIDE_ACTION_PAUSE := &"pe_pause"
@@ -14,9 +14,6 @@ const AIM_CAMERA_LERP_SPEED := 9.0
 
 
 func _ready() -> void:
-	_world = World.new()
-	_world.name = "RuntimeWorld"
-	add_child(_world)
 	ECS.world = _world
 	_register_systems_when_world_ready()
 	# Ensure DemoGame processes after children (Player) so input is polled
@@ -38,16 +35,11 @@ func _register_systems_when_world_ready() -> void:
 		return
 	if ECS.world == null:
 		return
-	if ECS.world.systems.has(_combat_fire_system) and ECS.world.systems.has(_projectile_motion_system):
-		_systems_registered = true
-		return
-	if _combat_fire_system.get_parent() != null:
-		_combat_fire_system.get_parent().remove_child(_combat_fire_system)
-	if _projectile_motion_system.get_parent() != null:
-		_projectile_motion_system.get_parent().remove_child(_projectile_motion_system)
-	ECS.world.add_system(_combat_fire_system)
-	ECS.world.add_system(_projectile_motion_system)
-	_systems_registered = true
+	if not ECS.world.systems.has(_combat_fire_system):
+		ECS.world.add_system(_combat_fire_system)
+	if not ECS.world.systems.has(_projectile_motion_system):
+		ECS.world.add_system(_projectile_motion_system)
+	_systems_registered = ECS.world.systems.has(_combat_fire_system) and ECS.world.systems.has(_projectile_motion_system)
 
 
 func _poll_pause_input() -> void:

@@ -130,20 +130,7 @@ func _setup_ecs_entity() -> void:
 		combat.equipped_weapon_id = "game:item/weapon/pistol"
 		combat.ammo_max = 15
 		combat.ammo_current = 15
-	if ECS.world:
-		ECS.world.add_entity(_ecs_entity)
-	elif not ECS.world_changed.is_connected(_on_ecs_world_changed):
-		ECS.world_changed.connect(_on_ecs_world_changed)
-
-
-func _on_ecs_world_changed(world: World) -> void:
-	if _ecs_entity == null or world == null:
-		return
-	if world.entities.has(_ecs_entity):
-		return
-	world.add_entity(_ecs_entity)
-	if ECS.world_changed.is_connected(_on_ecs_world_changed):
-		ECS.world_changed.disconnect(_on_ecs_world_changed)
+	register_ecs_entity(_ecs_entity)
 
 #endregion ECS Bridge Setup
 

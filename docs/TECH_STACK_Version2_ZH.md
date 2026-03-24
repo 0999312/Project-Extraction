@@ -45,12 +45,14 @@
 - **@nathanhoad/godot_sound_manager**（推荐，易于使用）
   - 自动加载播放音效/背景音乐。
   - 通过音频桥接器包装，以便日后轻松替换。
-  - 当前项目音频注册改为“按文件夹 + 文件名配置”
-    （`scripts/audio/audio_catalog.gd`），由
-    `scripts/audio/audio_registry_bootstrap.gd` 初始化。
+  - 当前项目音频注册采用“按文件夹 + 文件名配置”
+    （`scripts/audio/audio_catalog.gd`）。
+  - 当前初始化流程为场景驱动：
+    - 启动阶段音频在 `scenes/opening/opening.gd` 注册。
+    - 游戏阶段音频在 `scenes/loading_screen/loading_screen.gd` 注册。
 
 ### 1.8 本地化
-- UI JSON 本地化由 `scripts/localization/localization_bootstrap.gd`
+- UI JSON 本地化由 `scenes/opening/opening.gd` 中的 `I18NManager`
   独立初始化（与音频注册解耦）。
 - 当前支持语言：`en`、`zh`。
 - 当前语言写入 `AppSettings.GAME_SECTION` 的 `Language` 键，
@@ -143,6 +145,8 @@ MSF 演示使用带有 `scene/script` 的 `ItemInfo`。对于本项目：
 ### 5.1 玩家 (节点 + ECS 混合)
 - 节点：`CharacterBody2D` 用于移动/碰撞和动画。
 - ECS：权威的游戏状态和战斗决策。
+- 实现说明：玩家实体继承 `HumanBase`（其基类为
+  `BiologicalBodyBase`），并持有子 ECS 实体作为状态桥接。
 
 **同步路径：**
 - 节点 → ECS：位置/瞄准
@@ -151,6 +155,17 @@ MSF 演示使用带有 `scene/script` 的 `ItemInfo`。对于本项目：
 ### 5.2 敌人 (ECS 优先)
 - ECS 处理 AI 状态、目标选择、武器使用、生命值。
 - 节点视图最小化，并可根据区块激活/停用。
+- 人类敌人复用 `HumanBase` 的手部瞄准骨架；非人类敌人使用全身朝向瞄准，
+  两者均复用 `BiologicalBodyBase` 的 ECS 注册逻辑。
+
+### 5.6 生物体基类场景契约
+- 共享基类脚本：`scripts/ecs/entities/gameplay/e_biological_body_base.gd`。
+- 职责：
+  - 将子 ECS 实体注册到当前 GECS World。
+  - 当 World 尚未就绪时，通过 `ECS.world_changed` 延迟注册。
+- 派生体：
+  - `HumanBase`（玩家 + 人类敌人）。
+  - `NonHumanEnemyBody`（非人类敌人全身朝向）。
 
 ### 5.3 抛射物 (仅 ECS)
 - ECS 更新位置，执行命中检测，施加伤害事件。

@@ -27,7 +27,7 @@
 ## The [member NonHumanEnemy.variant] property on the ECS entity child
 ## selects the archetype (SWARMER, CHARGER, DRONE, BLOB).
 class_name NonHumanEnemyBody
-extends CharacterBody2D
+extends BiologicalBodyBase
 
 
 #region Constants
@@ -85,9 +85,7 @@ func _setup_ecs_entity() -> void:
 	if pos_comp:
 		pos_comp.world_position = global_position
 
-	# Register with the active GECS World.
-	if ECS.world:
-		ECS.world.add_entity(_ecs_entity)
+	register_ecs_entity(_ecs_entity)
 
 #endregion ECS Bridge Setup
 
