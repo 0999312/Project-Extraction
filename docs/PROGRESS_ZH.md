@@ -1,5 +1,23 @@
 # Project Extraction — 开发进度
 
+## 更新 13.1 — 交互碰撞层、玩家颜色更新与物品翻转验证
+
+### 变更内容
+
+- **新增交互碰撞层（第 4 层）**：
+  - 在碰撞层设计中新增第 4 层（`0x08`）作为**交互层**。
+  - 用于物品拾取、战利品容器、交易终端等可交互对象。
+  - 只有玩家掩码此层；可交互对象使用 `Area2D` 位于第 4 层进行重叠检测。
+  - 同步更新 `COLLISION_LAYER_DESIGN.md` 和 `COLLISION_LAYER_DESIGN_ZH.md`，新增"可交互对象"章节并更新玩家掩码。
+- **将玩家默认颜色更改为 `0xFFFF66`**：
+  - 玩家 `_setup_runtime_state()` 中的 `body_color` 从 `Color(0.45, 0.65, 0.85)` 改为 `Color("ffff66")`。
+- **验证瞄准翻转时手中物品是否正常翻转**：
+  - 确认 AimPivot 中的物品节点（ItemPivot/ItemSprite、RightHand、LeftHand）作为 `AimPivot` 子节点，在朝左瞄准时正确继承 `scale.y = -1` 翻转。
+  - 无需代码修改；`HumanActor` 中现有的 `_update_sprite_flip()` 对玩家和人类敌人场景均能正确处理。
+- **同步更新进度文档**。
+
+---
+
 ## 更新 13 — 精灵图翻转、人类体色、碰撞层设计文档与实体注册表文档
 
 ### 变更内容

@@ -1,5 +1,23 @@
 # Project Extraction — Progress
 
+## Update 13.1 — Interaction Layer, Player Color Update, and Item Flip Verification
+
+### Changes
+
+- **Added Interaction collision layer (Layer 4)**:
+  - Added Layer 4 (`0x08`) to the collision layer design as the **Interaction** layer.
+  - Intended for item pickups, loot containers, trader terminals, and other interactable objects.
+  - Only the player masks this layer; interactable objects use `Area2D` on layer 4 for overlap detection.
+  - Updated `COLLISION_LAYER_DESIGN.md` and `COLLISION_LAYER_DESIGN_ZH.md` with the new layer, a new "Interactable Object" section, and updated player mask.
+- **Changed player default color to `0xFFFF66`**:
+  - Player `body_color` in `_setup_runtime_state()` changed from `Color(0.45, 0.65, 0.85)` to `Color("ffff66")`.
+- **Verified held-item flipping during aim direction change**:
+  - Confirmed that items held in AimPivot (ItemPivot/ItemSprite, RightHand, LeftHand) are children of `AimPivot` and correctly inherit the `scale.y = -1` flip when aiming left.
+  - No code change required; the existing `_update_sprite_flip()` in `HumanActor` handles this correctly for both player and human enemy scenes.
+- **Updated progress documents**.
+
+---
+
 ## Update 13 — Sprite Flip, Body Color, Collision Layer Design, and Entity Registry Docs
 
 ### Changes
