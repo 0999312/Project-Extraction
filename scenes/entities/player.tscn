@@ -14,6 +14,7 @@ height = 60.0
 radius = 31.016125
 
 [node name="Player" type="CharacterBody2D" unique_id=209863306]
+texture_filter = 1
 collision_layer = 2
 collision_mask = 10
 script = ExtResource("1_player")
@@ -24,6 +25,7 @@ texture_repeat = 1
 texture = ExtResource("2_5u6hq")
 
 [node name="GroundCollision" type="CollisionShape2D" parent="." unique_id=570426844]
+visible = false
 position = Vector2(0, 25)
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_5u6hq")
@@ -34,10 +36,10 @@ texture_repeat = 1
 texture = ExtResource("2_ball_r")
 
 [node name="HitCollision" type="Area2D" parent="." unique_id=1993467086]
-collision_layer = 1
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape2D" parent="HitCollision"]
+[node name="Shape" type="CollisionShape2D" parent="HitCollision" unique_id=1050335618]
+visible = false
 shape = SubResource("CircleShape2D_wls55")
 
 [node name="AimPivot" type="Node2D" parent="." unique_id=1851131436]

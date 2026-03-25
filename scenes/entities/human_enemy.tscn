@@ -32,10 +32,9 @@ texture_filter = 1
 texture = ExtResource("2_wgu71")
 
 [node name="HitCollision" type="Area2D" parent="." unique_id=1476033526]
-collision_layer = 1
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape2D" parent="HitCollision"]
+[node name="Shape" type="CollisionShape2D" parent="HitCollision" unique_id=556398935]
 visible = false
 shape = SubResource("CircleShape2D_ijes7")
 

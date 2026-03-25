@@ -22,7 +22,7 @@ func process(projectile_parent: Node, actors: Array, delta: float) -> void:
 		var current_position := previous_position + step
 		var collision_info := _find_collision(projectile, previous_position, current_position, actors, projectile_parent)
 		projectile.global_position = collision_info.position
-		var hit_target := collision_info.actor
+		var hit_target = collision_info.actor
 		if hit_target != null:
 			proj.has_hit = true
 			projectile.on_hit(hit_target, projectile.global_position)
@@ -76,12 +76,12 @@ func _find_hit_target(projectile: Projectile, current_position: Vector2, previou
 func _is_blocked_by_air_collision(projectile: Projectile, previous_position: Vector2, current_position: Vector2, projectile_parent: Node) -> bool:
 	if projectile_parent == null:
 		return false
-	var world := projectile_parent.get_world_2d()
+	var world : World2D = projectile_parent.get_world_2d()
 	if world == null:
 		return false
 	var query := PhysicsRayQueryParameters2D.create(previous_position, current_position)
 	query.collision_mask = ProjectileData.COLLISION_LAYER_AIR
-	query.exclude = [projectile.get_rid()]
+	#query.exclude = [projectile.get_rid()]
 	query.collide_with_areas = true
 	query.collide_with_bodies = true
 	var space_state := world.direct_space_state
@@ -90,7 +90,7 @@ func _is_blocked_by_air_collision(projectile: Projectile, previous_position: Vec
 	var hit := space_state.intersect_ray(query)
 	if hit.is_empty():
 		return false
-	var collider := hit.get("collider")
+	var collider = hit.get("collider")
 	if collider is BiologicalActor:
 		return false
 	var hit_position: Variant = hit.get("position")
