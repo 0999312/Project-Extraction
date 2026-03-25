@@ -3,10 +3,12 @@ extends BiologicalActor
 
 const AIM_EPSILON: float = 0.0001
 
+@export_node_path("Sprite2D") var body_sprite_path: NodePath = ^"BodySprite"
+
 @onready var _aim_pivot: Node2D = $AimPivot
 @onready var _right_hand: Node2D = $AimPivot/RightHand
 @onready var _left_hand: Node2D = $AimPivot/LeftHand
-@onready var _body_sprite: Sprite2D = get_node_or_null("BodySprite") as Sprite2D
+@onready var _body_sprite: Sprite2D = get_node_or_null(body_sprite_path) as Sprite2D
 
 func _ready() -> void:
 	super._ready()
