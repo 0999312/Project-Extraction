@@ -1,5 +1,23 @@
 # Project Extraction — 开发进度
 
+## 更新 13.3 — 独立碰撞形状的层/掩码对齐修正
+
+### 变更内容
+
+- **按碰撞设计文档对齐实体 collision_layer / collision_mask**：
+  - `Player`（`CharacterBody2D`）设置为 `collision_layer = 3`（受击+地面），`collision_mask = 10`（地面+交互）。
+  - `HumanEnemy` 设置为 `collision_layer = 3`（受击+地面），`collision_mask = 2`（地面）。
+  - `NonHumanEnemy` 设置为 `collision_layer = 5`（受击+空中），`collision_mask = 4`（空中）。
+- **保留独立碰撞形状并确保职责分离**：
+  - 人类实体继续使用独立的 `GroundCollision` 与 `HitCollision` 节点。
+  - 地面移动碰撞与受击/交互域碰撞保持结构分离。
+- **修正死亡时碰撞禁用兼容性**：
+  - 更新 `BiologicalActor.on_death()`，在存在时禁用 `CollisionShape2D`、`GroundCollision`、`HitCollision`。
+  - 同时兼容历史单碰撞体命名与当前分离碰撞体结构。
+- **同步更新进度文档**。
+
+---
+
 ## 更新 13.2 — 人类实体地面/受击碰撞分离与手部颜色同步
 
 ### 变更内容

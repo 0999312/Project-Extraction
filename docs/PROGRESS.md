@@ -1,5 +1,23 @@
 # Project Extraction — Progress
 
+## Update 13.3 — Collision Layer/Mask Alignment for Independent Shapes
+
+### Changes
+
+- **Aligned entity collision layer/mask with collision design doc**:
+  - `Player` (`CharacterBody2D`) set to `collision_layer = 3` (Hit + Ground), `collision_mask = 10` (Ground + Interaction).
+  - `HumanEnemy` set to `collision_layer = 3` (Hit + Ground), `collision_mask = 2` (Ground).
+  - `NonHumanEnemy` set to `collision_layer = 5` (Hit + Air), `collision_mask = 4` (Air).
+- **Kept independent collision shapes and matched responsibilities**:
+  - Human entities continue using separate `GroundCollision` and `HitCollision` nodes.
+  - Ground movement collision and hit/interaction-domain collision remain structurally split.
+- **Death-time collision disable compatibility fix**:
+  - Updated `BiologicalActor.on_death()` to disable `CollisionShape2D`, `GroundCollision`, and `HitCollision` if present.
+  - Preserves behavior for both legacy single-shape nodes and current split-shape setup.
+- **Updated progress documents**.
+
+---
+
 ## Update 13.2 — Human Ground/Hit Collision Split and Hand Color Sync
 
 ### Changes
