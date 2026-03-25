@@ -91,6 +91,12 @@ func on_death(_killer_id: String = "") -> void:
 			var shape := get_node(shape_name)
 			if shape is CollisionShape2D:
 				shape.disabled = true
+			elif shape is Area2D:
+				shape.monitoring = false
+				shape.monitorable = false
+				for child in shape.get_children():
+					if child is CollisionShape2D:
+						child.disabled = true
 	modulate = Color(1.0, 1.0, 1.0, 0.55)
 
 func is_hostile_to(other: BiologicalActor) -> bool:

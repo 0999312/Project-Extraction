@@ -1,5 +1,21 @@
 # Project Extraction — Progress
 
+## Update 13.4 — Human Hitbox Isolation and Projectile Air Blocking
+
+### Changes
+
+- **Human hitbox no longer collides with ground/air movement layers**:
+  - Converted `Player/HitCollision` and `HumanEnemy/HitCollision` from direct `CollisionShape2D` to `Area2D` (`collision_layer = 1`, `collision_mask = 0`) with a child shape.
+  - Set human `CharacterBody2D` movement collision to ground-only layer (`collision_layer = 2`), preserving interaction mask for player.
+- **Projectile collision behavior aligned to docs and current requirement**:
+  - Kept hostile actor hit-detection on hit domain (layer-1 semantics via runtime actor targeting).
+  - Added air-layer blocker check in projectile motion using physics ray query; projectiles now expire when they hit air-blocking colliders.
+  - Added explicit projectile collision bit fields in `ProjectileData` (`layer=Air`, `mask=Hit+Air`) for alignment and maintainability.
+- **Death handling compatibility expanded**:
+  - `BiologicalActor.on_death()` now also disables `Area2D`-based hit nodes (`monitoring/monitorable=false`) and child `CollisionShape2D` if present.
+
+---
+
 ## Update 13.3 — Collision Layer/Mask Alignment for Independent Shapes
 
 ### Changes

@@ -17,10 +17,10 @@ This document describes the collision layer assignment for all physics objects i
 
 | Property | Layers |
 |---|---|
-| `collision_layer` | 1 (Hit), 2 (Ground) |
+| `collision_layer` | 2 (Ground) |
 | `collision_mask` | 2 (Ground), 4 (Interaction) |
 
-- **HitCollision** (CircleShape2D) — on layer 1, detectable by projectile queries.
+- **HitCollision** (`Area2D` + CircleShape2D child) — on layer 1 with mask 0, used as a hit-domain only; it does not collide with ground or air movement layers.
 - **GroundCollision** (CapsuleShape2D) — on layer 2, collides with ground-blocking tiles.
 - Player masks layer 4 so it can detect interactable objects (item pickup, terminals, etc.).
 
@@ -28,10 +28,10 @@ This document describes the collision layer assignment for all physics objects i
 
 | Property | Layers |
 |---|---|
-| `collision_layer` | 1 (Hit), 2 (Ground) |
+| `collision_layer` | 2 (Ground) |
 | `collision_mask` | 2 (Ground) |
 
-- Same layout as Player for hit and ground, but does not mask the interaction layer.
+- Same split as Player: movement on ground layer, and `HitCollision` as layer-1 hit-domain only (`Area2D`, mask 0). Human enemies do not mask the interaction layer.
 
 ### Non-Human Enemy (BiologicalActor)
 

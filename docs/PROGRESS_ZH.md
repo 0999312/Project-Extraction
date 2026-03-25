@@ -1,5 +1,21 @@
 # Project Extraction — 开发进度
 
+## 更新 13.4 — 人类受击箱隔离与子弹空中阻挡碰撞
+
+### 变更内容
+
+- **人类受击碰撞箱不再与地面/空中移动层发生碰撞**：
+  - 将 `Player/HitCollision` 与 `HumanEnemy/HitCollision` 从直接 `CollisionShape2D` 改为 `Area2D`（`collision_layer = 1`，`collision_mask = 0`）并挂载子形状。
+  - 将人类 `CharacterBody2D` 移动碰撞层收敛为地面层（`collision_layer = 2`），同时保留玩家交互层掩码。
+- **子弹碰撞行为按文档与当前需求对齐**：
+  - 保持对敌对目标的受击检测（语义对应第 1 层受击域）。
+  - 在子弹运动系统中新增空中阻挡检测（物理射线查询）；命中空中阻挡体时子弹会过期销毁。
+  - 在 `ProjectileData` 中显式补充子弹碰撞位字段（`layer=空中`、`mask=受击+空中`）以增强一致性与可维护性。
+- **死亡态兼容性扩展**：
+  - `BiologicalActor.on_death()` 现会同时关闭 `Area2D` 受击节点（`monitoring/monitorable=false`）并禁用其子 `CollisionShape2D`（若存在）。
+
+---
+
 ## 更新 13.3 — 独立碰撞形状的层/掩码对齐修正
 
 ### 变更内容
