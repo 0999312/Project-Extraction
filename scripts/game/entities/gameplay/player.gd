@@ -40,6 +40,7 @@ func _physics_process(delta: float) -> void:
 	sync_runtime_position()
 
 func _setup_runtime_state() -> void:
+	body_color = Color(0.45, 0.65, 0.85)
 	health = HealthState.new(100.0)
 	stamina_state = StaminaState.new(100.0, 10.0)
 	status_effects = StatusEffectsState.new()
