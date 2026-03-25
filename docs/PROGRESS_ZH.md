@@ -1,5 +1,47 @@
 # Project Extraction — 开发进度
 
+## 更新 13.1 — 交互碰撞层、玩家颜色更新与物品翻转验证
+
+### 变更内容
+
+- **新增交互碰撞层（第 4 层）**：
+  - 在碰撞层设计中新增第 4 层（`0x08`）作为**交互层**。
+  - 用于物品拾取、战利品容器、交易终端等可交互对象。
+  - 只有玩家掩码此层；可交互对象使用 `Area2D` 位于第 4 层进行重叠检测。
+  - 同步更新 `COLLISION_LAYER_DESIGN.md` 和 `COLLISION_LAYER_DESIGN_ZH.md`，新增"可交互对象"章节并更新玩家掩码。
+- **将玩家默认颜色更改为 `0xFFFF66`**：
+  - 玩家 `_setup_runtime_state()` 中的 `body_color` 从 `Color(0.45, 0.65, 0.85)` 改为 `Color("ffff66")`。
+- **验证瞄准翻转时手中物品是否正常翻转**：
+  - 确认 AimPivot 中的物品节点（ItemPivot/ItemSprite、RightHand、LeftHand）作为 `AimPivot` 子节点，在朝左瞄准时正确继承 `scale.y = -1` 翻转。
+  - 无需代码修改；`HumanActor` 中现有的 `_update_sprite_flip()` 对玩家和人类敌人场景均能正确处理。
+- **同步更新进度文档**。
+
+---
+
+## 更新 13 — 精灵图翻转、人类体色、碰撞层设计文档与实体注册表文档
+
+### 变更内容
+
+- **根据瞄准方向翻转精灵图（以右方向为正方向）**：
+  - 在 `HumanActor` 基类中新增 `_update_sprite_flip()` 方法。
+  - 当瞄准方向朝左（`x < 0`）时，身体精灵水平翻转（`flip_h = true`），同时 `AimPivot` 的 Y 轴缩放取反（`scale.y = -1`），使手部和武器正确渲染。
+  - 通过继承自动应用于玩家和人类敌人。
+- **在人类角色基类中新增 `body_color` 变量**：
+  - `HumanActor` 新增 `body_color: Color` 变量（默认 `Color.WHITE`）。
+  - 在 `_ready()` 中通过 `_apply_body_color()` 将身体精灵的 `modulate` 设为 `body_color`。
+  - 玩家在 `_setup_runtime_state()` 中设定预设蓝色色调（`Color(0.45, 0.65, 0.85)`）。
+  - 未来的人类敌人或自定义皮肤可在 `super._ready()` 前覆盖 `body_color`。
+- **碰撞层设计文档**：
+  - 新增 `COLLISION_LAYER_DESIGN.md` 和 `COLLISION_LAYER_DESIGN_ZH.md`。
+  - 第 1 层 = 受击碰撞（所有实体），第 2 层 = 地面碰撞（人类角色 + 地面 Tile），第 3 层 = 空中碰撞（非人类敌人、子弹、空中 Tile）。
+  - Tile 可同时参与地面碰撞、空中碰撞或两者皆参与。
+- **实体注册表文档**：
+  - 新增 `ENTITY_REGISTRY.md`（英文，主版本）和 `ENTITY_REGISTRY_ZH.md`，遵循注册表设计模板。
+  - 记录条目结构、校验规则、加载时机、运行时访问方式和当前条目。
+- **同步更新进度文档**。
+
+---
+
 ## 更新 12 — 准星放松态隐藏、ADS 自由鼠标跟随、ADS 暗角蒙版与 UI 按钮音效修正
 
 ### 变更内容
@@ -276,6 +318,7 @@
 
 ## 待完成工作
 
+- 在实体场景和 Tile 地图中按 `COLLISION_LAYER_DESIGN.md` 实现碰撞层分配。
 - 全局状态机重新设计（覆盖所有游戏流程和菜单）。
 - 完善弹丸命中检测和伤害应用管道。
 - 完整的敌人 AI 瞄准/射击集成。

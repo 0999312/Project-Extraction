@@ -1,5 +1,47 @@
 # Project Extraction — Progress
 
+## Update 13.1 — Interaction Layer, Player Color Update, and Item Flip Verification
+
+### Changes
+
+- **Added Interaction collision layer (Layer 4)**:
+  - Added Layer 4 (`0x08`) to the collision layer design as the **Interaction** layer.
+  - Intended for item pickups, loot containers, trader terminals, and other interactable objects.
+  - Only the player masks this layer; interactable objects use `Area2D` on layer 4 for overlap detection.
+  - Updated `COLLISION_LAYER_DESIGN.md` and `COLLISION_LAYER_DESIGN_ZH.md` with the new layer, a new "Interactable Object" section, and updated player mask.
+- **Changed player default color to `0xFFFF66`**:
+  - Player `body_color` in `_setup_runtime_state()` changed from `Color(0.45, 0.65, 0.85)` to `Color("ffff66")`.
+- **Verified held-item flipping during aim direction change**:
+  - Confirmed that items held in AimPivot (ItemPivot/ItemSprite, RightHand, LeftHand) are children of `AimPivot` and correctly inherit the `scale.y = -1` flip when aiming left.
+  - No code change required; the existing `_update_sprite_flip()` in `HumanActor` handles this correctly for both player and human enemy scenes.
+- **Updated progress documents**.
+
+---
+
+## Update 13 — Sprite Flip, Body Color, Collision Layer Design, and Entity Registry Docs
+
+### Changes
+
+- **Sprite flipping based on aim direction (right = positive)**:
+  - Added `_update_sprite_flip()` to `HumanActor` base class.
+  - When the aim direction faces left (`x < 0`), the body sprite is flipped horizontally (`flip_h = true`) and the `AimPivot` scale is inverted on the Y axis (`scale.y = -1`) so hands and weapon render correctly.
+  - Applies automatically to both Player and HumanEnemy through inheritance.
+- **Added `body_color` variable to human actor base class**:
+  - `HumanActor` now holds a `body_color: Color` variable (default `Color.WHITE`).
+  - On `_ready()`, the body sprite's `modulate` is set to `body_color` via `_apply_body_color()`.
+  - Player sets a preset blue tint (`Color(0.45, 0.65, 0.85)`) in `_setup_runtime_state()`.
+  - Future human enemies or custom skins can override `body_color` before `super._ready()`.
+- **Collision layer design document**:
+  - Added `COLLISION_LAYER_DESIGN.md` and `COLLISION_LAYER_DESIGN_ZH.md`.
+  - Layer 1 = Hit Collision (all entities), Layer 2 = Ground Collision (human actors + ground tiles), Layer 3 = Air Collision (non-human enemies, projectiles, air tiles).
+  - Tiles can participate in ground, air, or both layers.
+- **Entity registry documentation**:
+  - Added `ENTITY_REGISTRY.md` (English, primary) and `ENTITY_REGISTRY_ZH.md` following the registry design template.
+  - Documents the entry schema, validation rules, load timing, runtime access pattern, and current entries.
+- **Updated progress documents**.
+
+---
+
 ## Update 12 — Crosshair Relaxed-State Hidden, Free-Mouse ADS, ADS Vignette, and UI Button SFX Fix
 
 ### Changes
@@ -276,6 +318,7 @@
 
 ## Remaining Work
 
+- Implement collision layer assignments in entity scenes and tile maps per `COLLISION_LAYER_DESIGN.md`.
 - Full global state machine redesign across all game flows and menus.
 - Complete projectile hit detection and damage application pipeline.
 - Full enemy AI-driven aiming/shooting integration.

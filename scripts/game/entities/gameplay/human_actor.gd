@@ -3,15 +3,26 @@ extends BiologicalActor
 
 const AIM_EPSILON: float = 0.0001
 
+## Base color tint for this human actor's body sprite.
+## Override in subclasses or set per-instance for different colored characters.
+var body_color: Color = Color.WHITE
+
 @onready var _aim_pivot: Node2D = $AimPivot
 @onready var _right_hand: Node2D = $AimPivot/RightHand
 @onready var _left_hand: Node2D = $AimPivot/LeftHand
+@onready var _body_sprite: Sprite2D = $BodySprite
 
 func _ready() -> void:
 	super._ready()
+	_apply_body_color()
 
 func _physics_process(_delta: float) -> void:
 	_update_aim_pivot()
+	_update_sprite_flip()
+
+func _apply_body_color() -> void:
+	if _body_sprite != null:
+		_body_sprite.modulate = body_color
 
 func _update_aim_pivot() -> void:
 	if _aim_pivot == null:
@@ -19,6 +30,14 @@ func _update_aim_pivot() -> void:
 	var dir := _get_aim_direction()
 	if dir.length_squared() > AIM_EPSILON:
 		_aim_pivot.rotation = dir.angle()
+
+func _update_sprite_flip() -> void:
+	var dir := _get_aim_direction()
+	var facing_left := dir.x < 0.0
+	if _body_sprite != null:
+		_body_sprite.flip_h = facing_left
+	if _aim_pivot != null:
+		_aim_pivot.scale.y = -1.0 if facing_left else 1.0
 
 func _get_aim_direction() -> Vector2:
 	if aim_state != null and aim_state.aim_direction.length_squared() > AIM_EPSILON:
