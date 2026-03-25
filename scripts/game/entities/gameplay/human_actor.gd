@@ -4,6 +4,7 @@ extends BiologicalActor
 const AIM_EPSILON: float = 0.0001
 
 @export_node_path("Sprite2D") var body_sprite_path: NodePath = ^"BodySprite"
+@export var character_color: Color = Color.WHITE
 
 @onready var _aim_pivot: Node2D = $AimPivot
 @onready var _right_hand: Node2D = $AimPivot/RightHand
@@ -12,6 +13,7 @@ const AIM_EPSILON: float = 0.0001
 
 func _ready() -> void:
 	super._ready()
+	_apply_character_color()
 
 func _physics_process(_delta: float) -> void:
 	_update_aim_pivot()
@@ -50,3 +52,14 @@ func get_muzzle_position() -> Vector2:
 	if _right_hand == null:
 		return global_position
 	return _right_hand.global_position
+
+func set_character_color(value: Color) -> void:
+	character_color = value
+	_apply_character_color()
+
+func _apply_character_color() -> void:
+	if _body_sprite == null:
+		_body_sprite = get_node_or_null(body_sprite_path) as Sprite2D
+	if _body_sprite == null:
+		return
+	_body_sprite.self_modulate = character_color
