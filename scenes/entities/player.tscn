@@ -6,16 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://gtnpwtfb288i" path="res://assets/game/textures/entities/ball/ball_hand.png" id="3_hand"]
 [ext_resource type="Texture2D" uid="uid://c4dqlhsvoq23a" path="res://assets/game/textures/items/rifle.png" id="4_fqt4w"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5u6hq"]
-radius = 7.0
-height = 60.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_wls55"]
-radius = 31.016125
-
 [node name="Player" type="CharacterBody2D" unique_id=209863306]
-collision_layer = 3
-collision_mask = 14
 script = ExtResource("1_player")
 
 [node name="ShadowSprite" type="Sprite2D" parent="." unique_id=1239432533]
@@ -23,19 +14,10 @@ texture_filter = 1
 texture_repeat = 1
 texture = ExtResource("2_5u6hq")
 
-[node name="GroundCollision" type="CollisionShape2D" parent="." unique_id=570426844]
-position = Vector2(0, 25)
-rotation = 1.5707964
-shape = SubResource("CapsuleShape2D_5u6hq")
-
 [node name="BodySprite" type="Sprite2D" parent="." unique_id=238874539]
 texture_filter = 1
 texture_repeat = 1
 texture = ExtResource("2_ball_r")
-
-[node name="HitCollision" type="CollisionShape2D" parent="." unique_id=1993467086]
-visible = false
-shape = SubResource("CircleShape2D_wls55")
 
 [node name="AimPivot" type="Node2D" parent="." unique_id=1851131436]
 

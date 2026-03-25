@@ -86,10 +86,6 @@ func apply_damage(amount: float, source_id: String = "") -> void:
 func on_death(_killer_id: String = "") -> void:
 	velocity = Vector2.ZERO
 	set_physics_process(false)
-	if has_node("CollisionShape2D"):
-		var shape := get_node("CollisionShape2D")
-		if shape is CollisionShape2D:
-			shape.disabled = true
 	modulate = Color(1.0, 1.0, 1.0, 0.55)
 
 func is_hostile_to(other: BiologicalActor) -> bool:
