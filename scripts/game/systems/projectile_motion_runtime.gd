@@ -2,7 +2,7 @@ class_name ProjectileMotionRuntime
 extends RefCounted
 
 const PROJECTILE_RADIUS_SCALE := 0.75
-const PHYSICS_EPSILON := 0.000001
+const PHYSICS_EPSILON := 0.001
 
 func process(projectile_parent: Node, actors: Array, delta: float) -> void:
 	if projectile_parent == null:
@@ -80,7 +80,7 @@ func _is_blocked_by_air_collision(projectile: Projectile, previous_position: Vec
 	if world == null:
 		return false
 	var query := PhysicsRayQueryParameters2D.create(previous_position, current_position)
-	query.collision_mask = projectile.projectile_data.collision_layer
+	query.collision_mask = ProjectileData.COLLISION_LAYER_AIR
 	query.exclude = [projectile.get_rid()]
 	query.collide_with_areas = true
 	query.collide_with_bodies = true
@@ -95,7 +95,7 @@ func _is_blocked_by_air_collision(projectile: Projectile, previous_position: Vec
 		return false
 	var hit_position: Variant = hit.get("position")
 	if hit_position is Vector2:
-		if (hit_position as Vector2).distance_squared_to(previous_position) <= PHYSICS_EPSILON:
+		if (hit_position as Vector2).distance_squared_to(previous_position) <= PHYSICS_EPSILON * PHYSICS_EPSILON:
 			return false
 	return true
 
