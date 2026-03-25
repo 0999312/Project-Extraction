@@ -21,6 +21,8 @@ static var _collision_radius_cache: Dictionary = {}
 @export var spread_deviation_rad: float = 0.0
 @export_file("*.png", "*.webp", "*.jpg", "*.jpeg") var sprite_path: String = DEFAULT_SPRITE_PATH
 @export var collision_radius: float = 4.0
+@export var collision_layer: int = CollisionLayers.PROJECTILE_AIR
+@export var collision_mask: int = CollisionLayers.MASK_PROJECTILE_AIR
 
 func _init(spd: float = 600.0, dmg: float = 20.0, pen: float = 0.0, life: float = 2.0, max_dist: float = 1400.0) -> void:
 	speed = spd

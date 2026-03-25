@@ -6,6 +6,7 @@ const AIM_EPSILON: float = 0.0001
 @onready var _aim_pivot: Node2D = $AimPivot
 @onready var _right_hand: Node2D = $AimPivot/RightHand
 @onready var _left_hand: Node2D = $AimPivot/LeftHand
+@onready var _body_sprite: Sprite2D = get_node_or_null("BodySprite") as Sprite2D
 
 func _ready() -> void:
 	super._ready()
@@ -19,6 +20,8 @@ func _update_aim_pivot() -> void:
 	var dir := _get_aim_direction()
 	if dir.length_squared() > AIM_EPSILON:
 		_aim_pivot.rotation = dir.angle()
+		if _body_sprite != null and absf(dir.x) > AIM_EPSILON:
+			_body_sprite.flip_h = dir.x < 0.0
 
 func _get_aim_direction() -> Vector2:
 	if aim_state != null and aim_state.aim_direction.length_squared() > AIM_EPSILON:
