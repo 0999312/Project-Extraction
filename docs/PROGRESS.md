@@ -1,5 +1,21 @@
 # Project Extraction — Progress
 
+## Update 13.2 — Human Ground/Hit Collision Split and Hand Color Sync
+
+### Changes
+
+- **Verified human entities use separate Ground/Hit collision shapes**:
+  - Confirmed both `Player` and `HumanEnemy` scenes use distinct `CollisionShape2D` nodes:
+    - `GroundCollision` for movement collision against ground-layer blockers.
+    - `HitCollision` for hit/interaction-domain overlap logic.
+  - Ground and hit/interaction responsibilities no longer share one `CollisionShape2D`.
+- **Applied body color tint to both hands for human entities**:
+  - Updated `HumanActor._apply_body_color()` so `LeftHand/HandSprite` and `RightHand/HandSprite` are tinted with the same `body_color` as `BodySprite`.
+  - This automatically affects both `Player` and `HumanEnemy` through inheritance.
+- **Updated progress documents**.
+
+---
+
 ## Update 13.1 — Interaction Layer, Player Color Update, and Item Flip Verification
 
 ### Changes

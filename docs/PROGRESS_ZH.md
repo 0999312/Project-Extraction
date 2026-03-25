@@ -1,5 +1,21 @@
 # Project Extraction — 开发进度
 
+## 更新 13.2 — 人类实体地面/受击碰撞分离与手部颜色同步
+
+### 变更内容
+
+- **确认人类实体使用分离的 Ground/Hit 碰撞形状**：
+  - 已确认 `Player` 与 `HumanEnemy` 场景均使用独立的 `CollisionShape2D` 节点：
+    - `GroundCollision` 用于与地面阻挡层的移动碰撞。
+    - `HitCollision` 用于受击/交互域的重叠检测逻辑。
+  - 地面碰撞与受击/交互职责不再共享同一个 `CollisionShape2D`。
+- **实现人类实体替换体色时左右手同步换色**：
+  - 更新 `HumanActor._apply_body_color()`，使 `LeftHand/HandSprite` 与 `RightHand/HandSprite` 使用与 `BodySprite` 相同的 `body_color` 着色。
+  - 通过继承自动作用于 `Player` 与 `HumanEnemy`。
+- **同步更新进度文档**。
+
+---
+
 ## 更新 13.1 — 交互碰撞层、玩家颜色更新与物品翻转验证
 
 ### 变更内容

@@ -11,6 +11,8 @@ var body_color: Color = Color.WHITE
 @onready var _right_hand: Node2D = $AimPivot/RightHand
 @onready var _left_hand: Node2D = $AimPivot/LeftHand
 @onready var _body_sprite: Sprite2D = $BodySprite
+@onready var _right_hand_sprite: Sprite2D = $AimPivot/RightHand/HandSprite
+@onready var _left_hand_sprite: Sprite2D = $AimPivot/LeftHand/HandSprite
 
 func _ready() -> void:
 	super._ready()
@@ -23,6 +25,10 @@ func _physics_process(_delta: float) -> void:
 func _apply_body_color() -> void:
 	if _body_sprite != null:
 		_body_sprite.modulate = body_color
+	if _right_hand_sprite != null:
+		_right_hand_sprite.modulate = body_color
+	if _left_hand_sprite != null:
+		_left_hand_sprite.modulate = body_color
 
 func _update_aim_pivot() -> void:
 	if _aim_pivot == null:
