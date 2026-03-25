@@ -12,7 +12,7 @@
 
 ## 2. 层位分配
 
-实现位置：`scripts/game/collision/collision_layers.gd`
+实现说明：当前碰撞常量按需直接定义在使用处（例如 `scripts/game/components/combat/projectile_data.gd`）。
 
 | 位索引（1-based） | 常量 | 含义 |
 |---|---|---|

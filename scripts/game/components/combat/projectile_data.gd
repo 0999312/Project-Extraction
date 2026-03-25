@@ -4,6 +4,10 @@ extends Resource
 const DEFAULT_SPRITE_PATH := "res://assets/game/textures/projectiles/bullet.png"
 const DEFAULT_PROJECTILE_TEXTURE := preload("res://assets/game/textures/projectiles/bullet.png")
 static var _collision_radius_cache: Dictionary = {}
+const ENTITY_HIT := 1 << 0
+const TILE_AIR := 1 << 4
+const PROJECTILE_AIR := 1 << 5
+const MASK_PROJECTILE_AIR := ENTITY_HIT | TILE_AIR
 
 @export var velocity: Vector2 = Vector2.ZERO
 @export var speed: float = 600.0
@@ -21,8 +25,8 @@ static var _collision_radius_cache: Dictionary = {}
 @export var spread_deviation_rad: float = 0.0
 @export_file("*.png", "*.webp", "*.jpg", "*.jpeg") var sprite_path: String = DEFAULT_SPRITE_PATH
 @export var collision_radius: float = 4.0
-@export var collision_layer: int = CollisionLayers.PROJECTILE_AIR
-@export var collision_mask: int = CollisionLayers.MASK_PROJECTILE_AIR
+@export var collision_layer: int = PROJECTILE_AIR
+@export var collision_mask: int = MASK_PROJECTILE_AIR
 
 func _init(spd: float = 600.0, dmg: float = 20.0, pen: float = 0.0, life: float = 2.0, max_dist: float = 1400.0) -> void:
 	speed = spd

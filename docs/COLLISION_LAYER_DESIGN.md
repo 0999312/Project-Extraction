@@ -12,7 +12,7 @@ Unify runtime collision semantics with the following constraints:
 
 ## 2. Layer Mapping
 
-Implementation file: `scripts/game/collision/collision_layers.gd`
+Implementation reference: collision constants are currently used directly where needed (for example, `scripts/game/components/combat/projectile_data.gd`).
 
 | Bit Index (1-based) | Constant | Meaning |
 |---|---|---|
