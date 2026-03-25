@@ -1,18 +1,18 @@
 [gd_scene format=3 uid="uid://dmaeo4pio87g7"]
 
 [ext_resource type="Script" uid="uid://dghykhuhxs850" path="res://scripts/game/entities/enemies/non_human_enemy.gd" id="1_nhebdy"]
-[ext_resource type="Texture2D" uid="uid://dj1mqbkr1efcy" path="res://assets/game/textures/entities/enemy_mob/rapid/rapid_1.png" id="2_rapid"]
+[ext_resource type="Texture2D" uid="uid://kndl7cwew65g" path="res://assets/game/textures/entities/enemy_mob/weak/weak.png" id="2_4ilqh"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_nhe"]
-radius = 13.601471
+radius = 16.03122
 
 [node name="NonHumanEnemy" type="CharacterBody2D" unique_id=754672953]
 up_direction = Vector2(0, 1)
 script = ExtResource("1_nhebdy")
 
-[node name="HitCollision" type="CollisionShape2D" parent="." unique_id=711217790]
-shape = SubResource("CircleShape2D_nhe")
-
 [node name="BodySprite" type="Sprite2D" parent="." unique_id=1938800841]
 texture_filter = 1
-texture = ExtResource("2_rapid")
+texture = ExtResource("2_4ilqh")
+
+[node name="HitCollision" type="CollisionShape2D" parent="." unique_id=711217790]
+shape = SubResource("CircleShape2D_nhe")

@@ -32,7 +32,6 @@ texture_repeat = 1
 texture = ExtResource("2_ball_r")
 
 [node name="HitCollision" type="CollisionShape2D" parent="." unique_id=1993467086]
-visible = false
 shape = SubResource("CircleShape2D_wls55")
 
 [node name="AimPivot" type="Node2D" parent="." unique_id=1851131436]

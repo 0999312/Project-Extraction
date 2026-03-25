@@ -27,6 +27,7 @@ collision_enabled = false
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1259125727]
 tile_map_data = PackedByteArray("AAAGAAUAAAAAAAMAAAAjABEAAAAEAAIAAAAKABQAAAAAAAUAAAAjABMAAAAEAAIAAAAjAA8AAAAEAAIAAAAjABAAAAAEAAIAAAAjAAIAAAAEAAIAAAAjAAMAAAAEAAIAAAAjAAQAAAAEAAIAAAAjAAUAAAAEAAIAAAAjAAYAAAAEAAIAAAAjAAcAAAAEAAIAAAAjAAgAAAAEAAIAAAAjAAkAAAAEAAIAAAAjAAoAAAAEAAIAAAAjAAsAAAAEAAIAAAAjAAwAAAAEAAIAAAAjAA0AAAAEAAIAAAAjAA4AAAAEAAIAAAAjABIAAAAEAAIAAAA=")
 tile_set = ExtResource("1_ateyy")
+collision_enabled = false
 
 [node name="PlayerSpawn" type="Marker2D" parent="." unique_id=1200860737]
 position = Vector2(2, 377)
@@ -38,6 +39,7 @@ position = Vector2(577, 378)
 position = Vector2(705, 377)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1276063257]
+top_level = true
 position = Vector2(374, 377)
 
 [node name="PhantomCameraHost" type="Node" parent="Camera2D" unique_id=508011638]
