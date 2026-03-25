@@ -17,10 +17,10 @@
 
 | 属性 | 所在层 |
 |---|---|
-| `collision_layer` | 1（受击）、2（地面） |
+| `collision_layer` | 2（地面） |
 | `collision_mask` | 2（地面）、4（交互） |
 
-- **HitCollision**（CircleShape2D）— 位于第 1 层，可被子弹查询检测。
+- **HitCollision**（`Area2D` + CircleShape2D 子节点）— 位于第 1 层且 mask=0，仅作为受击域；不会与地面/空中移动层发生碰撞。
 - **GroundCollision**（CapsuleShape2D）— 位于第 2 层，与阻挡地面的 Tile 碰撞。
 - 玩家掩码第 4 层，用于检测可交互对象（拾取物品、终端等）。
 
@@ -28,10 +28,10 @@
 
 | 属性 | 所在层 |
 |---|---|
-| `collision_layer` | 1（受击）、2（地面） |
+| `collision_layer` | 2（地面） |
 | `collision_mask` | 2（地面） |
 
-- 受击和地面碰撞与玩家相同，但不掩码交互层。
+- 与玩家相同采用分离结构：移动使用地面层，`HitCollision` 仅作为第 1 层受击域（`Area2D`，mask=0）；且不掩码交互层。
 
 ### 非人类敌人（BiologicalActor）
 

@@ -14,6 +14,8 @@ height = 60.0
 radius = 31.575306
 
 [node name="HumanEnemy" type="CharacterBody2D" unique_id=911570360]
+collision_layer = 2
+collision_mask = 2
 script = ExtResource("1_hebdy")
 
 [node name="ShadowSprite" type="Sprite2D" parent="." unique_id=1800785662]
@@ -29,7 +31,11 @@ shape = SubResource("CapsuleShape2D_7kbbi")
 texture_filter = 1
 texture = ExtResource("2_wgu71")
 
-[node name="HitCollision" type="CollisionShape2D" parent="." unique_id=1476033526]
+[node name="HitCollision" type="Area2D" parent="." unique_id=1476033526]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape2D" parent="HitCollision"]
 visible = false
 shape = SubResource("CircleShape2D_ijes7")
 

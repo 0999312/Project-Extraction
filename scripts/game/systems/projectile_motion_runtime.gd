@@ -2,6 +2,7 @@ class_name ProjectileMotionRuntime
 extends RefCounted
 
 const PROJECTILE_RADIUS_SCALE := 0.75
+const PHYSICS_EPSILON := 0.001
 
 func process(projectile_parent: Node, actors: Array, delta: float) -> void:
 	if projectile_parent == null:
@@ -18,11 +19,16 @@ func process(projectile_parent: Node, actors: Array, delta: float) -> void:
 		proj.age += delta
 		var step := proj.velocity * delta
 		var travelled := step.length()
-		projectile.global_position += step
-		var hit_target := _find_hit_target(projectile, projectile.global_position, previous_position, actors)
+		var current_position := previous_position + step
+		var collision_info := _find_collision(projectile, previous_position, current_position, actors, projectile_parent)
+		projectile.global_position = collision_info.position
+		var hit_target := collision_info.actor
 		if hit_target != null:
 			proj.has_hit = true
 			projectile.on_hit(hit_target, projectile.global_position)
+			continue
+		if collision_info.blocked:
+			projectile.on_expire()
 			continue
 		proj.remaining_distance = maxf(0.0, proj.remaining_distance - travelled)
 		var travel_ratio := 0.0
@@ -34,6 +40,21 @@ func process(projectile_parent: Node, actors: Array, delta: float) -> void:
 			proj.velocity = proj.velocity.normalized() * speed
 		if proj.age >= proj.lifetime or proj.remaining_distance <= 0.0:
 			projectile.on_expire()
+
+func _find_collision(projectile: Projectile, previous_position: Vector2, current_position: Vector2, actors: Array, projectile_parent: Node) -> Dictionary:
+	var hit_target := _find_hit_target(projectile, current_position, previous_position, actors)
+	if hit_target != null:
+		return {
+			"actor": hit_target,
+			"blocked": false,
+			"position": current_position,
+		}
+	var blocked := _is_blocked_by_air_collision(projectile, previous_position, current_position, projectile_parent)
+	return {
+		"actor": null,
+		"blocked": blocked,
+		"position": current_position,
+	}
 
 func _find_hit_target(projectile: Projectile, current_position: Vector2, previous_position: Vector2, actors: Array) -> BiologicalActor:
 	var owner_id := projectile.owner_actor_id
@@ -51,6 +72,32 @@ func _find_hit_target(projectile: Projectile, current_position: Vector2, previou
 		if _segment_distance_to_point_squared(previous_position, current_position, actor.global_position) <= radius * radius:
 			return actor
 	return null
+
+func _is_blocked_by_air_collision(projectile: Projectile, previous_position: Vector2, current_position: Vector2, projectile_parent: Node) -> bool:
+	if projectile_parent == null:
+		return false
+	var world := projectile_parent.get_world_2d()
+	if world == null:
+		return false
+	var query := PhysicsRayQueryParameters2D.create(previous_position, current_position)
+	query.collision_mask = ProjectileData.COLLISION_LAYER_AIR
+	query.exclude = [projectile.get_rid()]
+	query.collide_with_areas = true
+	query.collide_with_bodies = true
+	var space_state := world.direct_space_state
+	if space_state == null:
+		return false
+	var hit := space_state.intersect_ray(query)
+	if hit.is_empty():
+		return false
+	var collider := hit.get("collider")
+	if collider is BiologicalActor:
+		return false
+	var hit_position: Variant = hit.get("position")
+	if hit_position is Vector2:
+		if (hit_position as Vector2).distance_squared_to(previous_position) <= PHYSICS_EPSILON * PHYSICS_EPSILON:
+			return false
+	return true
 
 func _segment_distance_to_point_squared(a: Vector2, b: Vector2, point: Vector2) -> float:
 	var segment := b - a

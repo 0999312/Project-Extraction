@@ -1,5 +1,55 @@
 # Project Extraction — Progress
 
+## Update 13.4 — Human Hitbox Isolation and Projectile Air Blocking
+
+### Changes
+
+- **Human hitbox no longer collides with ground/air movement layers**:
+  - Converted `Player/HitCollision` and `HumanEnemy/HitCollision` from direct `CollisionShape2D` to `Area2D` (`collision_layer = 1`, `collision_mask = 0`) with a child shape.
+  - Set human `CharacterBody2D` movement collision to ground-only layer (`collision_layer = 2`), preserving interaction mask for player.
+- **Projectile collision behavior aligned to docs and current requirement**:
+  - Kept hostile actor hit-detection on hit domain (layer-1 semantics via runtime actor targeting).
+  - Added air-layer blocker check in projectile motion using physics ray query; projectiles now expire when they hit air-blocking colliders.
+  - Added explicit projectile collision bit fields in `ProjectileData` (`layer=Air`, `mask=Hit+Air`) for alignment and maintainability.
+- **Death handling compatibility expanded**:
+  - `BiologicalActor.on_death()` now also disables `Area2D`-based hit nodes (`monitoring/monitorable=false`) and child `CollisionShape2D` if present.
+
+---
+
+## Update 13.3 — Collision Layer/Mask Alignment for Independent Shapes
+
+### Changes
+
+- **Aligned entity collision layer/mask with collision design doc**:
+  - `Player` (`CharacterBody2D`) set to `collision_layer = 3` (Hit + Ground), `collision_mask = 10` (Ground + Interaction).
+  - `HumanEnemy` set to `collision_layer = 3` (Hit + Ground), `collision_mask = 2` (Ground).
+  - `NonHumanEnemy` set to `collision_layer = 5` (Hit + Air), `collision_mask = 4` (Air).
+- **Kept independent collision shapes and matched responsibilities**:
+  - Human entities continue using separate `GroundCollision` and `HitCollision` nodes.
+  - Ground movement collision and hit/interaction-domain collision remain structurally split.
+- **Death-time collision disable compatibility fix**:
+  - Updated `BiologicalActor.on_death()` to disable `CollisionShape2D`, `GroundCollision`, and `HitCollision` if present.
+  - Preserves behavior for both legacy single-shape nodes and current split-shape setup.
+- **Updated progress documents**.
+
+---
+
+## Update 13.2 — Human Ground/Hit Collision Split and Hand Color Sync
+
+### Changes
+
+- **Verified human entities use separate Ground/Hit collision shapes**:
+  - Confirmed both `Player` and `HumanEnemy` scenes use distinct `CollisionShape2D` nodes:
+    - `GroundCollision` for movement collision against ground-layer blockers.
+    - `HitCollision` for hit/interaction-domain overlap logic.
+  - Ground and hit/interaction responsibilities no longer share one `CollisionShape2D`.
+- **Applied body color tint to both hands for human entities**:
+  - Updated `HumanActor._apply_body_color()` so `LeftHand/HandSprite` and `RightHand/HandSprite` are tinted with the same `body_color` as `BodySprite`.
+  - This automatically affects both `Player` and `HumanEnemy` through inheritance.
+- **Updated progress documents**.
+
+---
+
 ## Update 13.1 — Interaction Layer, Player Color Update, and Item Flip Verification
 
 ### Changes

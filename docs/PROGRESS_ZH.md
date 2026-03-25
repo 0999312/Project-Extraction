@@ -1,5 +1,55 @@
 # Project Extraction — 开发进度
 
+## 更新 13.4 — 人类受击箱隔离与子弹空中阻挡碰撞
+
+### 变更内容
+
+- **人类受击碰撞箱不再与地面/空中移动层发生碰撞**：
+  - 将 `Player/HitCollision` 与 `HumanEnemy/HitCollision` 从直接 `CollisionShape2D` 改为 `Area2D`（`collision_layer = 1`，`collision_mask = 0`）并挂载子形状。
+  - 将人类 `CharacterBody2D` 移动碰撞层收敛为地面层（`collision_layer = 2`），同时保留玩家交互层掩码。
+- **子弹碰撞行为按文档与当前需求对齐**：
+  - 保持对敌对目标的受击检测（语义对应第 1 层受击域）。
+  - 在子弹运动系统中新增空中阻挡检测（物理射线查询）；命中空中阻挡体时子弹会过期销毁。
+  - 在 `ProjectileData` 中显式补充子弹碰撞位字段（`layer=空中`、`mask=受击+空中`）以增强一致性与可维护性。
+- **死亡态兼容性扩展**：
+  - `BiologicalActor.on_death()` 现会同时关闭 `Area2D` 受击节点（`monitoring/monitorable=false`）并禁用其子 `CollisionShape2D`（若存在）。
+
+---
+
+## 更新 13.3 — 独立碰撞形状的层/掩码对齐修正
+
+### 变更内容
+
+- **按碰撞设计文档对齐实体 collision_layer / collision_mask**：
+  - `Player`（`CharacterBody2D`）设置为 `collision_layer = 3`（受击+地面），`collision_mask = 10`（地面+交互）。
+  - `HumanEnemy` 设置为 `collision_layer = 3`（受击+地面），`collision_mask = 2`（地面）。
+  - `NonHumanEnemy` 设置为 `collision_layer = 5`（受击+空中），`collision_mask = 4`（空中）。
+- **保留独立碰撞形状并确保职责分离**：
+  - 人类实体继续使用独立的 `GroundCollision` 与 `HitCollision` 节点。
+  - 地面移动碰撞与受击/交互域碰撞保持结构分离。
+- **修正死亡时碰撞禁用兼容性**：
+  - 更新 `BiologicalActor.on_death()`，在存在时禁用 `CollisionShape2D`、`GroundCollision`、`HitCollision`。
+  - 同时兼容历史单碰撞体命名与当前分离碰撞体结构。
+- **同步更新进度文档**。
+
+---
+
+## 更新 13.2 — 人类实体地面/受击碰撞分离与手部颜色同步
+
+### 变更内容
+
+- **确认人类实体使用分离的 Ground/Hit 碰撞形状**：
+  - 已确认 `Player` 与 `HumanEnemy` 场景均使用独立的 `CollisionShape2D` 节点：
+    - `GroundCollision` 用于与地面阻挡层的移动碰撞。
+    - `HitCollision` 用于受击/交互域的重叠检测逻辑。
+  - 地面碰撞与受击/交互职责不再共享同一个 `CollisionShape2D`。
+- **实现人类实体替换体色时左右手同步换色**：
+  - 更新 `HumanActor._apply_body_color()`，使 `LeftHand/HandSprite` 与 `RightHand/HandSprite` 使用与 `BodySprite` 相同的 `body_color` 着色。
+  - 通过继承自动作用于 `Player` 与 `HumanEnemy`。
+- **同步更新进度文档**。
+
+---
+
 ## 更新 13.1 — 交互碰撞层、玩家颜色更新与物品翻转验证
 
 ### 变更内容
