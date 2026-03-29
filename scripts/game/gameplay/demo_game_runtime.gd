@@ -20,6 +20,8 @@ var _combat_fire_system := CombatFireRuntime.new()
 var _projectile_motion_system := ProjectileMotionRuntime.new()
 var _projectiles: Node2D = null
 var _pause_pressed_last_frame: bool = false
+var _inventory_menu: InventoryMenu = null
+var _inventory_pressed_last_frame: bool = false
 
 const GUIDE_ACTION_PAUSE := &"pe_pause"
 const GUIDE_ACTION_AIM_AXIS_OPTIONAL := &"pe_aim_axis"
@@ -46,6 +48,7 @@ func _ready() -> void:
 	_assign_enemy_targets()
 	_default_mouse_mode = Input.mouse_mode
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+	_setup_inventory_menu()
 	print("[DEBUG][DemoGame] _ready | actors=%d" % _get_runtime_actors().size())
 
 func _exit_tree() -> void:
@@ -71,9 +74,11 @@ func _spawn_registered_entity(entity_id: String, spawn_position: Vector2, node_n
 func _physics_process(delta: float) -> void:
 	_assign_enemy_targets()
 	_poll_pause_input()
-	_update_crosshair_and_camera_target()
-	_combat_fire_system.process(_get_runtime_actors(), _projectiles, delta)
-	_projectile_motion_system.process(_projectiles, _get_runtime_actors(), delta)
+	_poll_inventory_input()
+	if _inventory_menu == null or not _inventory_menu.is_open():
+		_update_crosshair_and_camera_target()
+		_combat_fire_system.process(_get_runtime_actors(), _projectiles, delta)
+		_projectile_motion_system.process(_projectiles, _get_runtime_actors(), delta)
 
 func _get_runtime_actors() -> Array:
 	var actors: Array = []
@@ -172,4 +177,33 @@ func _update_ads_vignette(active: bool) -> void:
 			_ads_vignette.update_center(screen_pos)
 
 func _is_relaxed_state() -> bool:
+	if _inventory_menu != null and _inventory_menu.is_open():
+		return true
 	return get_tree().paused
+
+func _setup_inventory_menu() -> void:
+	_inventory_menu = InventoryMenu.new()
+	_inventory_menu.name = "InventoryMenu"
+	add_child(_inventory_menu)
+	if _player != null and _player.inventory_ref != null and _player.inventory_ref.inventory != null:
+		_inventory_menu.bind_inventory(_player.inventory_ref.inventory)
+		# Set hotbar slot 0 to the equipped weapon
+		if _player.combat_state != null and not _player.combat_state.equipped_weapon_id.is_empty():
+			_player.inventory_ref.inventory.set_hotbar_slot(0, _player.combat_state.equipped_weapon_id)
+	_inventory_menu.held_item_changed.connect(_on_held_item_changed)
+
+func _poll_inventory_input() -> void:
+	var is_pressed := Input.is_key_pressed(KEY_TAB)
+	if is_pressed and not _inventory_pressed_last_frame:
+		if _inventory_menu != null:
+			_inventory_menu.toggle()
+	_inventory_pressed_last_frame = is_pressed
+
+func _on_held_item_changed(item_id: String) -> void:
+	if _player == null or _player.combat_state == null:
+		return
+	if item_id.is_empty():
+		return
+	_player.combat_state.equipped_weapon_id = item_id
+	WeaponCatalog.apply_to_combat_state(_player.combat_state)
+	print("[DEBUG][DemoGame] Held item changed to: %s" % item_id)
