@@ -12,7 +12,7 @@
 - **条目命名空间：** `game`
 - **条目 ID 命名规范：** `game:item/<类别>/<名称>`（例如 `game:item/weapon/pistol`）
 - **标签命名规范：** 条目内为字符串标签（`weapon`、`med`、`ammo`、`caliber_9x19`）
-- **跨注册表引用：** 武器注册表通过 `WeaponDefinition.item_id` 反向引用物品 ID
+- **跨注册表引用：** 武器注册表通过 `WeaponDefinition.item_id` 引用物品 ID
 
 ## 3. 加载时机与生命周期
 

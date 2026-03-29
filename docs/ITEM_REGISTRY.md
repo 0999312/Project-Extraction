@@ -12,7 +12,7 @@
 - **Entry namespace(s):** `game`
 - **Entry ID naming convention:** `game:item/<category>/<name>` (e.g. `game:item/weapon/pistol`)
 - **Required tag naming convention:** optional string tags in entry payload (`weapon`, `med`, `ammo`, `caliber_9x19`)
-- **Cross-registry references:** Weapon registry entries map back to item IDs (`WeaponDefinition.item_id`)
+- **Cross-registry references:** Weapon registry entries reference item IDs (`WeaponDefinition.item_id`)
 
 ## 3. Load Timing and Lifecycle
 

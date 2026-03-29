@@ -7,7 +7,7 @@
 
 ## 1. Registry Overview
 
-- **Registry name:** `core:buff`
+- **Registry name:** `buff`
 - **Business purpose:** Centralised definition and lookup of all temporary or persistent status modifiers (buffs and debuffs) that can be applied to any biological actor. Replaces hardcoded boolean flags in `StatusEffectsState` with a data-driven, extensible system.
 - **Primary owner:** Gameplay Systems / Player & Enemy Combat
 - **Related gameplay/content areas:** Player state, enemy state, medical items, combat damage, HUD display
