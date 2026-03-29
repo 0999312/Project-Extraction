@@ -13,4 +13,5 @@ extends Resource
 @export var recoil_per_shot: float = 0.6
 @export var recoil_recovery_per_sec: float = 2.0
 @export var pellets_per_shot: int = 1
+@export_file("*.png", "*.webp", "*.jpg", "*.jpeg", "*.svg") var icon_path: String = ""
 

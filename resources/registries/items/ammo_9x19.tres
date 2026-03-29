@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/components/gameplay/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "game:item/ammo/9x19"
+display_name = "9x19 Ammo"
+category = "ammo"
+size_w = 1
+size_h = 1
+weight = 0.015
+max_stack = 60
+icon_path = ""
+tags = Array[String](["ammo", "caliber_9x19"])

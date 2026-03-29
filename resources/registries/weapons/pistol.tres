@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="WeaponDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/components/combat/weapon_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "game:weapon/pistol"
+display_name = "Pistol"
+item_id = "game:item/weapon/pistol"
+projectile_definition_id = "game:projectile/bullet"
+ammo_capacity = 15
+fire_interval = 0.14
+reload_duration_sec = 1.5
+hipfire_spread_deg = 6.0
+ads_spread_deg = 1.5
+recoil_per_shot = 0.6
+recoil_recovery_per_sec = 2.0
+pellets_per_shot = 1
+icon_path = "res://assets/game/textures/items/pistol.png"

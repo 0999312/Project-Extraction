@@ -2,29 +2,9 @@ class_name ProjectileCatalog
 extends RefCounted
 
 const REGISTRY_TYPE := "projectile"
+const PROJECTILES_JSON_PATH := "res://resources/registries/projectiles/projectiles.json"
 const BULLET := "game:projectile/bullet"
 const CREATURE_BOLT := "game:projectile/creature_bolt"
-
-const PROJECTILE_DEFINITIONS := {
-	BULLET: {
-		"script_path": "res://scripts/game/projectiles/projectile.gd",
-		"speed": 850.0,
-		"damage": 20.0,
-		"penetration": 0.0,
-		"lifetime": 2.0,
-		"max_distance": 1400.0,
-		"sprite_path": "res://assets/game/textures/projectiles/bullet.png",
-	},
-	CREATURE_BOLT: {
-		"script_path": "res://scripts/game/projectiles/projectile.gd",
-		"speed": 720.0,
-		"damage": 12.0,
-		"penetration": 0.0,
-		"lifetime": 2.0,
-		"max_distance": 900.0,
-		"sprite_path": "res://assets/game/textures/projectiles/bullet.png",
-	},
-}
 
 
 static func ensure_registry() -> void:
@@ -34,11 +14,34 @@ static func ensure_registry() -> void:
 	if registry == null:
 		push_error("[ProjectileCatalog] Unable to resolve projectile registry.")
 		return
-	for projectile_id in PROJECTILE_DEFINITIONS:
+	_load_projectiles_from_json(registry)
+
+
+static func _load_projectiles_from_json(registry: ProjectileRegistry) -> void:
+	if not FileAccess.file_exists(PROJECTILES_JSON_PATH):
+		push_warning("[ProjectileCatalog] Projectile JSON not found: %s" % PROJECTILES_JSON_PATH)
+		return
+	var file := FileAccess.open(PROJECTILES_JSON_PATH, FileAccess.READ)
+	if file == null:
+		push_warning("[ProjectileCatalog] Failed to open projectile JSON: %s" % PROJECTILES_JSON_PATH)
+		return
+	var json := JSON.new()
+	var err := json.parse(file.get_as_text())
+	file.close()
+	if err != OK:
+		push_error("[ProjectileCatalog] JSON parse error in %s: %s" % [PROJECTILES_JSON_PATH, json.get_error_message()])
+		return
+	var data: Variant = json.data
+	if not (data is Dictionary):
+		push_error("[ProjectileCatalog] Projectile JSON root must be a Dictionary.")
+		return
+	for projectile_id in (data as Dictionary):
 		var resource_location := ResourceLocation.from_string(projectile_id)
 		if resource_location == null or registry.has_entry(resource_location):
 			continue
-		registry.register(resource_location, PROJECTILE_DEFINITIONS[projectile_id].duplicate(true))
+		var entry: Variant = (data as Dictionary)[projectile_id]
+		if entry is Dictionary:
+			registry.register(resource_location, (entry as Dictionary).duplicate(true))
 
 
 static func get_projectile_definition(projectile_id: String) -> Dictionary:

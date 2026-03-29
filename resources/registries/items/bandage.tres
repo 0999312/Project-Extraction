@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/components/gameplay/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "game:item/med/bandage"
+display_name = "Bandage"
+category = "med"
+size_w = 1
+size_h = 1
+weight = 0.1
+max_stack = 5
+icon_path = ""
+tags = Array[String](["med", "bleed_treatment"])

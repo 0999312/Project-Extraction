@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/components/gameplay/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "game:item/weapon/creature"
+display_name = "Creature Bolt Organ"
+category = "weapon"
+size_w = 2
+size_h = 2
+weight = 2.0
+max_stack = 1
+icon_path = ""
+tags = Array[String](["weapon", "organic"])

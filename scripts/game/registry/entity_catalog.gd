@@ -2,24 +2,10 @@ class_name EntityCatalog
 extends RefCounted
 
 const REGISTRY_TYPE := "entity"
+const ENTITIES_JSON_PATH := "res://resources/registries/entities/entities.json"
 const PLAYER := "game:entity/player"
 const HUMAN_ENEMY := "game:entity/human_enemy"
 const NON_HUMAN_ENEMY := "game:entity/non_human_enemy"
-
-const ENTITY_DEFINITIONS := {
-	PLAYER: {
-		"scene_path": "res://scenes/entities/player.tscn",
-		"class_name": "Player",
-	},
-	HUMAN_ENEMY: {
-		"scene_path": "res://scenes/entities/human_enemy.tscn",
-		"class_name": "HumanEnemy",
-	},
-	NON_HUMAN_ENEMY: {
-		"scene_path": "res://scenes/entities/non_human_enemy.tscn",
-		"class_name": "NonHumanEnemy",
-	},
-}
 
 
 static func ensure_registry() -> void:
@@ -29,11 +15,34 @@ static func ensure_registry() -> void:
 	if registry == null:
 		push_error("[EntityCatalog] Unable to resolve entity registry.")
 		return
-	for entity_id in ENTITY_DEFINITIONS:
+	_load_entities_from_json(registry)
+
+
+static func _load_entities_from_json(registry: EntityRegistry) -> void:
+	if not FileAccess.file_exists(ENTITIES_JSON_PATH):
+		push_warning("[EntityCatalog] Entity JSON not found: %s" % ENTITIES_JSON_PATH)
+		return
+	var file := FileAccess.open(ENTITIES_JSON_PATH, FileAccess.READ)
+	if file == null:
+		push_warning("[EntityCatalog] Failed to open entity JSON: %s" % ENTITIES_JSON_PATH)
+		return
+	var json := JSON.new()
+	var err := json.parse(file.get_as_text())
+	file.close()
+	if err != OK:
+		push_error("[EntityCatalog] JSON parse error in %s: %s" % [ENTITIES_JSON_PATH, json.get_error_message()])
+		return
+	var data: Variant = json.data
+	if not (data is Dictionary):
+		push_error("[EntityCatalog] Entity JSON root must be a Dictionary.")
+		return
+	for entity_id in (data as Dictionary):
 		var resource_location := ResourceLocation.from_string(entity_id)
 		if resource_location == null or registry.has_entry(resource_location):
 			continue
-		registry.register(resource_location, ENTITY_DEFINITIONS[entity_id].duplicate(true))
+		var entry: Variant = (data as Dictionary)[entity_id]
+		if entry is Dictionary:
+			registry.register(resource_location, (entry as Dictionary).duplicate(true))
 
 
 static func get_entity_definition(entity_id: String) -> Dictionary:
