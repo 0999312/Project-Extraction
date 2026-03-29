@@ -8,4 +8,4 @@ extends Resource
 @export var size_h: int = 1
 @export var weight: float = 0.0
 @export var max_stack: int = 1
-@export var tags: Array[String] = []
+@export_file("*.png", "*.webp", "*.jpg", "*.jpeg", "*.svg") var icon_path: String = ""

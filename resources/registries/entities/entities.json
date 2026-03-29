@@ -1,0 +1,14 @@
+{
+	"game:entity/player": {
+		"scene_path": "res://scenes/entities/player.tscn",
+		"class_name": "Player"
+	},
+	"game:entity/human_enemy": {
+		"scene_path": "res://scenes/entities/human_enemy.tscn",
+		"class_name": "HumanEnemy"
+	},
+	"game:entity/non_human_enemy": {
+		"scene_path": "res://scenes/entities/non_human_enemy.tscn",
+		"class_name": "NonHumanEnemy"
+	}
+}

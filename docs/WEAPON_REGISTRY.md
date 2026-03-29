@@ -17,7 +17,7 @@
 ## 3. Load Timing and Lifecycle
 
 - **When is the registry created?** On first `WeaponCatalog.ensure_registry()` call.
-- **When are entries registered?** During `WeaponCatalog.ensure_registry()`.
+- **When are entries registered?** During `WeaponCatalog.ensure_registry()` – loaded from `.tres` resource files in `resources/registries/weapons/`.
 - **Can entries be extended at runtime?** Yes.
 - **Should the registry persist across scenes?** Yes (global `RegistryManager`).
 
@@ -37,6 +37,7 @@
 | `recoil_per_shot` | `float` | No | `0.6` | Recoil gain per shot |
 | `recoil_recovery_per_sec` | `float` | No | `2.0` | Recoil recovery |
 | `pellets_per_shot` | `int` | No | `1` | Shot pellet count |
+| `icon_path` | `String` | No | `""` | Path to weapon icon texture |
 
 ## 5. Runtime Access Pattern
 
@@ -45,12 +46,13 @@
 
 ## 6. Current Built-in Entries
 
-- `game:weapon/pistol` (maps item `game:item/weapon/pistol`, projectile `game:projectile/bullet`)
-- `game:weapon/creature_organ` (maps item `game:item/weapon/creature`, projectile `game:projectile/creature_bolt`)
+- `game:weapon/pistol` – loaded from `resources/registries/weapons/pistol.tres`
+- `game:weapon/creature_organ` – loaded from `resources/registries/weapons/creature_organ.tres`
 
 ## 7. Source Files
 
 - `scripts/game/components/combat/weapon_definition.gd`
 - `scripts/game/registry/weapon_registry.gd`
 - `scripts/game/registry/weapon_catalog.gd`
+- `resources/registries/weapons/*.tres`
 

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BuffDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/components/gameplay/buff_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "game:buff/bleed_heavy"
+display_name = "Heavy Bleed"
+stackable = false
+max_stacks = 1
+base_duration = 0.0
+damage_per_second = 5.0
+move_speed_mult = 1.0
+aim_sway_mult = 1.0
+interaction_speed_mult = 1.0
+tags = Array[String](["bleed", "debuff"])

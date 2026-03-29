@@ -1,0 +1,20 @@
+{
+	"game:projectile/bullet": {
+		"script_path": "res://scripts/game/projectiles/projectile.gd",
+		"speed": 850.0,
+		"damage": 20.0,
+		"penetration": 0.0,
+		"lifetime": 2.0,
+		"max_distance": 1400.0,
+		"sprite_path": "res://assets/game/textures/projectiles/bullet.png"
+	},
+	"game:projectile/creature_bolt": {
+		"script_path": "res://scripts/game/projectiles/projectile.gd",
+		"speed": 720.0,
+		"damage": 12.0,
+		"penetration": 0.0,
+		"lifetime": 2.0,
+		"max_distance": 900.0,
+		"sprite_path": "res://assets/game/textures/projectiles/bullet.png"
+	}
+}

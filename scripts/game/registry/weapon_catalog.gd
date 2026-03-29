@@ -2,51 +2,10 @@ class_name WeaponCatalog
 extends RefCounted
 
 const REGISTRY_TYPE := "weapon"
+const WEAPONS_RESOURCE_DIR := "res://resources/registries/weapons"
 
 const WEAPON_PISTOL := "game:weapon/pistol"
 const WEAPON_CREATURE_ORGAN := "game:weapon/creature_organ"
-
-static func _make_pistol() -> WeaponDefinition:
-	var d := WeaponDefinition.new()
-	d.id = WEAPON_PISTOL
-	d.display_name = "Pistol"
-	d.item_id = ItemCatalog.ITEM_WEAPON_PISTOL
-	d.projectile_definition_id = ProjectileCatalog.BULLET
-	d.ammo_capacity = 15
-	d.fire_interval = 0.14
-	d.reload_duration_sec = 1.5
-	d.hipfire_spread_deg = 6.0
-	d.ads_spread_deg = 1.5
-	d.recoil_per_shot = 0.6
-	d.recoil_recovery_per_sec = 2.0
-	d.pellets_per_shot = 1
-	return d
-
-static func _make_creature_organ() -> WeaponDefinition:
-	var d := WeaponDefinition.new()
-	d.id = WEAPON_CREATURE_ORGAN
-	d.display_name = "Creature Organ Bolt"
-	d.item_id = ItemCatalog.ITEM_WEAPON_CREATURE
-	d.projectile_definition_id = ProjectileCatalog.CREATURE_BOLT
-	d.ammo_capacity = 6
-	d.fire_interval = 0.35
-	d.reload_duration_sec = 2.0
-	d.hipfire_spread_deg = 8.0
-	d.ads_spread_deg = 2.8
-	d.recoil_per_shot = 0.3
-	d.recoil_recovery_per_sec = 1.7
-	d.pellets_per_shot = 1
-	return d
-
-const _FACTORIES := {
-	WEAPON_PISTOL: "_make_pistol",
-	WEAPON_CREATURE_ORGAN: "_make_creature_organ",
-}
-
-const _WEAPON_BY_ITEM_ID := {
-	ItemCatalog.ITEM_WEAPON_PISTOL: WEAPON_PISTOL,
-	ItemCatalog.ITEM_WEAPON_CREATURE: WEAPON_CREATURE_ORGAN,
-}
 
 static func ensure_registry() -> void:
 	ItemCatalog.ensure_registry()
@@ -56,12 +15,26 @@ static func ensure_registry() -> void:
 	if registry == null:
 		push_error("[WeaponCatalog] Unable to resolve weapon registry.")
 		return
-	for weapon_id in _FACTORIES:
-		var rl := ResourceLocation.from_string(weapon_id)
-		if rl == null or registry.has_entry(rl):
-			continue
-		var factory_name: String = _FACTORIES[weapon_id]
-		registry.register(rl, WeaponCatalog.call(factory_name))
+	_load_weapons_from_resources(registry)
+
+static func _load_weapons_from_resources(registry: WeaponRegistry) -> void:
+	var dir := DirAccess.open(WEAPONS_RESOURCE_DIR)
+	if dir == null:
+		push_warning("[WeaponCatalog] Weapon resource directory not found: %s" % WEAPONS_RESOURCE_DIR)
+		return
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while not file_name.is_empty():
+		if not dir.current_is_dir() and file_name.ends_with(".tres"):
+			var path := "%s/%s" % [WEAPONS_RESOURCE_DIR, file_name]
+			var res := ResourceLoader.load(path)
+			if res is WeaponDefinition:
+				var weapon_def: WeaponDefinition = res
+				var rl := ResourceLocation.from_string(weapon_def.id)
+				if rl != null and not registry.has_entry(rl):
+					registry.register(rl, weapon_def)
+		file_name = dir.get_next()
+	dir.list_dir_end()
 
 static func get_weapon_definition(weapon_id: String) -> WeaponDefinition:
 	ensure_registry()
@@ -75,10 +48,15 @@ static func get_weapon_definition(weapon_id: String) -> WeaponDefinition:
 	return entry if entry is WeaponDefinition else null
 
 static func get_weapon_for_item(item_id: String) -> WeaponDefinition:
-	var weapon_id := str(_WEAPON_BY_ITEM_ID.get(item_id, ""))
-	if weapon_id.is_empty():
+	ensure_registry()
+	var registry := _get_registry()
+	if registry == null:
 		return null
-	return get_weapon_definition(weapon_id)
+	for key in registry.get_all_keys():
+		var entry := registry.get_entry(ResourceLocation.from_string(key))
+		if entry is WeaponDefinition and (entry as WeaponDefinition).item_id == item_id:
+			return entry
+	return null
 
 static func apply_to_combat_state(combat: CombatState) -> void:
 	if combat == null:

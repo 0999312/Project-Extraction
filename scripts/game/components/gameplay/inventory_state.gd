@@ -15,7 +15,7 @@ func _init(max_w: float = 50.0) -> void:
 func add_item(item_id: String, count: int = 1) -> void:
 	if inventory == null:
 		inventory = GridInventory.new()
-	inventory.add_stack(ItemStack.new(item_id, count))
+	inventory.auto_place(ItemStack.new(item_id, count))
 	recompute_weight()
 
 func recompute_weight() -> void:
@@ -23,3 +23,18 @@ func recompute_weight() -> void:
 		current_weight = 0.0
 		return
 	current_weight = inventory.compute_total_weight()
+
+var hotbar_slots: Array[String]:
+	get:
+		if inventory == null:
+			return ["", "", "", "", "", "", "", "", ""]
+		return inventory.hotbar_slots
+
+var active_hotbar_index: int:
+	get:
+		if inventory == null:
+			return 0
+		return inventory.active_hotbar_index
+	set(value):
+		if inventory != null:
+			inventory.set_active_hotbar(value)
