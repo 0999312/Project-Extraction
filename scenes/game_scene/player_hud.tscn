@@ -3,13 +3,113 @@
 [ext_resource type="Script" uid="uid://d3tsnjrjpb6eg" path="res://scripts/game/ui/player_hud.gd" id="1_hud_script"]
 [ext_resource type="Theme" uid="uid://b1ja4tvqptipj" path="res://resources/themes/minimal_vector.tres" id="2_hud_theme"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
-bg_color = Color(0.039, 0.039, 0.039, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.941, 0.941, 0.941, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ixt46"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0, 0.4, 0, 0)
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_maywa"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yrr7f"]
+bg_color = Color(0, 0.9, 0.10500011, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_njvgo"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y0ufx"]
+bg_color = Color(0, 0.9, 0.10500011, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6wsxy"]
+bg_color = Color(1, 1, 1, 0)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2lc7q"]
+bg_color = Color(0, 0.9, 0.10500011, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yue00"]
+bg_color = Color(1, 1, 1, 0)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wrtkm"]
+bg_color = Color(0, 0.9, 0.10500011, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="PlayerHUD" type="CanvasLayer" unique_id=2129801643]
 layer = 10
@@ -30,6 +130,7 @@ alignment = 1
 custom_minimum_size = Vector2(600, 0)
 layout_mode = 2
 size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_ixt46")
 
 [node name="StatsVBox" type="VBoxContainer" parent="HUDRoot/StatsPanel" unique_id=499143157]
 layout_mode = 2
@@ -43,7 +144,8 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/background = SubResource("StyleBoxFlat_maywa")
+theme_override_styles/fill = SubResource("StyleBoxFlat_yrr7f")
 value = 100.0
 show_percentage = false
 
@@ -62,7 +164,8 @@ vertical_alignment = 1
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/background = SubResource("StyleBoxFlat_njvgo")
+theme_override_styles/fill = SubResource("StyleBoxFlat_y0ufx")
 value = 100.0
 show_percentage = false
 
@@ -85,7 +188,8 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/background = SubResource("StyleBoxFlat_6wsxy")
+theme_override_styles/fill = SubResource("StyleBoxFlat_2lc7q")
 value = 100.0
 show_percentage = false
 
@@ -104,7 +208,8 @@ vertical_alignment = 1
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/background = SubResource("StyleBoxFlat_yue00")
+theme_override_styles/fill = SubResource("StyleBoxFlat_wrtkm")
 value = 100.0
 show_percentage = false
 
@@ -120,9 +225,11 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="HotbarRow" type="PanelContainer" parent="HUDRoot" unique_id=4862395]
+texture_filter = 1
 layout_mode = 2
 size_flags_horizontal = 4
 
 [node name="Hotbar" type="HBoxContainer" parent="HUDRoot/HotbarRow" unique_id=856603493]
+texture_filter = 1
 layout_mode = 2
 theme_override_constants/separation = 4

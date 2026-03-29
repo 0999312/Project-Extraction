@@ -18,7 +18,7 @@ const HOTBAR_SLOT_COUNT := 9
 
 # ── StyleBox fill colours (reused from theme, overridden per bar) ──────────────
 var _sb_hp_healthy : StyleBoxFlat
-var _sb_hp_injured : StyleBoxFlat
+#var _sb_hp_injured : StyleBoxFlat
 var _sb_stamina    : StyleBoxFlat
 var _sb_energy     : StyleBoxFlat
 var _sb_thirst     : StyleBoxFlat
@@ -125,19 +125,16 @@ func _find_player() -> void:
 		_player = p as BiologicalActor
 
 func _build_style_boxes() -> void:
-	_sb_hp_healthy = StyleBoxFlat.new()
+	_sb_hp_healthy = hp_bar.get_theme_stylebox("fill")
 	_sb_hp_healthy.bg_color = COLOR_HP_HEALTHY
 
-	_sb_hp_injured = StyleBoxFlat.new()
-	_sb_hp_injured.bg_color = COLOR_HP_INJURED
-
-	_sb_stamina = StyleBoxFlat.new()
+	_sb_stamina = stamina_bar.get_theme_stylebox("fill")
 	_sb_stamina.bg_color = COLOR_STAMINA
 
-	_sb_energy = StyleBoxFlat.new()
+	_sb_energy = energy_bar.get_theme_stylebox("fill")
 	_sb_energy.bg_color = COLOR_ENERGY
 
-	_sb_thirst = StyleBoxFlat.new()
+	_sb_thirst = thirst_bar.get_theme_stylebox("fill")
 	_sb_thirst.bg_color = COLOR_THIRST
 
 func _apply_bar_styles() -> void:
@@ -152,8 +149,8 @@ func _refresh_bars() -> void:
 	if h != null:
 		hp_bar.max_value = h.max_hp
 		hp_bar.value = h.current_hp
-		var fill := _sb_hp_healthy if (h.max_hp > 0.0 and (h.current_hp / h.max_hp) >= 0.5) else _sb_hp_injured
-		hp_bar.add_theme_stylebox_override("fill", fill)
+		#var fill := _sb_hp_healthy if (h.max_hp > 0.0 and (h.current_hp / h.max_hp) >= 0.5) else _sb_hp_injured
+		#hp_bar.add_theme_stylebox_override("fill", fill)
 		hp_label.text = "%d/%d" % [int(h.current_hp), int(h.max_hp)]
 
 	# Stamina

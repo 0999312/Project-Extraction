@@ -81,6 +81,7 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scrollbar_grabber"]
+bg_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scrollbar_grabber_hl"]
 
@@ -129,12 +130,12 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nap0l"]
 content_margin_left = 4.0
 content_margin_top = 4.0
 content_margin_right = 4.0
 content_margin_bottom = 4.0
-bg_color = Color(1, 1, 1, 0)
+bg_color = Color(0.8, 0.4, 0, 1)
 border_width_left = 6
 border_width_top = 6
 border_width_right = 6
@@ -145,12 +146,21 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_container"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dh5ef"]
 content_margin_left = 4.0
 content_margin_top = 4.0
 content_margin_right = 4.0
 content_margin_bottom = 4.0
-bg_color = Color(0.3325, 0.57, 0, 0)
+bg_color = Color(0, 0.4, 0, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_bg"]
 bg_color = Color(1, 1, 1, 1)
@@ -188,6 +198,19 @@ border_width_bottom = 6
 border_color = Color(0.05, 0.05, 0.05, 1)
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l1cu4"]
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+bg_color = Color(0.9, 0, 0, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_hovered"]
 content_margin_left = 6.0
@@ -237,7 +260,7 @@ Label/colors/font_color = Color(0.941, 0.941, 0.941, 1)
 Label/colors/font_outline_color = Color(0, 0, 0, 1)
 Label/constants/outline_size = 6
 Label/font_sizes/font_size = 12
-LineEdit/colors/cursor_color = Color(0, 0.898, 1, 1)
+LineEdit/colors/cursor_color = Color(0, 0, 0, 1)
 LineEdit/colors/font_color = Color(1, 1, 1, 1)
 LineEdit/colors/font_outline_color = Color(0, 0, 0, 1)
 LineEdit/colors/font_placeholder_color = Color(0.5, 0.5, 0.5, 1)
@@ -246,19 +269,19 @@ LineEdit/constants/outline_size = 10
 LineEdit/styles/focus = SubResource("StyleBoxFlat_lineedit_focus")
 LineEdit/styles/normal = SubResource("StyleBoxFlat_lineedit_normal")
 LineEdit/styles/read_only = SubResource("StyleBoxFlat_btn_disabled")
-Panel/styles/panel = SubResource("StyleBoxFlat_panel")
-PanelContainer/styles/panel = SubResource("StyleBoxFlat_panel_container")
+Panel/styles/panel = SubResource("StyleBoxFlat_nap0l")
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_dh5ef")
 ProgressBar/colors/font_color = Color(1, 1, 1, 1)
 ProgressBar/colors/font_outline_color = Color(0, 0, 0, 1)
 ProgressBar/constants/outline_size = 10
 ProgressBar/styles/background = SubResource("StyleBoxFlat_progress_bg")
 ProgressBar/styles/fill = SubResource("StyleBoxFlat_progress_fill")
-TabContainer/colors/font_disabled_color = Color(0.4, 0.4, 0.4, 1)
-TabContainer/colors/font_hovered_color = Color(0, 0.898, 1, 1)
+TabContainer/colors/font_disabled_color = Color(0, 0, 0, 1)
+TabContainer/colors/font_hovered_color = Color(1, 1, 1, 1)
 TabContainer/colors/font_selected_color = Color(0.039, 0.039, 0.039, 1)
 TabContainer/colors/font_unselected_color = Color(0.941, 0.941, 0.941, 1)
 TabContainer/styles/panel = SubResource("StyleBoxFlat_tab_panel")
-TabContainer/styles/tab_disabled = SubResource("StyleBoxFlat_btn_disabled")
+TabContainer/styles/tab_disabled = SubResource("StyleBoxFlat_l1cu4")
 TabContainer/styles/tab_focus = SubResource("StyleBoxEmpty_blank")
 TabContainer/styles/tab_hovered = SubResource("StyleBoxFlat_tab_hovered")
 TabContainer/styles/tab_selected = SubResource("StyleBoxFlat_tab_selected")
