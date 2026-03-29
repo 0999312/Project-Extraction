@@ -61,22 +61,24 @@ All IDs in design and implementation use **Minecraft-Style-Framework `ResourceLo
 
 ## 4) Key Systems (Tarkov-like Feature Checklist)
 
-### 4.1 Player State (Lightweight Injury)
+### 4.1 Player State (Lightweight Survival)
 Focus on readable, gameplay-relevant states:
-- `HP` (single pool)
-- `Stamina`
-- `Encumbrance` (weight affects speed, stamina regen, noise)
-- `BleedLight` / `BleedHeavy`
-- `Pain` (aim sway penalty / interaction speed penalty)
-- Optional later: `Fracture` (movement penalty)
+- `HP` (single health pool)
+- `Stamina` (sprint / melee cost pool)
+- `Energy` (caloric energy; drains over time, low energy penalises stamina regen)
+- `Thirst` (hydration; drains over time, dehydration penalises energy regen and movement)
+- `Encumbrance` (weight; affects speed, stamina regen, noise)
+
+Bleed (`BleedLight` / `BleedHeavy`) and `Fracture` are now modelled as **Buff instances** managed by a `BuffComponent` (see Section 4.7 and the Buff Registry design document). This keeps the core state struct minimal while retaining the same gameplay effects.
 
 **Healing items:** registered as **one major category** `game:item_med`.  
 Effects are tag-driven: `game:tag/med_bandage`, `game:tag/med_painkiller`, etc.
 
 ### 4.2 Combat (Ranged + Melee)
 **Ranged weapons**
-- Caliber + fire mode determined by tags (e.g. `game:tag/caliber_9x19`, `game:tag/firemode_auto`)
-- Basic recoil/spread model
+- Weapon behavior is item-driven: combat runtime resolves `equipped_weapon_id` (`game:item/...`) to a `WeaponDefinition` from `core:weapon`.
+- `WeaponDefinition` controls projectile ID, magazine size, fire interval, reload duration, spread profile, recoil profile, and pellets-per-shot.
+- Caliber + fire mode still use tags/data (e.g. `game:tag/caliber_9x19`, `game:tag/firemode_auto`) but are now expressed through item + weapon registry data.
 - Basic armor vs penetration model (lightweight)
 
 **Melee**
@@ -106,6 +108,13 @@ Effects are tag-driven: `game:tag/med_bandage`, `game:tag/med_painkiller`, etc.
 - Dialogue: branching options, quest gates
 - **No merchant entities**: traders are **fixed interaction points** in safehouse (and optionally in-raid kiosks).
 - Trading: buy/sell/barter, reputation/tech gates
+
+### 4.7 Buff System
+Temporary or persistent modifiers applied to actors are managed via a `BuffComponent` node.
+- Each active buff is a `BuffInstance` referencing a `BuffDefinition` from `core:buff` registry.
+- Buffs apply stat multipliers (move speed, aim sway, interaction speed), periodic damage (bleed), or periodic healing.
+- Examples: `game:buff/bleed_light`, `game:buff/bleed_heavy`, `game:buff/fracture`.
+- See **BUFF_REGISTRY.md** / **BUFF_REGISTRY_ZH.md** for the full design.
 
 ---
 
@@ -176,6 +185,19 @@ Items in inventory should be **pure data**, not Nodes, for performance and save 
 
 **World drops:** when an item is dropped, spawn a **world pickup node** referencing `item_id` and display data.
 
+### 5.5 Concrete Runtime Status (Current Project)
+Current implementation in this repository now includes:
+- `ItemDefinition` (`core:item`) — canonical item schema (`id`, category, size, weight, stack, tags).
+- `ItemStack` — runtime stack record (`item_id`, `count`, `durability`, `custom_data`).
+- `GridInventory` — lightweight inventory container with `width`, `height`, stack list, and total-weight computation.
+- `InventoryState` now owns a `GridInventory` and keeps `current_weight` synchronized.
+- `WeaponDefinition` (`core:weapon`) — data-driven weapon profile bound to an item ID.
+- `WeaponCatalog.apply_to_combat_state(...)` — maps equipped item → combat parameters (projectile, ammo, spread, recoil, reload timing).
+
+Built-in examples:
+- Items: `game:item/weapon/pistol`, `game:item/weapon/creature`, `game:item/med/bandage`, `game:item/ammo/9x19`
+- Weapons: `game:weapon/pistol`, `game:weapon/creature_organ`
+
 ### 5.4 POI Data Model (Open World + Fragments)
 POI registry entries include:
 - `poi_id: ResourceLocation`
@@ -196,7 +218,7 @@ We explicitly separate gameplay content by how it should be implemented for perf
 **Implementation:**
 - Godot Node: `CharacterBody2D` (movement, collision, animation, interaction origin).
 - Runtime state: a `PlayerState` data object or Resource stored on the player script:
-  - health / stamina / bleed / pain
+  - health / stamina / energy / thirst
   - inventory reference
   - weapon state
   - quest state reference

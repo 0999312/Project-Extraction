@@ -1,6 +1,8 @@
 class_name Projectile
 extends Node2D
 
+const HIT_PARTICLE_SCENE := preload("res://scenes/vfx/hit_particle_effect.tscn")
+
 var projectile_data: ProjectileData = null
 var owner_faction: FactionState.FactionType = FactionState.FactionType.NEUTRAL
 var owner_actor_id: String = ""
@@ -46,6 +48,7 @@ func is_hostile_to(target: BiologicalActor) -> bool:
 			return false
 
 func on_hit(target: BiologicalActor, _hit_position: Vector2) -> void:
+	_spawn_hit_particle(_hit_position)
 	if target != null:
 		target.apply_damage(projectile_data.damage, owner_actor_id)
 	queue_free()
@@ -62,3 +65,17 @@ func _ensure_sprite() -> void:
 		var texture := load(projectile_data.sprite_path)
 		if texture is Texture2D:
 			_sprite.texture = texture
+
+func _spawn_hit_particle(hit_position: Vector2) -> void:
+	var effect := HIT_PARTICLE_SCENE.instantiate()
+	if not (effect is Node2D):
+		return
+	var effect_node := effect as Node2D
+	effect_node.global_position = hit_position
+	var parent_node := get_parent()
+	if parent_node == null:
+		return
+	parent_node.add_child(effect_node)
+	if effect_node.has_method("emit_hit"):
+		var dir := projectile_data.velocity.normalized() if projectile_data != null and projectile_data.velocity.length_squared() > 0.0 else Vector2.ZERO
+		effect_node.call("emit_hit", dir)

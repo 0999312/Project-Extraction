@@ -4,6 +4,8 @@ extends CharacterBody2D
 var actor_id: String = ""
 var health: HealthState = null
 var stamina_state: StaminaState = null
+var energy_state: EnergyState = null
+var thirst_state: ThirstState = null
 var status_effects: StatusEffectsState = null
 var position_state: PositionState = null
 var velocity_state: VelocityState = null
@@ -47,6 +49,12 @@ func get_health() -> HealthState:
 
 func get_stamina_state() -> StaminaState:
 	return stamina_state
+
+func get_energy_state() -> EnergyState:
+	return energy_state
+
+func get_thirst_state() -> ThirstState:
+	return thirst_state
 
 func get_status_effects() -> StatusEffectsState:
 	return status_effects

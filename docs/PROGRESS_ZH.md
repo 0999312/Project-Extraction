@@ -1,5 +1,36 @@
 # Project Extraction — 开发进度
 
+## 更新 14 — 中弹粒子特效 + 物品/背包/武器数据系统
+
+### 变更内容
+
+- **新增中弹粒子效果（不依赖额外精灵图）**：
+  - 新场景：`scenes/vfx/hit_particle_effect.tscn`，仅使用 `CPUParticles2D`。
+  - 新脚本：`scripts/game/vfx/hit_particle_effect.gd`。
+  - 实现一次性喷溅粒子（短生命周期、重力、散射方向），用于子弹命中反馈。
+  - 已在 `projectile.gd:on_hit` 中接入，命中时实例化并调用 `emit_hit(...)`。
+- **实现物品系统（注册表驱动）**：
+  - 新增 `ItemDefinition` 资源结构。
+  - 新增 `ItemRegistry` + `ItemCatalog`，内置条目：
+    - `game:item/weapon/pistol`
+    - `game:item/weapon/creature`
+    - `game:item/med/bandage`
+    - `game:item/ammo/9x19`
+- **实现背包系统（纯数据运行时结构）**：
+  - 新增 `ItemStack` 与 `GridInventory`。
+  - 更新 `InventoryState`：持有 `GridInventory`，支持 `add_item(...)`，并通过物品定义重量同步 `current_weight`。
+- **基于物品系统实现武器系统**：
+  - 新增 `WeaponDefinition`、`WeaponRegistry`、`WeaponCatalog`。
+  - 武器条目从已装备物品 ID 映射到战斗参数（弹丸 ID、弹匣容量、散布、后坐、换弹时序）。
+  - 新增 `WeaponCatalog.apply_to_combat_state(...)`，并已接入玩家/人类敌人/非人类敌人的运行时初始化逻辑。
+  - `DemoGameRuntime` 启动时新增 item/weapon 注册表初始化。
+- **同步更新设计文档**：
+  - 扩展 `GDD_Version2.md` / `GDD_Version2_ZH.md`，补充物品→武器映射的运行时说明。
+  - 新增 `ITEM_REGISTRY.md` / `ITEM_REGISTRY_ZH.md`。
+  - 新增 `WEAPON_REGISTRY.md` / `WEAPON_REGISTRY_ZH.md`。
+
+---
+
 ## 更新 13.4 — 人类受击箱隔离与子弹空中阻挡碰撞
 
 ### 变更内容

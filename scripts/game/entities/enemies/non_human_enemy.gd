@@ -51,10 +51,8 @@ func _setup_runtime_state() -> void:
 	combat_state = CombatState.new()
 	faction_state = FactionState.new(FactionState.FactionType.NON_HUMAN_ENEMY)
 	aim_state = AimState.new()
-	combat_state.equipped_weapon_id = "game:item/weapon/creature"
-	combat_state.projectile_definition_id = ProjectileCatalog.CREATURE_BOLT
-	combat_state.ammo_max = 6
-	combat_state.ammo_current = 6
+	combat_state.equipped_weapon_id = ItemCatalog.ITEM_WEAPON_CREATURE
+	WeaponCatalog.apply_to_combat_state(combat_state)
 
 func set_target_actor(actor: Player) -> void:
 	_target_actor = actor

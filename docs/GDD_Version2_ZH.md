@@ -61,22 +61,24 @@
 
 ## 4) 关键系统 (类《逃离塔科夫》功能清单)
 
-### 4.1 玩家状态 (轻量化伤害)
+### 4.1 玩家状态 (轻量化生存)
 聚焦于可读且与玩法相关的状态：
 - `HP` (生命值，单一池)
-- `Stamina` (耐力)
+- `Stamina` (耐力，冲刺/近战消耗池)
+- `Energy` (能量值，热量能量；随时间消耗，低能量惩罚耐力回复速度)
+- `Thirst` (口渴值，水分；随时间消耗，脱水惩罚能量回复速度和移动速度)
 - `Encumbrance` (负重，影响速度、耐力回复、噪音)
-- `BleedLight` / `BleedHeavy` (轻度/重度流血)
-- `Pain` (疼痛，影响瞄准晃动/互动速度)
-- 可选后期加入：`Fracture` (骨折，移动惩罚)
+
+流血（`BleedLight` / `BleedHeavy`）和骨折（`Fracture`）现在通过 **Buff 实例**进行建模，由挂载在角色上的 `BuffComponent` 管理（详见第 4.7 节和 Buff 注册表设计文档）。这使核心状态结构保持极简，同时保留相同的游戏效果。
 
 **治疗物品:** 注册为**一个主要类别** `game:item_med`。  
 效果由标签驱动：`game:tag/med_bandage`、`game:tag/med_painkiller`等。
 
 ### 4.2 战斗 (远程 + 近战)
 **远程武器**
-- 口径 + 开火模式由标签决定 (例如 `game:tag/caliber_9x19`、`game:tag/firemode_auto`)
-- 基础后坐力/散布模型
+- 武器行为由物品驱动：战斗运行时通过 `equipped_weapon_id`（`game:item/...`）解析到 `core:weapon` 中的 `WeaponDefinition`。
+- `WeaponDefinition` 统一控制弹丸 ID、弹匣容量、射击间隔、换弹时长、散布参数、后坐力参数和每次射击弹丸数。
+- 口径与开火模式仍通过标签/数据表达（如 `game:tag/caliber_9x19`、`game:tag/firemode_auto`），但其承载体改为物品+武器注册表数据。
 - 基础护甲 vs 穿透模型 (轻量化)
 
 **近战**
@@ -106,6 +108,13 @@
 - 对话：分支选项，任务门槛
 - **无商人实体**：交易者是安全屋中的**固定交互点** (以及可选在Raid内的售货亭)。
 - 交易：购买/出售/以物易物，受声望/科技门槛限制
+
+### 4.7 Buff 系统
+对角色施加的临时或持久修改器由 `BuffComponent` 节点统一管理。
+- 每个激活的 Buff 是一个 `BuffInstance`，引用 `core:buff` 注册表中的 `BuffDefinition`。
+- Buff 可施加属性倍率（移动速度、瞄准晃动、交互速度）、周期伤害（流血）或周期治疗。
+- 示例：`game:buff/bleed_light`、`game:buff/bleed_heavy`、`game:buff/fracture`。
+- 完整设计详见 **BUFF_REGISTRY.md** / **BUFF_REGISTRY_ZH.md**。
 
 ---
 
@@ -176,6 +185,19 @@
 
 **世界掉落物:** 当物品被丢弃时，生成一个**世界拾取节点**，引用 `item_id` 与显示数据。
 
+### 5.5 当前仓库中的具体运行时实现
+当前代码已包含以下落地结构：
+- `ItemDefinition`（`core:item`）—— 物品标准结构（`id`、分类、尺寸、重量、堆叠、标签）。
+- `ItemStack` —— 运行时堆叠记录（`item_id`、`count`、`durability`、`custom_data`）。
+- `GridInventory` —— 轻量背包容器，包含 `width`、`height`、堆叠列表与总重量计算。
+- `InventoryState` 现在持有 `GridInventory`，并同步维护 `current_weight`。
+- `WeaponDefinition`（`core:weapon`）—— 绑定物品 ID 的数据驱动武器参数。
+- `WeaponCatalog.apply_to_combat_state(...)` —— 将已装备物品映射到战斗参数（弹丸、弹药、散布、后坐、换弹时序）。
+
+内置示例：
+- 物品：`game:item/weapon/pistol`、`game:item/weapon/creature`、`game:item/med/bandage`、`game:item/ammo/9x19`
+- 武器：`game:weapon/pistol`、`game:weapon/creature_organ`
+
 ### 5.4 兴趣点数据模型 (开放世界 + 片段)
 兴趣点注册表条目包含：
 - `poi_id: ResourceLocation`
@@ -196,7 +218,7 @@
 **实现：**
 - Godot 节点：`CharacterBody2D`（移动、碰撞、动画、交互起点）。
 - 运行时状态：由玩家脚本持有 `PlayerState` 数据对象或 Resource：
-  - 生命 / 耐力 / 流血 / 疼痛
+  - 生命 / 耐力 / 能量 / 口渴
   - 背包引用
   - 武器状态
   - 任务状态引用
