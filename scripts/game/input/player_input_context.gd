@@ -13,6 +13,16 @@ func _init() -> void:
 		_make_fire_mode_toggle_mapping(),
 		_make_sprint_mapping(),
 		_make_pause_mapping(),
+		_make_inventory_mapping(),
+		_make_hotbar_slot_mapping(0, KEY_1),
+		_make_hotbar_slot_mapping(1, KEY_2),
+		_make_hotbar_slot_mapping(2, KEY_3),
+		_make_hotbar_slot_mapping(3, KEY_4),
+		_make_hotbar_slot_mapping(4, KEY_5),
+		_make_hotbar_slot_mapping(5, KEY_6),
+		_make_hotbar_slot_mapping(6, KEY_7),
+		_make_hotbar_slot_mapping(7, KEY_8),
+		_make_hotbar_slot_mapping(8, KEY_9),
 	]
 
 
@@ -134,6 +144,38 @@ func _make_fire_mode_toggle_mapping() -> GUIDEActionMapping:
 	mapping.input_mappings = [
 		_make_key_mapping(KEY_B),
 		_make_joy_button_mapping(JOY_BUTTON_Y),
+	]
+	return mapping
+
+
+func _make_inventory_mapping() -> GUIDEActionMapping:
+	var action := GUIDEAction.new()
+	action.name = &"pe_inventory"
+	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
+	action.is_remappable = true
+	action.display_name = "ui.input.action_inventory"
+	action.display_category = "System"
+
+	var mapping := GUIDEActionMapping.new()
+	mapping.action = action
+	mapping.input_mappings = [
+		_make_key_mapping(KEY_TAB),
+	]
+	return mapping
+
+
+func _make_hotbar_slot_mapping(index: int, keycode: Key) -> GUIDEActionMapping:
+	var action := GUIDEAction.new()
+	action.name = StringName("pe_hotbar_%d" % (index + 1))
+	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
+	action.is_remappable = true
+	action.display_name = "ui.input.action_hotbar_%d" % (index + 1)
+	action.display_category = "Inventory"
+
+	var mapping := GUIDEActionMapping.new()
+	mapping.action = action
+	mapping.input_mappings = [
+		_make_key_mapping(keycode),
 	]
 	return mapping
 
