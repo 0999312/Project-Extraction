@@ -43,6 +43,8 @@ var _hotbar_slots_ui : Array[TextureRect] = []
 var _hotbar_texture : Texture2D = null
 var _hotbar_pressed : Array[bool] = []
 
+## Emitted when the active hotbar slot changes via key input.
+## item_id is the item ID in the newly selected slot, or "" if the slot is empty.
 signal hotbar_selection_changed(item_id: String)
 
 func _ready() -> void:
@@ -73,6 +75,8 @@ func _on_inventory_changed() -> void:
 func _load_hotbar_texture() -> void:
 	if ResourceLoader.exists(HOTBAR_TEXTURE_PATH):
 		_hotbar_texture = ResourceLoader.load(HOTBAR_TEXTURE_PATH, "Texture2D", ResourceLoader.CACHE_MODE_REUSE)
+	else:
+		push_warning("[PlayerHUD] Hotbar texture not found: %s" % HOTBAR_TEXTURE_PATH)
 
 func _build_hotbar_slots() -> void:
 	for child in hotbar_container.get_children():
