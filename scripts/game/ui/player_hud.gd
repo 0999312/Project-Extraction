@@ -8,17 +8,18 @@ const COLOR_STAMINA     := Color(0.753, 0.753, 0.753, 1)   # light-grey
 const COLOR_ENERGY      := Color(1.0,   0.843, 0.0,   1)   # yellow
 const COLOR_THIRST      := Color(0.196, 0.784, 0.941, 1)   # water-blue / cyan
 
-# ── Hotbar visual constants ──────────────────────────────────────────────────
+# ── Hotbar visual constants (no texture, pure StyleBoxFlat) ──────────────────
 const HOTBAR_SLOT_SIZE := Vector2(56, 56)
 const HOTBAR_SLOT_SELECTED_SIZE := Vector2(64, 64)
-const HOTBAR_SELECTED_COLOR := Color(0.7, 0.85, 1.0, 1.0)   # light blue
-const HOTBAR_NORMAL_COLOR := Color(1.0, 1.0, 1.0, 1.0)
-const HOTBAR_TEXTURE_PATH := "res://assets/game/textures/ui/hud_item.png"
+const HOTBAR_BG_COLOR := Color(0.0, 0.0, 0.0, 64.0 / 255.0)        # alpha = 64
+const HOTBAR_SELECTED_BG_COLOR := Color(0.0, 0.0, 0.3, 64.0 / 255.0) # deep blue, alpha = 64
+const HOTBAR_BORDER_COLOR := Color(0.0, 0.0, 0.0, 1.0)               # pure black
+const HOTBAR_BORDER_WIDTH := 6
+const HOTBAR_CORNER_RADIUS := 8
 const HOTBAR_SLOT_COUNT := 9
 
 # ── StyleBox fill colours (reused from theme, overridden per bar) ──────────────
 var _sb_hp_healthy : StyleBoxFlat
-#var _sb_hp_injured : StyleBoxFlat
 var _sb_stamina    : StyleBoxFlat
 var _sb_energy     : StyleBoxFlat
 var _sb_thirst     : StyleBoxFlat
@@ -39,8 +40,7 @@ var _sb_thirst     : StyleBoxFlat
 # ── Tracked state ─────────────────────────────────────────────────────────────
 var _player : BiologicalActor = null
 var _grid : GridInventory = null
-var _hotbar_slots_ui : Array[TextureRect] = []
-var _hotbar_texture : Texture2D = null
+var _hotbar_slots_ui : Array[PanelContainer] = []
 var _hotbar_pressed : Array[bool] = []
 
 ## Emitted when the active hotbar slot changes via key input.
@@ -51,7 +51,6 @@ func _ready() -> void:
 	_build_style_boxes()
 	_apply_bar_styles()
 	_find_player()
-	_load_hotbar_texture()
 	_build_hotbar_slots()
 	_update_hotbar_selection()
 
@@ -72,11 +71,19 @@ func _on_inventory_changed() -> void:
 	_update_hotbar_selection()
 
 # ── Hotbar ─────────────────────────────────────────────────────────────────────
-func _load_hotbar_texture() -> void:
-	if ResourceLoader.exists(HOTBAR_TEXTURE_PATH):
-		_hotbar_texture = ResourceLoader.load(HOTBAR_TEXTURE_PATH, "Texture2D", ResourceLoader.CACHE_MODE_REUSE)
-	else:
-		push_warning("[PlayerHUD] Hotbar texture not found: %s" % HOTBAR_TEXTURE_PATH)
+static func _make_hotbar_stylebox(is_selected: bool) -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = HOTBAR_SELECTED_BG_COLOR if is_selected else HOTBAR_BG_COLOR
+	sb.border_width_left = HOTBAR_BORDER_WIDTH
+	sb.border_width_top = HOTBAR_BORDER_WIDTH
+	sb.border_width_right = HOTBAR_BORDER_WIDTH
+	sb.border_width_bottom = HOTBAR_BORDER_WIDTH
+	sb.border_color = HOTBAR_BORDER_COLOR
+	sb.corner_radius_top_left = HOTBAR_CORNER_RADIUS
+	sb.corner_radius_top_right = HOTBAR_CORNER_RADIUS
+	sb.corner_radius_bottom_right = HOTBAR_CORNER_RADIUS
+	sb.corner_radius_bottom_left = HOTBAR_CORNER_RADIUS
+	return sb
 
 func _build_hotbar_slots() -> void:
 	for child in hotbar_container.get_children():
@@ -84,11 +91,9 @@ func _build_hotbar_slots() -> void:
 	_hotbar_slots_ui.clear()
 	_hotbar_pressed.clear()
 	for i in range(HOTBAR_SLOT_COUNT):
-		var slot := TextureRect.new()
-		slot.texture = _hotbar_texture
+		var slot := PanelContainer.new()
 		slot.custom_minimum_size = HOTBAR_SLOT_SIZE
-		slot.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		slot.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		slot.add_theme_stylebox_override("panel", _make_hotbar_stylebox(false))
 		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		hotbar_container.add_child(slot)
 		_hotbar_slots_ui.append(slot)
@@ -102,10 +107,10 @@ func _update_hotbar_selection() -> void:
 		var slot := _hotbar_slots_ui[i]
 		if i == active_index:
 			slot.custom_minimum_size = HOTBAR_SLOT_SELECTED_SIZE
-			slot.modulate = HOTBAR_SELECTED_COLOR
+			slot.add_theme_stylebox_override("panel", _make_hotbar_stylebox(true))
 		else:
 			slot.custom_minimum_size = HOTBAR_SLOT_SIZE
-			slot.modulate = HOTBAR_NORMAL_COLOR
+			slot.add_theme_stylebox_override("panel", _make_hotbar_stylebox(false))
 
 func _poll_hotbar_input() -> void:
 	for i in range(HOTBAR_SLOT_COUNT):
@@ -149,8 +154,6 @@ func _refresh_bars() -> void:
 	if h != null:
 		hp_bar.max_value = h.max_hp
 		hp_bar.value = h.current_hp
-		#var fill := _sb_hp_healthy if (h.max_hp > 0.0 and (h.current_hp / h.max_hp) >= 0.5) else _sb_hp_injured
-		#hp_bar.add_theme_stylebox_override("fill", fill)
 		hp_label.text = "%d/%d" % [int(h.current_hp), int(h.max_hp)]
 
 	# Stamina

@@ -82,6 +82,8 @@
       "action_hotbar_7": "快捷栏 7",
       "action_hotbar_8": "快捷栏 8",
       "action_hotbar_9": "快捷栏 9",
+      "action_hotbar_next": "下一快捷栏格",
+      "action_hotbar_prev": "上一快捷栏格",
       "rebind": "重新绑定",
       "clear": "清除",
       "reset_defaults": "恢复默认",

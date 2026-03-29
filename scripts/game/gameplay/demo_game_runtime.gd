@@ -23,6 +23,7 @@ var _pause_pressed_last_frame: bool = false
 var _inventory_menu: InventoryMenu = null
 var _inventory_pressed_last_frame: bool = false
 var _player_hud: PlayerHUD = null
+var _player_equipment: EquipmentState = null
 
 const GUIDE_ACTION_PAUSE := &"pe_pause"
 const GUIDE_ACTION_INVENTORY := &"pe_inventory"
@@ -185,14 +186,24 @@ func _is_relaxed_state() -> bool:
 	return get_tree().paused
 
 func _setup_inventory_menu() -> void:
+	# Create default equipment state: backpack (6×6) + tactical vest (3×2)
+	_player_equipment = EquipmentState.new()
+	var backpack_grid := GridInventory.new(6, 6)
+	_player_equipment.equip("backpack", "default_backpack")
+	_player_equipment.set_container_grid("backpack", backpack_grid)
+	var vest_grid := GridInventory.new(3, 2)
+	_player_equipment.equip("tactical_vest", "default_tactical_vest")
+	_player_equipment.set_container_grid("tactical_vest", vest_grid)
+
+	# Use backpack as the primary inventory for hotbar binding
 	_inventory_menu = InventoryMenu.new()
 	_inventory_menu.name = "InventoryMenu"
 	add_child(_inventory_menu)
-	if _player != null and _player.inventory_ref != null and _player.inventory_ref.inventory != null:
-		_inventory_menu.bind_inventory(_player.inventory_ref.inventory)
-		# Set hotbar slot 0 to the equipped weapon
-		if _player.combat_state != null and not _player.combat_state.equipped_weapon_id.is_empty():
-			_player.inventory_ref.inventory.set_hotbar_slot(0, _player.combat_state.equipped_weapon_id)
+	_inventory_menu.bind_inventory(backpack_grid)
+	_inventory_menu.bind_equipment(_player_equipment)
+
+	if _player != null and _player.combat_state != null and not _player.combat_state.equipped_weapon_id.is_empty():
+		backpack_grid.set_hotbar_slot(0, _player.combat_state.equipped_weapon_id)
 	_inventory_menu.held_item_changed.connect(_on_held_item_changed)
 
 func _poll_inventory_input() -> void:
@@ -220,6 +231,9 @@ func _setup_player_hud() -> void:
 	if _player_hud == null:
 		return
 	add_child(_player_hud)
-	if _player != null and _player.inventory_ref != null and _player.inventory_ref.inventory != null:
-		_player_hud.bind_inventory(_player.inventory_ref.inventory)
+	# Bind to backpack grid (primary container)
+	if _player_equipment != null:
+		var bp_grid := _player_equipment.get_container_grid("backpack")
+		if bp_grid != null:
+			_player_hud.bind_inventory(bp_grid)
 	_player_hud.hotbar_selection_changed.connect(_on_held_item_changed)
