@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://player_hud_scene"]
+[gd_scene format=3 uid="uid://bevqhk2ql4tkv"]
 
-[ext_resource type="Script" path="res://scripts/game/ui/player_hud.gd" id="1_hud_script"]
-[ext_resource type="Theme" path="res://resources/themes/minimal_vector.tres" id="2_hud_theme"]
+[ext_resource type="Script" uid="uid://d3tsnjrjpb6eg" path="res://scripts/game/ui/player_hud.gd" id="1_hud_script"]
+[ext_resource type="Theme" uid="uid://b1ja4tvqptipj" path="res://resources/themes/minimal_vector.tres" id="2_hud_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
 bg_color = Color(0.039, 0.039, 0.039, 1)
@@ -11,130 +11,118 @@ border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.941, 0.941, 0.941, 1)
 
-; ── Root: CanvasLayer ─────────────────────────────────────────────────────────
-[node name="PlayerHUD" type="CanvasLayer"]
+[node name="PlayerHUD" type="CanvasLayer" unique_id=2129801643]
 layer = 10
 script = ExtResource("1_hud_script")
 
-; ── HUDRoot: anchored to the bottom-center of the screen ─────────────────────
-[node name="HUDRoot" type="VBoxContainer" parent="."]
-theme = ExtResource("2_hud_theme")
-layout_mode = 3
-anchors_preset = 7
-anchor_left = 0.0
+[node name="HUDRoot" type="VBoxContainer" parent="." unique_id=352499070]
+anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = -160.0
 grow_horizontal = 2
 grow_vertical = 0
+theme = ExtResource("2_hud_theme")
 alignment = 1
 
-; ── StatsPanel holds the two stat rows ───────────────────────────────────────
-[node name="StatsPanel" type="PanelContainer" parent="HUDRoot"]
+[node name="StatsPanel" type="PanelContainer" parent="HUDRoot" unique_id=180226073]
+custom_minimum_size = Vector2(600, 0)
 layout_mode = 2
 size_flags_horizontal = 4
-custom_minimum_size = Vector2(600, 0)
 
-[node name="StatsVBox" type="VBoxContainer" parent="HUDRoot/StatsPanel"]
+[node name="StatsVBox" type="VBoxContainer" parent="HUDRoot/StatsPanel" unique_id=499143157]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-; ── Row 1: Energy + Thirst ────────────────────────────────────────────────────
-[node name="Row1" type="HBoxContainer" parent="HUDRoot/StatsPanel/StatsVBox"]
+[node name="Row1" type="HBoxContainer" parent="HUDRoot/StatsPanel/StatsVBox" unique_id=2112280776]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="EnergyBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row1"]
+[node name="EnergyBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row1" unique_id=1227825951]
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 24)
-show_percentage = false
-value = 100.0
-max_value = 100.0
 theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+value = 100.0
+show_percentage = false
 
-[node name="EnergyLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row1/EnergyBar"]
+[node name="EnergyLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row1/EnergyBar" unique_id=343346399]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+text = "100/100"
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "100/100"
 
-[node name="ThirstBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row1"]
+[node name="ThirstBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row1" unique_id=668664573]
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 24)
-show_percentage = false
-value = 100.0
-max_value = 100.0
 theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+value = 100.0
+show_percentage = false
 
-[node name="ThirstLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row1/ThirstBar"]
+[node name="ThirstLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row1/ThirstBar" unique_id=1874446991]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+text = "100/100"
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "100/100"
 
-; ── Row 2: HP + Stamina ───────────────────────────────────────────────────────
-[node name="Row2" type="HBoxContainer" parent="HUDRoot/StatsPanel/StatsVBox"]
+[node name="Row2" type="HBoxContainer" parent="HUDRoot/StatsPanel/StatsVBox" unique_id=761005814]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="HPBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row2"]
+[node name="HPBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row2" unique_id=1097752553]
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 24)
-show_percentage = false
-value = 100.0
-max_value = 100.0
 theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+value = 100.0
+show_percentage = false
 
-[node name="HPLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row2/HPBar"]
+[node name="HPLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row2/HPBar" unique_id=186311383]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+text = "100/100"
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "100/100"
 
-[node name="StaminaBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row2"]
+[node name="StaminaBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row2" unique_id=1511854881]
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 24)
-show_percentage = false
-value = 100.0
-max_value = 100.0
 theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+value = 100.0
+show_percentage = false
 
-[node name="StaminaLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row2/StaminaBar"]
+[node name="StaminaLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row2/StaminaBar" unique_id=1152345940]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+text = "100/100"
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "100/100"
 
-; ── HotbarRow: 9 quick-item slots ─────────────────────────────────────────────
-[node name="HotbarRow" type="PanelContainer" parent="HUDRoot"]
+[node name="HotbarRow" type="PanelContainer" parent="HUDRoot" unique_id=4862395]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="Hotbar" type="HBoxContainer" parent="HUDRoot/HotbarRow"]
+[node name="Hotbar" type="HBoxContainer" parent="HUDRoot/HotbarRow" unique_id=856603493]
 layout_mode = 2
 theme_override_constants/separation = 4

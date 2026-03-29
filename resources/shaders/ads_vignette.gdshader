@@ -1,8 +1,8 @@
 shader_type canvas_item;
 
 uniform vec2 center_px = vec2(640.0, 360.0);
-uniform float radius_px = 32.0;
-uniform float darkness = 0.5;
+uniform float radius_px = 30.0;
+uniform float darkness = 0.75;
 uniform float softness_px = 4.0;
 
 void fragment() {
