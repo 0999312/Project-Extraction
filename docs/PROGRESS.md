@@ -1,5 +1,46 @@
 # Project Extraction — Progress
 
+## Update 15 — Equipment System + UI Overhaul (No Textures)
+
+### Changes
+
+- **Introduced Equipment System (`EquipmentState`)**:
+  - New component: `scripts/game/components/gameplay/equipment_state.gd`.
+  - Defines 14 equipment slots: primary/secondary/melee weapons, 6 usable hotbar slots, armor, headset, helmet, backpack, tactical vest.
+  - Container slots (backpack, vest) own their own `GridInventory` instances.
+  - Designed for extensibility — new slots can be added to `SLOT_KEYS` without breaking existing code/saves.
+  - `sync_weapons_to_hotbar()` pushes equipped weapons to hotbar slots 0-2.
+- **Rewrote hotbar UI to use StyleBoxFlat (no texture/material)**:
+  - Each hotbar slot is now a `PanelContainer` + `StyleBoxFlat` (was `TextureRect` + `hud_item.png`).
+  - Theme: 6 px pure-black border, 8 px corner radius, background alpha = 64.
+  - Selected slot: slightly enlarged (56→64 px) with deep-blue fill.
+- **Rewrote inventory grid cells to use StyleBoxFlat (no texture/material)**:
+  - `InventorySlot` changed from `TextureRect` to `PanelContainer` + `StyleBoxFlat`.
+  - Theme: 6 px pure-black border, 0 px corner radius (no rounding), background alpha = 64.
+- **Inventory menu now generates equipment-based grids**:
+  - Default player has backpack (6×6) and tactical vest (3×2).
+  - Equipment panel (left side) shows placeholder slots for all gear categories.
+  - Container grids (right side) are dynamically generated per equipped container.
+- **Item textures use fit-by-height scaling**:
+  - New `_fit_by_height_rect()` in `InventoryGridPanel` maintains aspect ratio, scales to cell height, centres horizontally.
+  - Item icons rendered above grid, not affected by inventory panel mask.
+- **Updated `DemoGameRuntime`**:
+  - Creates `EquipmentState` with default backpack + tactical vest at startup.
+  - Binds both inventory grid and equipment state to `InventoryMenu`.
+  - HUD binds to backpack grid for hotbar display.
+- **Updated i18n**:
+  - Added `action_hotbar_next` and `action_hotbar_prev` strings (EN + ZH).
+- **New documentation**:
+  - Added `EQUIPMENT_SYSTEM.md` / `EQUIPMENT_SYSTEM_ZH.md`.
+  - Updated `HUD_HOTBAR_DESIGN.md` / `HUD_HOTBAR_DESIGN_ZH.md` (v0.2).
+  - Updated `INVENTORY_SYSTEM.md` / `INVENTORY_SYSTEM_ZH.md` (v0.2).
+- **Key bindings verified**:
+  - `pe_inventory` (Tab) for opening inventory.
+  - `pe_hotbar_1` through `pe_hotbar_9` (keys 1-9) for hotbar selection.
+  - All via GUIDE input system, fully remappable.
+
+---
+
 ## Update 14 — Hit Particle VFX + Item/Inventory/Weapon Data Systems
 
 ### Changes

@@ -82,6 +82,8 @@
       "action_hotbar_7": "Hotbar Slot 7",
       "action_hotbar_8": "Hotbar Slot 8",
       "action_hotbar_9": "Hotbar Slot 9",
+      "action_hotbar_next": "Next Hotbar Slot",
+      "action_hotbar_prev": "Previous Hotbar Slot",
       "rebind": "Rebind",
       "clear": "Clear",
       "reset_defaults": "Reset Defaults",

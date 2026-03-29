@@ -1,10 +1,10 @@
 # Inventory System Design – Tetris-Style Drag & Drop Grid
 
-> Version 0.1 – 2026-03-29
+> Version 0.2 – 2026-03-29
 
 ## 1. Overview
 
-The inventory system is a **Tetris-style grid inventory** where items occupy rectangular cells defined by their `size_w × size_h`. Players can **drag and drop** items to place, move, or swap them. The system also includes a **hotbar** (quick-access slots) and a **held item** indicator.
+The inventory system is a **Tetris-style grid inventory** where items occupy rectangular cells defined by their `size_w × size_h`. Players can **drag and drop** items to place, move, or swap them. The system now generates **equipment-based grids** — each container equipment (backpack, tactical vest) owns its own grid. The system also includes a **hotbar** (quick-access slots) and a **held item** indicator.
 
 ## 2. Data Model
 
@@ -17,11 +17,22 @@ The inventory system is a **Tetris-style grid inventory** where items occupy rec
 | `cells` | `Array[String]` | `[]` (size = w×h, "" = empty) | Flat array; each cell stores the `item_id` of the stack that occupies it, or `""` if empty |
 | `placements` | `Array[Dictionary]` | `[]` | Each dict: `{ "item_id": String, "grid_x": int, "grid_y": int, "rotated": bool, "stack": ItemStack }` |
 
-### 2.2 ItemStack (Unchanged)
+### 2.2 Equipment-Based Grids
+
+The inventory menu generates **one grid per container equipment** from `EquipmentState`:
+
+| Equipment | Slot Key | Default Grid Size |
+|---|---|---|
+| Backpack | `backpack` | 6 × 6 (36 cells) |
+| Tactical Vest | `tactical_vest` | 3 × 2 (6 cells) |
+
+See [EQUIPMENT_SYSTEM.md](EQUIPMENT_SYSTEM.md) for full equipment slot details.
+
+### 2.3 ItemStack (Unchanged)
 
 Already defined: `item_id`, `count`, `durability`, `custom_data`.
 
-### 2.3 ItemDefinition (Updated in Task 1)
+### 2.4 ItemDefinition (Updated in Task 1)
 
 Added `icon_path` and MSF tag integration.
 
@@ -43,7 +54,7 @@ Added `icon_path` and MSF tag integration.
 | `hotbar_slots` | `Array[String]` | Size = 9; each entry is an `item_id` reference from a placement, or `""` |
 | `active_hotbar_index` | `int` | Currently selected slot (0–8), default 0 |
 
-The hotbar references items **already placed** in the grid. Setting a hotbar slot to an `item_id` that exists in `placements` links it. The active slot determines the **held item**.
+The hotbar references items **already placed** in the grid. Setting a hotbar slot to an `item_id` that exists in `placements` links it. The active slot determines the **held item**. Hotbar slots 0–2 are reserved for weapons (see Equipment System).
 
 ## 5. UI Architecture
 
@@ -51,30 +62,37 @@ The hotbar references items **already placed** in the grid. Setting a hotbar slo
 
 - Toggled with the **Tab** key (input action `pe_inventory`).
 - While open: pauses gameplay input, shows mouse cursor.
-- Contains the grid panel plus the hotbar strip.
+- Contains an **equipment panel** (left), **container grids** (right), and a **hotbar strip** (bottom).
 
-### 5.2 Grid Panel
+### 5.2 Equipment Panel
 
-- A `Control` node with size `width × height` cells.
-- Each cell is `64 × 64` px.
-- Background texture: `inventory_item.png` tiled per cell.
-- When a cell is occupied, a **light white-gray overlay** (`Color(1, 1, 1, 0.18)`) is drawn on top.
+- Displays placeholder slots for all equipment categories: Primary Weapon, Secondary Weapon, Melee Weapon, Helmet, Headset, Armor, Backpack, Vest.
+- Currently shows labels only (no drag-drop interaction yet — placeholder UI).
 
-### 5.3 Item Rendering
+### 5.3 Grid Panels
 
-- Each placed item renders its `icon_path` texture (if set) stretched across its bounding cells.
-- Items with no icon show their `display_name` as a centered label.
+- One `InventoryGridPanel` per equipped container, dynamically generated from `EquipmentState.get_all_container_grids()`.
+- Each cell is `64 × 64` px, rendered as a `PanelContainer` + `StyleBoxFlat`.
+- Cell style: **6 px pure-black border, 0 px corner radius**, background alpha = 64.
+- No texture/material assets.
 
-### 5.4 Drag & Drop
+### 5.4 Item Rendering
+
+- Each placed item renders its `icon_path` texture with **fit-by-height** scaling (maintain aspect ratio, scale to cell height, centre horizontally).
+- Item textures are drawn via `_draw()` above the grid and are **not clipped by the inventory panel mask**.
+- Items with no icon show their `display_name` as a centred label.
+
+### 5.5 Drag & Drop
 
 - **Pick up**: Click on an occupied cell → the placement is removed from the grid and attached to the cursor as a floating sprite.
 - **Drop**: Click on an empty area in the grid → attempt `can_place`; if valid, `place_item`; if not, return to original position.
 - **Swap**: If drop target overlaps exactly one other item, swap positions (if both fit).
 - **Right-click rotate**: While holding an item, right-click to toggle `rotated` (swap w/h).
 
-### 5.5 Hotbar Interaction
+### 5.6 Hotbar Interaction
 
 - The 9 hotbar slots are displayed at the bottom.
+- Hotbar slot style: **6 px pure-black border, 8 px corner radius**, background alpha = 64. Selected slot has deep-blue fill and is slightly enlarged.
 - Dragging an item onto a hotbar slot assigns it.
 - Clicking a hotbar slot number key (1–9) selects the active slot.
 - The active slot's item becomes the player's **held item** (`combat_state.equipped_weapon_id`).
@@ -84,13 +102,14 @@ The hotbar references items **already placed** in the grid. Setting a hotbar slo
 | Path | Type | Purpose |
 |------|------|---------|
 | `scripts/game/components/gameplay/grid_inventory.gd` | Data | Cell-based grid with placements |
-| `scripts/game/ui/inventory_menu.gd` | UI Script | CanvasLayer toggle + main layout |
+| `scripts/game/components/gameplay/equipment_state.gd` | Data | Equipment slots + container grids |
+| `scripts/game/ui/inventory_menu.gd` | UI Script | Equipment panel + container grids + hotbar |
 | `scripts/game/ui/inventory_grid_panel.gd` | UI Script | Grid rendering + drag & drop |
-| `scripts/game/ui/inventory_slot.gd` | UI Script | Single cell visual |
+| `scripts/game/ui/inventory_slot.gd` | UI Script | Single cell (StyleBoxFlat, no texture) |
 | `scenes/game_scene/inventory_menu.tscn` | Scene | Inventory menu scene |
 
 ## 7. Integration
 
-- `DemoGameRuntime._ready()` adds an `InventoryMenu` child.
-- `Player._setup_runtime_state()` populates initial items via `GridInventory.place_item()`.
-- `PlayerHUD` hotbar display updates from the player's `InventoryState.hotbar_slots`.
+- `DemoGameRuntime._ready()` creates an `EquipmentState` with default backpack (6×6) and tactical vest (3×2), adds an `InventoryMenu`, and binds both the inventory grid and equipment state.
+- `PlayerHUD` hotbar display updates from the backpack `GridInventory.hotbar_slots`.
+- The equipment system is fully extensible for future container types and mod support.

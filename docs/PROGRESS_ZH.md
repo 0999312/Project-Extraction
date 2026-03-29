@@ -1,5 +1,46 @@
 # Project Extraction — 开发进度
 
+## 更新 15 — 装备系统 + UI 全面重构（无贴图）
+
+### 变更内容
+
+- **新增装备系统（`EquipmentState`）**：
+  - 新组件：`scripts/game/components/gameplay/equipment_state.gd`。
+  - 定义 14 个装备槽位：主武器/副武器/近战武器、6 格可用物品快捷栏、护甲、耳机、头盔、背包、战术弹挂。
+  - 容器槽位（背包、弹挂）各自拥有独立的 `GridInventory` 实例。
+  - 设计注重拓展性 — 在 `SLOT_KEYS` 中追加条目即可新增槽位，不影响已有代码/存档。
+  - `sync_weapons_to_hotbar()` 将已装备武器推送至快捷栏第 0-2 格。
+- **重写快捷栏 UI 为 StyleBoxFlat（无贴图/材质）**：
+  - 每个快捷栏格子现为 `PanelContainer` + `StyleBoxFlat`（原为 `TextureRect` + `hud_item.png`）。
+  - 主题：6 px 纯黑边框，8 px 圆角，背景透明度 = 64。
+  - 选中格：略微放大（56→64 px），深蓝色填充。
+- **重写物品栏网格格子为 StyleBoxFlat（无贴图/材质）**：
+  - `InventorySlot` 从 `TextureRect` 改为 `PanelContainer` + `StyleBoxFlat`。
+  - 主题：6 px 纯黑边框，0 px 圆角（无圆角），背景透明度 = 64。
+- **物品栏菜单改为按装备生成不同的网格**：
+  - 默认玩家装备背包（6×6）和战术弹挂（3×2）。
+  - 装备面板（左侧）显示所有装备类别的占位槽。
+  - 容器网格（右侧）根据已装备容器动态生成。
+- **物品贴图使用按高度适宜比例缩放**：
+  - `InventoryGridPanel` 新增 `_fit_by_height_rect()` 方法，保持纵横比，缩放至格子高度，水平居中。
+  - 物品图标绘制在网格上方，不受物品栏面板蒙版影响。
+- **更新 `DemoGameRuntime`**：
+  - 启动时创建 `EquipmentState`，默认配备背包 + 战术弹挂。
+  - 同时将物品栏网格和装备状态绑定到 `InventoryMenu`。
+  - HUD 绑定背包网格用于快捷栏显示。
+- **更新国际化文本**：
+  - 新增 `action_hotbar_next` 和 `action_hotbar_prev` 文本（英文 + 中文）。
+- **新增文档**：
+  - 新增 `EQUIPMENT_SYSTEM.md` / `EQUIPMENT_SYSTEM_ZH.md`。
+  - 更新 `HUD_HOTBAR_DESIGN.md` / `HUD_HOTBAR_DESIGN_ZH.md`（v0.2）。
+  - 更新 `INVENTORY_SYSTEM.md` / `INVENTORY_SYSTEM_ZH.md`（v0.2）。
+- **按键绑定已确认**：
+  - `pe_inventory`（Tab）打开物品栏。
+  - `pe_hotbar_1` 到 `pe_hotbar_9`（按键 1-9）选择快捷栏。
+  - 全部通过 GUIDE 输入系统配置，支持完全重映射。
+
+---
+
 ## 更新 14 — 中弹粒子特效 + 物品/背包/武器数据系统
 
 ### 变更内容

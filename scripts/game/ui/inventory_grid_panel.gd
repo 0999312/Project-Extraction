@@ -9,7 +9,6 @@ const HOVER_INVALID_COLOR := Color(0.8, 0.2, 0.2, 0.25)
 const ITEM_BG_COLOR := Color(0.45, 0.55, 0.65, 0.5)
 
 var _grid: GridInventory = null
-var _slot_texture: Texture2D = null
 var _slots: Array[InventorySlot] = []
 
 # Drag state
@@ -24,9 +23,8 @@ signal item_dropped(item_id: String, grid_x: int, grid_y: int, rotated: bool)
 signal item_picked_up(placement: Dictionary)
 signal hotbar_assign_requested(item_id: String, slot_index: int)
 
-func setup(grid: GridInventory, slot_tex: Texture2D) -> void:
+func setup(grid: GridInventory, _slot_tex: Texture2D = null) -> void:
 	_grid = grid
-	_slot_texture = slot_tex
 	_rebuild_slots()
 	if _grid != null and not _grid.inventory_changed.is_connected(_on_inventory_changed):
 		_grid.inventory_changed.connect(_on_inventory_changed)
@@ -46,7 +44,6 @@ func _rebuild_slots() -> void:
 	for gy in range(_grid.height):
 		for gx in range(_grid.width):
 			var slot := InventorySlot.new(gx, gy)
-			slot.setup(_slot_texture)
 			slot.position = Vector2(gx * CELL_SIZE, gy * CELL_SIZE)
 			slot.size = Vector2(CELL_SIZE, CELL_SIZE)
 			add_child(slot)
@@ -161,6 +158,18 @@ func _draw() -> void:
 	if _dragging and not _drag_placement.is_empty():
 		_draw_drag_preview()
 
+## Compute a destination rect that fits the texture by height while maintaining
+## aspect ratio, centred horizontally inside the cell rect.
+static func _fit_by_height_rect(tex: Texture2D, cell_rect: Rect2) -> Rect2:
+	var tex_size := tex.get_size()
+	if tex_size.y <= 0:
+		return cell_rect
+	var scale_factor := cell_rect.size.y / tex_size.y
+	var draw_w := tex_size.x * scale_factor
+	var draw_h := cell_rect.size.y
+	var offset_x := (cell_rect.size.x - draw_w) * 0.5
+	return Rect2(cell_rect.position + Vector2(offset_x, 0), Vector2(draw_w, draw_h))
+
 func _draw_placement(p: Dictionary) -> void:
 	var item_id: String = p.get("item_id", "")
 	var gx: int = p.get("grid_x", 0)
@@ -173,7 +182,8 @@ func _draw_placement(p: Dictionary) -> void:
 	if def != null and not def.icon_path.is_empty() and ResourceLoader.exists(def.icon_path):
 		var tex := ResourceLoader.load(def.icon_path, "Texture2D", ResourceLoader.CACHE_MODE_REUSE)
 		if tex is Texture2D:
-			draw_texture_rect(tex, rect, false)
+			var icon_rect := _fit_by_height_rect(tex, rect)
+			draw_texture_rect(tex, icon_rect, false)
 			return
 	# Fallback: draw name label
 	if def != null:
@@ -193,9 +203,10 @@ func _draw_drag_preview() -> void:
 	var color := HOVER_VALID_COLOR if valid else HOVER_INVALID_COLOR
 	var rect := Rect2(Vector2(gx * CELL_SIZE, gy * CELL_SIZE), Vector2(sz.x * CELL_SIZE, sz.y * CELL_SIZE))
 	draw_rect(rect, color)
-	# Draw item icon on cursor
+	# Draw item icon on cursor (fit by height, not affected by mask)
 	var def := ItemCatalog.get_item_definition(item_id)
 	if def != null and not def.icon_path.is_empty() and ResourceLoader.exists(def.icon_path):
 		var tex := ResourceLoader.load(def.icon_path, "Texture2D", ResourceLoader.CACHE_MODE_REUSE)
 		if tex is Texture2D:
-			draw_texture_rect(tex, rect, false, Color(1, 1, 1, 0.7))
+			var icon_rect := _fit_by_height_rect(tex, rect)
+			draw_texture_rect(tex, icon_rect, false, Color(1, 1, 1, 0.7))
