@@ -17,7 +17,7 @@
 ## 3. 加载时机与生命周期
 
 - **何时创建注册表？** 首次调用 `WeaponCatalog.ensure_registry()` 时。
-- **何时注册条目？** 在 `WeaponCatalog.ensure_registry()` 内批量注册。
+- **何时注册条目？** 在 `WeaponCatalog.ensure_registry()` 内 – 从 `resources/registries/weapons/` 目录下的 `.tres` 资源文件加载。
 - **是否允许运行时扩展？** 是。
 - **是否跨场景持久存在？** 是（全局 `RegistryManager`）。
 
@@ -37,6 +37,7 @@
 | `recoil_per_shot` | `float` | 否 | `0.6` | 每发后坐累计 |
 | `recoil_recovery_per_sec` | `float` | 否 | `2.0` | 后坐恢复速度 |
 | `pellets_per_shot` | `int` | 否 | `1` | 每次射击弹丸数量 |
+| `icon_path` | `String` | 否 | `""` | 武器图标贴图路径 |
 
 ## 5. 运行时访问方式
 
@@ -45,12 +46,13 @@
 
 ## 6. 当前内置条目
 
-- `game:weapon/pistol`（对应物品 `game:item/weapon/pistol`，弹丸 `game:projectile/bullet`）
-- `game:weapon/creature_organ`（对应物品 `game:item/weapon/creature`，弹丸 `game:projectile/creature_bolt`）
+- `game:weapon/pistol` – 加载自 `resources/registries/weapons/pistol.tres`
+- `game:weapon/creature_organ` – 加载自 `resources/registries/weapons/creature_organ.tres`
 
 ## 7. 相关文件
 
 - `scripts/game/components/combat/weapon_definition.gd`
 - `scripts/game/registry/weapon_registry.gd`
 - `scripts/game/registry/weapon_catalog.gd`
+- `resources/registries/weapons/*.tres`
 

@@ -18,7 +18,7 @@
 
 - **条目命名空间：** `game`
 - **条目 ID 命名规范：** `game:buff/<buff名称>`（例如 `game:buff/bleed_light`）
-- **标签命名规范：** `BuffDefinition.tags` 内部使用纯字符串标签（如 `"bleed"`、`"debuff"`、`"fracture"`），不采用 ResourceLocation 格式。
+- **标签命名规范：** `BuffDefinition.tags` 内使用纯字符串标签（如 `"bleed"`、`"debuff"`）。注册时会自动添加到 MSF TagRegistry，路径为 `game:tag/buff/<标签名>`。运行时通过 `BuffCatalog.has_tag()` 查询。
 - **跨注册表引用：** 医疗物品效果（通过 `game:item_med` 标签规则）引用 Buff ID 来施加/移除 Buff。当前阶段无需其他注册表交叉引用。
 
 ---
@@ -26,7 +26,7 @@
 ## 3. 加载时机与生命周期
 
 - **何时创建注册表？** 首次调用 `BuffCatalog.ensure_registry()` 时，通常在游戏场景加载时或首次应用 Buff 时触发。
-- **何时注册条目？** 内置条目在 `BuffCatalog.ensure_registry()` 中注册；自定义条目可通过 `BuffRegistry.register(rl, definition)` 添加。
+- **何时注册条目？** 从 `resources/registries/buffs/` 目录下的 `.tres` 资源文件加载；自定义条目可通过 `BuffRegistry.register(rl, definition)` 添加。
 - **是否允许运行时扩展？** 是——模组或扩展内容可在游戏开始前注册额外的 `BuffDefinition` 条目。
 - **是否跨场景持久存在？** 是——存于全局 `RegistryManager` 自动加载节点。
 
@@ -90,8 +90,8 @@
 ## 7. 编写流程
 
 1. 遵循 `game:buff/<名称>` 规范确定 Buff ID。
-2. 创建 `BuffDefinition` 资源（可在编辑器内创建，也可通过 `BuffCatalog` 工厂方法生成）。
-3. 将条目注册至 `BuffCatalog._BUILT_IN_FACTORIES`（内置 Buff），或通过 `BuffRegistry.register(rl, def)` 动态注册。
+2. 在 `resources/registries/buffs/` 目录下创建 `BuffDefinition` `.tres` 资源文件。
+3. 条目会在 `BuffCatalog.ensure_registry()` 运行时自动注册。
 4. 在游戏逻辑代码中调用：`actor.get_node("BuffComponent").apply_buff(BuffCatalog.BLEED_LIGHT)` 施加 Buff。
 5. 通过同一 API 治疗并移除：`actor.get_node("BuffComponent").remove_buff(...)`。
 
@@ -107,11 +107,11 @@
 
 ## 9. 内置条目
 
-| ID | 显示名称 | 每秒伤害 | 移速倍率 | 瞄准晃动倍率 | 持续时间 | 备注 |
+| ID | 显示名称 | 每秒伤害 | 移速倍率 | 瞄准晃动倍率 | 持续时间 | 资源文件 |
 |---|---|---|---|---|---|---|
-| `game:buff/bleed_light` | 轻度流血 | 1.0 | 1.0 | 1.0 | 永久 | 使用绷带治疗 |
-| `game:buff/bleed_heavy` | 重度流血 | 5.0 | 1.0 | 1.0 | 永久 | 使用止血钳治疗 |
-| `game:buff/fracture` | 骨折 | 0.0 | 0.6 | 1.0 | 永久 | 使用夹板治疗 |
+| `game:buff/bleed_light` | 轻度流血 | 1.0 | 1.0 | 1.0 | 永久 | `resources/registries/buffs/bleed_light.tres` |
+| `game:buff/bleed_heavy` | 重度流血 | 5.0 | 1.0 | 1.0 | 永久 | `resources/registries/buffs/bleed_heavy.tres` |
+| `game:buff/fracture` | 骨折 | 0.0 | 0.6 | 1.0 | 永久 | `resources/registries/buffs/fracture.tres` |
 
 ---
 
@@ -137,7 +137,8 @@ static func _make_bleed_light() -> BuffDefinition:
 - `scripts/game/components/gameplay/buff_instance.gd` — 激活 Buff 的运行时实例。
 - `scripts/game/components/gameplay/buff_component.gd` — 管理角色上所有激活 Buff 的节点组件。
 - `scripts/game/registry/buff_registry.gd` — 注册表实现（继承 `RegistryBase`）。
-- `scripts/game/registry/buff_catalog.gd` — 包含内置定义和辅助方法的静态目录类。
+- `scripts/game/registry/buff_catalog.gd` — 从资源文件加载定义的静态目录类。
+- `resources/registries/buffs/*.tres` — Buff 定义资源文件。
 
 ---
 

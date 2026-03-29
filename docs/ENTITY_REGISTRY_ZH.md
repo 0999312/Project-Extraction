@@ -17,7 +17,7 @@
 ## 3. 加载时机与生命周期
 
 - **何时创建注册表？** 在游戏加载时，首次调用 `EntityCatalog.ensure_registry()` 时创建（通常由 `DemoGameRuntime` 触发）。
-- **何时注册条目？** 在 `EntityCatalog.ensure_registry()` 执行期间，将 `ENTITY_DEFINITIONS` 中的所有条目注册（如未存在）。
+- **何时注册条目？** 在 `EntityCatalog.ensure_registry()` 执行期间 – 从 `resources/registries/entities/entities.json` JSON 资源文件加载。
 - **是否允许运行时扩展？** 是 — 初始批次注册后，可通过 `EntityRegistry.register(...)` 注册额外条目。
 - **是否跨场景持久存在？** 是 — 注册表存储在全局 `RegistryManager` 自动加载节点中，跨场景切换不丢失。
 
@@ -45,9 +45,9 @@
 ## 7. 编写流程
 
 1. 在 `scenes/entities/` 下创建实体场景（`.tscn`）并附加对应 GDScript。
-2. 在 `EntityCatalog.ENTITY_DEFINITIONS` 中添加新的常量与定义条目。
+2. 在 `resources/registries/entities/entities.json` 中添加新条目。
 3. 条目会在 `EntityCatalog.ensure_registry()` 运行时自动注册。
-4. 通过 `EntityCatalog.instantiate_entity(EntityCatalog.NEW_ENTITY_ID)` 实例化。
+4. 通过 `EntityCatalog.instantiate_entity("game:entity/new_entity")` 实例化。
 
 ## 8. 存档 / 迁移说明
 
@@ -75,7 +75,8 @@
 ## 11. 源文件
 
 - `scripts/game/registry/entity_registry.gd` — 注册表实现（继承 `RegistryBase`）。
-- `scripts/game/registry/entity_catalog.gd` — 静态目录，包含定义常量和辅助方法。
+- `scripts/game/registry/entity_catalog.gd` — 静态目录，从 JSON 加载定义数据。
+- `resources/registries/entities/entities.json` — 实体定义数据文件。
 
 ## 12. 实施检查清单
 

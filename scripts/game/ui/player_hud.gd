@@ -16,15 +16,15 @@ var _sb_energy     : StyleBoxFlat
 var _sb_thirst     : StyleBoxFlat
 
 # ── Node references ────────────────────────────────────────────────────────────
-@onready var hp_bar      : ProgressBar = $HUDRoot/StatsPanel/Row2/HPBar
-@onready var stamina_bar : ProgressBar = $HUDRoot/StatsPanel/Row2/StaminaBar
-@onready var energy_bar  : ProgressBar = $HUDRoot/StatsPanel/Row1/EnergyBar
-@onready var thirst_bar  : ProgressBar = $HUDRoot/StatsPanel/Row1/ThirstBar
+@onready var hp_bar      : ProgressBar = $HUDRoot/StatsPanel/StatsVBox/Row2/HPBar
+@onready var stamina_bar : ProgressBar = $HUDRoot/StatsPanel/StatsVBox/Row2/StaminaBar
+@onready var energy_bar  : ProgressBar = $HUDRoot/StatsPanel/StatsVBox/Row1/EnergyBar
+@onready var thirst_bar  : ProgressBar = $HUDRoot/StatsPanel/StatsVBox/Row1/ThirstBar
 
-@onready var hp_label      : Label = $HUDRoot/StatsPanel/Row2/HPBar/HPLabel
-@onready var stamina_label : Label = $HUDRoot/StatsPanel/Row2/StaminaBar/StaminaLabel
-@onready var energy_label  : Label = $HUDRoot/StatsPanel/Row1/EnergyBar/EnergyLabel
-@onready var thirst_label  : Label = $HUDRoot/StatsPanel/Row1/ThirstBar/ThirstLabel
+@onready var hp_label      : Label = $HUDRoot/StatsPanel/StatsVBox/Row2/HPBar/HPLabel
+@onready var stamina_label : Label = $HUDRoot/StatsPanel/StatsVBox/Row2/StaminaBar/StaminaLabel
+@onready var energy_label  : Label = $HUDRoot/StatsPanel/StatsVBox/Row1/EnergyBar/EnergyLabel
+@onready var thirst_label  : Label = $HUDRoot/StatsPanel/StatsVBox/Row1/ThirstBar/ThirstLabel
 
 @onready var hotbar_container : HBoxContainer = $HUDRoot/HotbarRow/Hotbar
 

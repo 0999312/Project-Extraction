@@ -11,13 +11,13 @@
 
 - **Entry namespace(s):** `game`
 - **Entry ID naming convention:** `game:item/<category>/<name>` (e.g. `game:item/weapon/pistol`)
-- **Required tag naming convention:** optional string tags in entry payload (`weapon`, `med`, `ammo`, `caliber_9x19`)
+- **Tag naming convention:** Tags are managed via MSF TagRegistry under `game:tag/item/<tag_name>`. The `tags` field in `ItemDefinition` declares initial tags; at runtime use `ItemCatalog.has_tag()` and `ItemCatalog.get_items_with_tag()`.
 - **Cross-registry references:** Weapon registry entries reference item IDs (`WeaponDefinition.item_id`)
 
 ## 3. Load Timing and Lifecycle
 
 - **When is the registry created?** On first `ItemCatalog.ensure_registry()` call.
-- **When are entries registered?** During `ItemCatalog.ensure_registry()`.
+- **When are entries registered?** During `ItemCatalog.ensure_registry()` – loaded from `.tres` resource files in `resources/registries/items/`.
 - **Can entries be extended at runtime?** Yes.
 - **Should the registry persist across scenes?** Yes (global `RegistryManager`).
 
@@ -32,7 +32,8 @@
 | `size_h` | `int` | No | `1` | Grid height |
 | `weight` | `float` | No | `0.0` | Unit weight |
 | `max_stack` | `int` | No | `1` | Max stack count |
-| `tags` | `Array[String]` | No | `[]` | Category/behavior tags |
+| `icon_path` | `String` | No | `""` | Path to the item icon texture |
+| `tags` | `Array[String]` | No | `[]` | Initial tag names (registered into MSF TagRegistry) |
 
 ## 5. Validation Rules
 
@@ -43,20 +44,22 @@
 ## 6. Runtime Access Pattern
 
 - **Lookup API:** `ItemCatalog.get_item_definition(item_id)`
+- **Tag queries:** `ItemCatalog.has_tag(item_id, tag_name)`, `ItemCatalog.get_items_with_tag(tag_name)`
 - **Typical caller(s):** `InventoryState`, `GridInventory`, weapon mapping
 - **Caching strategy:** registry lookup via `RegistryManager`
 - **Failure behavior:** `null` return + error log on invalid registry state
 
 ## 7. Current Built-in Entries
 
-- `game:item/weapon/pistol`
-- `game:item/weapon/creature`
-- `game:item/med/bandage`
-- `game:item/ammo/9x19`
+- `game:item/weapon/pistol` – loaded from `resources/registries/items/pistol.tres`
+- `game:item/weapon/creature` – loaded from `resources/registries/items/creature_weapon.tres`
+- `game:item/med/bandage` – loaded from `resources/registries/items/bandage.tres`
+- `game:item/ammo/9x19` – loaded from `resources/registries/items/ammo_9x19.tres`
 
 ## 8. Source Files
 
 - `scripts/game/components/gameplay/item_definition.gd`
 - `scripts/game/registry/item_registry.gd`
 - `scripts/game/registry/item_catalog.gd`
+- `resources/registries/items/*.tres`
 

@@ -18,7 +18,7 @@
 
 - **Entry namespace(s):** `game`
 - **Entry ID naming convention:** `game:buff/<buff_name>` (e.g. `game:buff/bleed_light`)
-- **Required tag naming convention:** Tags inside `BuffDefinition.tags` are plain strings (e.g. `"bleed"`, `"debuff"`, `"fracture"`). Not ResourceLocation-formatted.
+- **Required tag naming convention:** Tags in `BuffDefinition.tags` are plain strings (e.g. `"bleed"`, `"debuff"`). At registration, they are added to MSF TagRegistry under `game:tag/buff/<tag_name>`. Query at runtime via `BuffCatalog.has_tag()`.
 - **Cross-registry references:** Medical item effects (via `game:item_med` tag rules) reference buff IDs to apply/remove buffs. No other registry cross-references required at this stage.
 
 ---
@@ -26,7 +26,7 @@
 ## 3. Load Timing and Lifecycle
 
 - **When is the registry created?** On first call to `BuffCatalog.ensure_registry()`, typically when the gameplay scene loads or a buff is first applied.
-- **When are entries registered?** Built-in entries are registered in `BuffCatalog.ensure_registry()`. Custom entries can be added via `BuffRegistry.register(rl, definition)`.
+- **When are entries registered?** Built-in entries are loaded from `.tres` resource files in `resources/registries/buffs/`. Custom entries can be added via `BuffRegistry.register(rl, definition)`.
 - **Can entries be extended at runtime?** Yes — mods or expansion content may register additional `BuffDefinition` entries before gameplay starts.
 - **Should the registry persist across scenes?** Yes — lives in the global `RegistryManager` autoload.
 
@@ -90,8 +90,8 @@
 ## 7. Authoring Workflow
 
 1. Decide on a buff ID following `game:buff/<name>` convention.
-2. Create a `BuffDefinition` resource (in-editor or via `BuffCatalog` factory methods).
-3. Register the entry in `BuffCatalog._BUILT_IN_FACTORIES` (for built-ins) or call `BuffRegistry.register(rl, def)` for dynamic entries.
+2. Create a `BuffDefinition` `.tres` resource file in `resources/registries/buffs/`.
+3. The entry is auto-registered when `BuffCatalog.ensure_registry()` runs.
 4. Apply from gameplay code via `actor.get_node("BuffComponent").apply_buff(BuffCatalog.BLEED_LIGHT)`.
 5. Treat and remove via the same API: `actor.get_node("BuffComponent").remove_buff(...)`.
 
@@ -107,11 +107,11 @@
 
 ## 9. Built-in Entries
 
-| ID | Display Name | DPS | move_speed_mult | aim_sway_mult | Duration | Notes |
+| ID | Display Name | DPS | move_speed_mult | aim_sway_mult | Duration | Resource File |
 |---|---|---|---|---|---|---|
-| `game:buff/bleed_light` | Light Bleed | 1.0 | 1.0 | 1.0 | Permanent | Cured by bandage |
-| `game:buff/bleed_heavy` | Heavy Bleed | 5.0 | 1.0 | 1.0 | Permanent | Cured by hemostat |
-| `game:buff/fracture` | Fracture | 0.0 | 0.6 | 1.0 | Permanent | Cured by splint |
+| `game:buff/bleed_light` | Light Bleed | 1.0 | 1.0 | 1.0 | Permanent | `resources/registries/buffs/bleed_light.tres` |
+| `game:buff/bleed_heavy` | Heavy Bleed | 5.0 | 1.0 | 1.0 | Permanent | `resources/registries/buffs/bleed_heavy.tres` |
+| `game:buff/fracture` | Fracture | 0.0 | 0.6 | 1.0 | Permanent | `resources/registries/buffs/fracture.tres` |
 
 ---
 
@@ -137,7 +137,8 @@ static func _make_bleed_light() -> BuffDefinition:
 - `scripts/game/components/gameplay/buff_instance.gd` — Runtime instance of an active buff.
 - `scripts/game/components/gameplay/buff_component.gd` — Node component managing active buffs on an actor.
 - `scripts/game/registry/buff_registry.gd` — Registry implementation (`extends RegistryBase`).
-- `scripts/game/registry/buff_catalog.gd` — Static catalog with built-in definitions and helper methods.
+- `scripts/game/registry/buff_catalog.gd` — Static catalog that loads definitions from resource files.
+- `resources/registries/buffs/*.tres` — Buff definition resource files.
 
 ---
 

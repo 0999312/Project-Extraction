@@ -17,7 +17,7 @@
 ## 3. Load Timing and Lifecycle
 
 - **When is the registry created?** At gameplay load time, when `EntityCatalog.ensure_registry()` is first called (typically from `DemoGameRuntime`).
-- **When are entries registered?** During `EntityCatalog.ensure_registry()`, all entries in `ENTITY_DEFINITIONS` are registered if not already present.
+- **When are entries registered?** During `EntityCatalog.ensure_registry()` – loaded from JSON resource file at `resources/registries/entities/entities.json`.
 - **Can entries be extended at runtime?** Yes — additional entries may be registered via `EntityRegistry.register(...)` after the initial batch.
 - **Should the registry persist across scenes?** Yes — the registry lives in the global `RegistryManager` autoload and survives scene transitions.
 
@@ -45,9 +45,9 @@
 ## 7. Authoring Workflow
 
 1. Create the entity scene (`.tscn`) under `scenes/entities/` and attach the corresponding GDScript.
-2. Add a new constant and definition entry in `EntityCatalog.ENTITY_DEFINITIONS`.
+2. Add a new entry in `resources/registries/entities/entities.json`.
 3. The entry is auto-registered when `EntityCatalog.ensure_registry()` runs.
-4. Instantiate via `EntityCatalog.instantiate_entity(EntityCatalog.NEW_ENTITY_ID)`.
+4. Instantiate via `EntityCatalog.instantiate_entity("game:entity/new_entity")`.
 
 ## 8. Save / Migration Notes
 
@@ -75,7 +75,8 @@
 ## 11. Source Files
 
 - `scripts/game/registry/entity_registry.gd` — Registry implementation (extends `RegistryBase`).
-- `scripts/game/registry/entity_catalog.gd` — Static catalog with definition constants and helper methods.
+- `scripts/game/registry/entity_catalog.gd` — Static catalog with helper methods; loads definitions from JSON.
+- `resources/registries/entities/entities.json` — Entity definition data file.
 
 ## 12. Implementation Checklist
 
