@@ -4,6 +4,7 @@ extends RefCounted
 const REGISTRY_TYPE := "item"
 const TAG_REGISTRY_TYPE := "item_tags"
 const ITEMS_RESOURCE_DIR := "res://resources/registries/items"
+const ITEM_TAGS_DIR := "res://resources/registries/tags/items"
 
 const ITEM_WEAPON_PISTOL := "game:item/weapon/pistol"
 const ITEM_WEAPON_CREATURE := "game:item/weapon/creature"
@@ -20,6 +21,7 @@ static func ensure_registry() -> void:
 		push_error("[ItemCatalog] Unable to resolve item registry.")
 		return
 	_load_items_from_resources(registry)
+	_load_tags_from_json()
 
 static func _load_items_from_resources(registry: ItemRegistry) -> void:
 	var dir := DirAccess.open(ITEMS_RESOURCE_DIR)
@@ -37,23 +39,54 @@ static func _load_items_from_resources(registry: ItemRegistry) -> void:
 				var rl := ResourceLocation.from_string(item_def.id)
 				if rl != null and not registry.has_entry(rl):
 					registry.register(rl, item_def)
-					_register_tags_for_item(item_def)
 		file_name = dir.get_next()
 	dir.list_dir_end()
 
-static func _register_tags_for_item(item_def: ItemDefinition) -> void:
+static func _load_tags_from_json() -> void:
 	var tag_registry := _get_tag_registry()
 	if tag_registry == null:
 		return
-	var item_rl := ResourceLocation.from_string(item_def.id)
-	if item_rl == null:
-		return
 	var registry_type_rl := ResourceLocation.new("core", REGISTRY_TYPE)
-	for tag_name in item_def.tags:
-		var tag_rl := ResourceLocation.new("game", "tag/item/%s" % tag_name)
-		if not tag_registry.has_entry(tag_rl):
-			tag_registry.register_tag(tag_rl, registry_type_rl)
-		tag_registry.add_to_tag(tag_rl, item_rl)
+	var dir := DirAccess.open(ITEM_TAGS_DIR)
+	if dir == null:
+		push_warning("[ItemCatalog] Item tags directory not found: %s" % ITEM_TAGS_DIR)
+		return
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while not file_name.is_empty():
+		if not dir.current_is_dir() and file_name.ends_with(".json"):
+			var tag_name := file_name.get_basename()
+			var tag_rl := ResourceLocation.new("game", "tag/item/%s" % tag_name)
+			var path := "%s/%s" % [ITEM_TAGS_DIR, file_name]
+			_load_single_tag(tag_registry, registry_type_rl, tag_rl, path)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+
+static func _load_single_tag(tag_registry: TagRegistry, registry_type_rl: ResourceLocation, tag_rl: ResourceLocation, path: String) -> void:
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		push_warning("[ItemCatalog] Failed to open tag file: %s" % path)
+		return
+	var json := JSON.new()
+	var err := json.parse(file.get_as_text())
+	file.close()
+	if err != OK:
+		push_error("[ItemCatalog] JSON parse error in %s: %s" % [path, json.get_error_message()])
+		return
+	var data: Variant = json.data
+	if not (data is Dictionary):
+		push_error("[ItemCatalog] Tag file root must be a Dictionary: %s" % path)
+		return
+	var values: Variant = (data as Dictionary).get("values", [])
+	if not (values is Array):
+		push_error("[ItemCatalog] Tag 'values' must be an Array: %s" % path)
+		return
+	if not tag_registry.has_entry(tag_rl):
+		tag_registry.register_tag(tag_rl, registry_type_rl)
+	for entry in (values as Array):
+		var entry_rl := ResourceLocation.from_string(str(entry))
+		if entry_rl != null:
+			tag_registry.add_to_tag(tag_rl, entry_rl)
 
 static func get_item_definition(item_id: String) -> ItemDefinition:
 	ensure_registry()

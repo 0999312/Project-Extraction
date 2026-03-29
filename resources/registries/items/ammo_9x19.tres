@@ -12,4 +12,3 @@ size_h = 1
 weight = 0.015
 max_stack = 60
 icon_path = ""
-tags = Array[String](["ammo", "caliber_9x19"])

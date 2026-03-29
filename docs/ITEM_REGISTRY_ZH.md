@@ -11,7 +11,7 @@
 
 - **条目命名空间：** `game`
 - **条目 ID 命名规范：** `game:item/<类别>/<名称>`（例如 `game:item/weapon/pistol`）
-- **标签命名规范：** 标签通过 MSF TagRegistry 管理，路径为 `game:tag/item/<标签名>`。`ItemDefinition` 中的 `tags` 字段声明初始标签；运行时使用 `ItemCatalog.has_tag()` 和 `ItemCatalog.get_items_with_tag()` 查询。
+- **标签命名规范：** 标签通过 MSF TagRegistry 管理，路径为 `game:tag/item/<标签名>`。标签定义在 `resources/registries/tags/items/` 下的独立 JSON 文件中，在物品注册完成后加载。运行时使用 `ItemCatalog.has_tag()` 和 `ItemCatalog.get_items_with_tag()` 查询。
 - **跨注册表引用：** 武器注册表通过 `WeaponDefinition.item_id` 引用物品 ID
 
 ## 3. 加载时机与生命周期
@@ -33,7 +33,6 @@
 | `weight` | `float` | 否 | `0.0` | 单位重量 |
 | `max_stack` | `int` | 否 | `1` | 最大堆叠数量 |
 | `icon_path` | `String` | 否 | `""` | 物品图标贴图路径 |
-| `tags` | `Array[String]` | 否 | `[]` | 初始标签名称（注册到 MSF TagRegistry） |
 
 ## 5. 校验规则
 
@@ -62,4 +61,5 @@
 - `scripts/game/registry/item_registry.gd`
 - `scripts/game/registry/item_catalog.gd`
 - `resources/registries/items/*.tres`
+- `resources/registries/tags/items/*.json` – 标签定义文件（每个 JSON 将标签映射到物品条目）
 

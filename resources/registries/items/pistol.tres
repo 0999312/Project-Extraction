@@ -12,4 +12,3 @@ size_h = 1
 weight = 1.2
 max_stack = 1
 icon_path = "res://assets/game/textures/items/pistol.png"
-tags = Array[String](["weapon", "pistol"])
