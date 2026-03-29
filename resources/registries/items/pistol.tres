@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemDefinition" format=3 uid="uid://dah11wnrna1ay"]
 
-[ext_resource type="Script" path="res://scripts/game/components/gameplay/item_definition.gd" id="1"]
+[ext_resource type="Script" uid="uid://drnogd4oymibs" path="res://scripts/game/components/gameplay/item_definition.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
@@ -8,7 +8,5 @@ id = "game:item/weapon/pistol"
 display_name = "Pistol"
 category = "weapon"
 size_w = 2
-size_h = 1
 weight = 1.2
-max_stack = 1
-icon_path = "res://assets/game/textures/items/pistol.png"
+icon_path = "uid://c7qnals2vslnu"

@@ -44,7 +44,7 @@ static func get_weapon_definition(weapon_id: String) -> WeaponDefinition:
 	var registry := _get_registry()
 	if registry == null:
 		return null
-	var entry := registry.get_entry(rl)
+	var entry : WeaponDefinition = registry.get_entry(rl)
 	return entry if entry is WeaponDefinition else null
 
 static func get_weapon_for_item(item_id: String) -> WeaponDefinition:
@@ -53,7 +53,7 @@ static func get_weapon_for_item(item_id: String) -> WeaponDefinition:
 	if registry == null:
 		return null
 	for key in registry.get_all_keys():
-		var entry := registry.get_entry(ResourceLocation.from_string(key))
+		var entry : WeaponDefinition = registry.get_entry(ResourceLocation.from_string(key))
 		if entry is WeaponDefinition and (entry as WeaponDefinition).item_id == item_id:
 			return entry
 	return null
@@ -81,4 +81,3 @@ static func _get_registry() -> WeaponRegistry:
 		return null
 	var registry := RegistryManager.get_registry(REGISTRY_TYPE)
 	return registry if registry is WeaponRegistry else null
-

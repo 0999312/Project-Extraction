@@ -96,7 +96,7 @@ static func get_item_definition(item_id: String) -> ItemDefinition:
 	var registry := _get_registry()
 	if registry == null:
 		return null
-	var entry := registry.get_entry(rl)
+	var entry : ItemDefinition = registry.get_entry(rl)
 	return entry if entry is ItemDefinition else null
 
 static func has_tag(item_id: String, tag_name: String) -> bool:
