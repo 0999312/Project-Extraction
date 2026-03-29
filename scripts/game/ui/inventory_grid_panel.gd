@@ -9,7 +9,6 @@ const HOVER_INVALID_COLOR := Color(0.8, 0.2, 0.2, 0.25)
 const ITEM_BG_COLOR := Color(0.45, 0.55, 0.65, 0.5)
 
 var _grid: GridInventory = null
-var _slot_texture: Texture2D = null
 var _slots: Array[InventorySlot] = []
 
 # Drag state
@@ -24,9 +23,8 @@ signal item_dropped(item_id: String, grid_x: int, grid_y: int, rotated: bool)
 signal item_picked_up(placement: Dictionary)
 signal hotbar_assign_requested(item_id: String, slot_index: int)
 
-func setup(grid: GridInventory, slot_tex: Texture2D) -> void:
+func setup(grid: GridInventory, _slot_tex: Texture2D = null) -> void:
 	_grid = grid
-	_slot_texture = slot_tex
 	_rebuild_slots()
 	if _grid != null and not _grid.inventory_changed.is_connected(_on_inventory_changed):
 		_grid.inventory_changed.connect(_on_inventory_changed)
@@ -46,7 +44,6 @@ func _rebuild_slots() -> void:
 	for gy in range(_grid.height):
 		for gx in range(_grid.width):
 			var slot := InventorySlot.new(gx, gy)
-			slot.setup(_slot_texture)
 			slot.position = Vector2(gx * CELL_SIZE, gy * CELL_SIZE)
 			slot.size = Vector2(CELL_SIZE, CELL_SIZE)
 			add_child(slot)

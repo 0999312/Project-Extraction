@@ -32,9 +32,6 @@ func _init(gx: int = 0, gy: int = 0) -> void:
 	sb.corner_radius_bottom_left = CORNER_RADIUS
 	add_theme_stylebox_override("panel", sb)
 
-func setup(_slot_texture: Texture2D) -> void:
-	pass
-
 func set_occupied(occupied: bool) -> void:
 	is_occupied = occupied
 	queue_redraw()
