@@ -61,14 +61,15 @@
 
 ## 4) 关键系统 (类《逃离塔科夫》功能清单)
 
-### 4.1 玩家状态 (轻量化伤害)
+### 4.1 玩家状态 (轻量化生存)
 聚焦于可读且与玩法相关的状态：
 - `HP` (生命值，单一池)
-- `Stamina` (耐力)
+- `Stamina` (耐力，冲刺/近战消耗池)
+- `Energy` (能量值，热量能量；随时间消耗，低能量惩罚耐力回复速度)
+- `Thirst` (口渴值，水分；随时间消耗，脱水惩罚能量回复速度和移动速度)
 - `Encumbrance` (负重，影响速度、耐力回复、噪音)
-- `BleedLight` / `BleedHeavy` (轻度/重度流血)
-- `Pain` (疼痛，影响瞄准晃动/互动速度)
-- 可选后期加入：`Fracture` (骨折，移动惩罚)
+
+流血（`BleedLight` / `BleedHeavy`）和骨折（`Fracture`）现在通过 **Buff 实例**进行建模，由挂载在角色上的 `BuffComponent` 管理（详见第 4.7 节和 Buff 注册表设计文档）。这使核心状态结构保持极简，同时保留相同的游戏效果。
 
 **治疗物品:** 注册为**一个主要类别** `game:item_med`。  
 效果由标签驱动：`game:tag/med_bandage`、`game:tag/med_painkiller`等。
@@ -106,6 +107,13 @@
 - 对话：分支选项，任务门槛
 - **无商人实体**：交易者是安全屋中的**固定交互点** (以及可选在Raid内的售货亭)。
 - 交易：购买/出售/以物易物，受声望/科技门槛限制
+
+### 4.7 Buff 系统
+对角色施加的临时或持久修改器由 `BuffComponent` 节点统一管理。
+- 每个激活的 Buff 是一个 `BuffInstance`，引用 `core:buff` 注册表中的 `BuffDefinition`。
+- Buff 可施加属性倍率（移动速度、瞄准晃动、交互速度）、周期伤害（流血）或周期治疗。
+- 示例：`game:buff/bleed_light`、`game:buff/bleed_heavy`、`game:buff/fracture`。
+- 完整设计详见 **BUFF_REGISTRY.md** / **BUFF_REGISTRY_ZH.md**。
 
 ---
 
@@ -196,7 +204,7 @@
 **实现：**
 - Godot 节点：`CharacterBody2D`（移动、碰撞、动画、交互起点）。
 - 运行时状态：由玩家脚本持有 `PlayerState` 数据对象或 Resource：
-  - 生命 / 耐力 / 流血 / 疼痛
+  - 生命 / 耐力 / 能量 / 口渴
   - 背包引用
   - 武器状态
   - 任务状态引用

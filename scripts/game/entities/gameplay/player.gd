@@ -43,6 +43,8 @@ func _setup_runtime_state() -> void:
 	body_color = Color("ffff66")
 	health = HealthState.new(100.0)
 	stamina_state = StaminaState.new(100.0, 10.0)
+	energy_state = EnergyState.new(100.0, 2.0)
+	thirst_state = ThirstState.new(100.0, 1.0)
 	status_effects = StatusEffectsState.new()
 	position_state = PositionState.new(global_position)
 	velocity_state = VelocityState.new(BASE_SPEED)
@@ -109,8 +111,8 @@ func _get_current_speed() -> float:
 	if inventory_ref != null and inventory_ref.max_weight > 0.0:
 		var enc_ratio := inventory_ref.current_weight / inventory_ref.max_weight
 		mult *= clampf(1.0 - enc_ratio * 0.5, 0.3, 1.0)
-	if status_effects != null and status_effects.fracture:
-		mult *= status_effects.fracture_move_speed_mult
+	if status_effects != null:
+		mult *= status_effects.move_speed_mult
 	return selected_speed * mult
 
 func _poll_guide_input() -> void:

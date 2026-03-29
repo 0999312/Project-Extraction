@@ -61,14 +61,15 @@ All IDs in design and implementation use **Minecraft-Style-Framework `ResourceLo
 
 ## 4) Key Systems (Tarkov-like Feature Checklist)
 
-### 4.1 Player State (Lightweight Injury)
+### 4.1 Player State (Lightweight Survival)
 Focus on readable, gameplay-relevant states:
-- `HP` (single pool)
-- `Stamina`
-- `Encumbrance` (weight affects speed, stamina regen, noise)
-- `BleedLight` / `BleedHeavy`
-- `Pain` (aim sway penalty / interaction speed penalty)
-- Optional later: `Fracture` (movement penalty)
+- `HP` (single health pool)
+- `Stamina` (sprint / melee cost pool)
+- `Energy` (caloric energy; drains over time, low energy penalises stamina regen)
+- `Thirst` (hydration; drains over time, dehydration penalises energy regen and movement)
+- `Encumbrance` (weight; affects speed, stamina regen, noise)
+
+Bleed (`BleedLight` / `BleedHeavy`) and `Fracture` are now modelled as **Buff instances** managed by a `BuffComponent` (see Section 4.7 and the Buff Registry design document). This keeps the core state struct minimal while retaining the same gameplay effects.
 
 **Healing items:** registered as **one major category** `game:item_med`.  
 Effects are tag-driven: `game:tag/med_bandage`, `game:tag/med_painkiller`, etc.
@@ -106,6 +107,13 @@ Effects are tag-driven: `game:tag/med_bandage`, `game:tag/med_painkiller`, etc.
 - Dialogue: branching options, quest gates
 - **No merchant entities**: traders are **fixed interaction points** in safehouse (and optionally in-raid kiosks).
 - Trading: buy/sell/barter, reputation/tech gates
+
+### 4.7 Buff System
+Temporary or persistent modifiers applied to actors are managed via a `BuffComponent` node.
+- Each active buff is a `BuffInstance` referencing a `BuffDefinition` from `core:buff` registry.
+- Buffs apply stat multipliers (move speed, aim sway, interaction speed), periodic damage (bleed), or periodic healing.
+- Examples: `game:buff/bleed_light`, `game:buff/bleed_heavy`, `game:buff/fracture`.
+- See **BUFF_REGISTRY.md** / **BUFF_REGISTRY_ZH.md** for the full design.
 
 ---
 
@@ -196,7 +204,7 @@ We explicitly separate gameplay content by how it should be implemented for perf
 **Implementation:**
 - Godot Node: `CharacterBody2D` (movement, collision, animation, interaction origin).
 - Runtime state: a `PlayerState` data object or Resource stored on the player script:
-  - health / stamina / bleed / pain
+  - health / stamina / energy / thirst
   - inventory reference
   - weapon state
   - quest state reference
