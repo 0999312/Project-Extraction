@@ -1,6 +1,6 @@
 # HUD & Hotbar System Design
 
-> Version 0.1 – 2026-03-29
+> Version 0.2 – 2026-03-29
 
 ## 1. Overview
 
@@ -11,20 +11,22 @@ The HUD (Heads-Up Display) system provides real-time gameplay information includ
 The `PlayerHUD` scene (`scenes/game_scene/player_hud.tscn`) is loaded at runtime by `DemoGameRuntime._setup_player_hud()`. The HUD is a `CanvasLayer` (layer 10) that renders above the game world.
 
 - **Loading**: `load("res://scenes/game_scene/player_hud.tscn")` → `instantiate()` → `add_child()`
-- **Inventory binding**: `PlayerHUD.bind_inventory(grid)` connects the HUD to the player's `GridInventory`
+- **Inventory binding**: `PlayerHUD.bind_inventory(grid)` connects the HUD to the player's `GridInventory` (backpack grid by default)
 - **Default selection**: Hotbar slot 0 is selected by default (`active_hotbar_index = 0`)
 
 ## 3. Hotbar Design
 
-### 3.1 Visual Design
+### 3.1 Visual Design (StyleBoxFlat — No Textures)
 
 | Property | Normal Slot | Selected Slot |
 |----------|------------|---------------|
 | Size | 56 × 56 px | 64 × 64 px |
-| Base texture | `hud_item.png` | `hud_item.png` |
-| Modulate color | White (1.0, 1.0, 1.0) | Light blue (0.7, 0.85, 1.0) |
+| Rendering | `PanelContainer` + `StyleBoxFlat` | `PanelContainer` + `StyleBoxFlat` |
+| Background | Black, alpha = 64 | Deep blue (0, 0, 0.3), alpha = 64 |
+| Border | 6 px, pure black | 6 px, pure black |
+| Corner radius | 8 px | 8 px |
 
-Each slot is a `TextureRect` node using `res://assets/game/textures/ui/hud_item.png` as its base texture. The selected slot is visually distinguished by a larger size and a light blue tint.
+Each slot is a `PanelContainer` with a `StyleBoxFlat` theme override. **No texture/material assets** are used. The selected slot is visually distinguished by a larger size and a deep-blue fill colour.
 
 ### 3.2 Key Bindings
 
@@ -48,7 +50,7 @@ Hotbar input is polled in `PlayerHUD._poll_hotbar_input()` each frame via `Guide
 
 When a hotbar key is pressed:
 1. `GridInventory.set_active_hotbar(index)` updates the data model
-2. `_update_hotbar_selection()` refreshes the visual state
+2. `_update_hotbar_selection()` refreshes the visual state (swaps StyleBoxFlat)
 3. `hotbar_selection_changed` signal is emitted with the active item ID
 4. `DemoGameRuntime._on_held_item_changed()` updates the player's equipped weapon
 
@@ -58,7 +60,7 @@ When a hotbar key is pressed:
 |-------------|-------------|--------------------|--------------------|
 | `pe_inventory` | `Tab` | Inventory | 物品栏 |
 
-The inventory menu is toggled via the GUIDE action `pe_inventory` (replacing the previous direct `Input.is_key_pressed(KEY_TAB)` approach). This enables key remapping support.
+The inventory menu is toggled via the GUIDE action `pe_inventory`. This enables key remapping support.
 
 ## 5. Hit Particle Enhancement
 
@@ -81,11 +83,11 @@ The hit particle effect (`scenes/vfx/hit_particle_effect.tscn`) was enhanced for
 
 | Path | Type | Purpose |
 |------|------|---------|
-| `scripts/game/ui/player_hud.gd` | Script | HUD + hotbar logic |
+| `scripts/game/ui/player_hud.gd` | Script | HUD + hotbar logic (StyleBoxFlat) |
 | `scenes/game_scene/player_hud.tscn` | Scene | HUD scene layout |
-| `scripts/game/gameplay/demo_game_runtime.gd` | Script | Game runtime (loads HUD) |
+| `scripts/game/gameplay/demo_game_runtime.gd` | Script | Game runtime (loads HUD, creates equipment) |
 | `scripts/game/input/player_input_context.gd` | Script | GUIDE input bindings |
+| `scripts/game/components/gameplay/equipment_state.gd` | Script | Equipment data model |
 | `resources/i18n/ui_text.en.json` | i18n | English localization |
 | `resources/i18n/ui_text.zh.json` | i18n | Chinese localization |
 | `scenes/vfx/hit_particle_effect.tscn` | Scene | Enhanced hit particles |
-| `assets/game/textures/ui/hud_item.png` | Texture | Hotbar slot base texture |
