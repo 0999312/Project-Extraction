@@ -76,8 +76,9 @@
 
 ### 4.2 战斗 (远程 + 近战)
 **远程武器**
-- 口径 + 开火模式由标签决定 (例如 `game:tag/caliber_9x19`、`game:tag/firemode_auto`)
-- 基础后坐力/散布模型
+- 武器行为由物品驱动：战斗运行时通过 `equipped_weapon_id`（`game:item/...`）解析到 `core:weapon` 中的 `WeaponDefinition`。
+- `WeaponDefinition` 统一控制弹丸 ID、弹匣容量、射击间隔、换弹时长、散布参数、后坐力参数和每次射击弹丸数。
+- 口径与开火模式仍通过标签/数据表达（如 `game:tag/caliber_9x19`、`game:tag/firemode_auto`），但其承载体改为物品+武器注册表数据。
 - 基础护甲 vs 穿透模型 (轻量化)
 
 **近战**
@@ -183,6 +184,19 @@
   - 每个堆叠的放置信息 (`x`, `y`, `rotated`)
 
 **世界掉落物:** 当物品被丢弃时，生成一个**世界拾取节点**，引用 `item_id` 与显示数据。
+
+### 5.5 当前仓库中的具体运行时实现
+当前代码已包含以下落地结构：
+- `ItemDefinition`（`core:item`）—— 物品标准结构（`id`、分类、尺寸、重量、堆叠、标签）。
+- `ItemStack` —— 运行时堆叠记录（`item_id`、`count`、`durability`、`custom_data`）。
+- `GridInventory` —— 轻量背包容器，包含 `width`、`height`、堆叠列表与总重量计算。
+- `InventoryState` 现在持有 `GridInventory`，并同步维护 `current_weight`。
+- `WeaponDefinition`（`core:weapon`）—— 绑定物品 ID 的数据驱动武器参数。
+- `WeaponCatalog.apply_to_combat_state(...)` —— 将已装备物品映射到战斗参数（弹丸、弹药、散布、后坐、换弹时序）。
+
+内置示例：
+- 物品：`game:item/weapon/pistol`、`game:item/weapon/creature`、`game:item/med/bandage`、`game:item/ammo/9x19`
+- 武器：`game:weapon/pistol`、`game:weapon/creature_organ`
 
 ### 5.4 兴趣点数据模型 (开放世界 + 片段)
 兴趣点注册表条目包含：

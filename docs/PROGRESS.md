@@ -1,5 +1,36 @@
 # Project Extraction — Progress
 
+## Update 14 — Hit Particle VFX + Item/Inventory/Weapon Data Systems
+
+### Changes
+
+- **Added hit particle effect for projectile impact without extra sprite assets**:
+  - New scene: `scenes/vfx/hit_particle_effect.tscn` using `CPUParticles2D` only.
+  - New script: `scripts/game/vfx/hit_particle_effect.gd`.
+  - Emits one-shot blood-like impact particles with gravity, spread, and short lifetime.
+  - Spawn integrated in projectile hit flow (`projectile.gd:on_hit`) via preloaded scene and runtime `emit_hit(...)`.
+- **Implemented item system (registry-driven)**:
+  - Added `ItemDefinition` resource schema.
+  - Added `ItemRegistry` + `ItemCatalog` with built-in entries:
+    - `game:item/weapon/pistol`
+    - `game:item/weapon/creature`
+    - `game:item/med/bandage`
+    - `game:item/ammo/9x19`
+- **Implemented inventory system (data-only runtime structures)**:
+  - Added `ItemStack` and `GridInventory`.
+  - Updated `InventoryState` to own `GridInventory`, support `add_item(...)`, and keep `current_weight` synchronized via computed item weights.
+- **Implemented weapon system based on item system**:
+  - Added `WeaponDefinition`, `WeaponRegistry`, and `WeaponCatalog`.
+  - Weapon entries map from equipped item IDs to combat parameters (projectile ID, ammo capacity, spread, recoil, reload timing).
+  - Added `WeaponCatalog.apply_to_combat_state(...)` and integrated into player/human enemy/non-human enemy runtime setup.
+  - `DemoGameRuntime` now ensures item/weapon registries are initialized at startup.
+- **Updated design docs**:
+  - Expanded `GDD_Version2.md` / `GDD_Version2_ZH.md` with item→weapon mapping runtime notes.
+  - Added `ITEM_REGISTRY.md` / `ITEM_REGISTRY_ZH.md`.
+  - Added `WEAPON_REGISTRY.md` / `WEAPON_REGISTRY_ZH.md`.
+
+---
+
 ## Update 13.4 — Human Hitbox Isolation and Projectile Air Blocking
 
 ### Changes

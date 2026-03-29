@@ -28,10 +28,8 @@ func _setup_runtime_state() -> void:
 	faction_state = FactionState.new(FactionState.FactionType.HUMAN_ENEMY)
 	ai_state = AIState.new(280.0, 200.0)
 	aim_state = AimState.new()
-	combat_state.equipped_weapon_id = "game:item/weapon/pistol"
-	combat_state.projectile_definition_id = ProjectileCatalog.BULLET
-	combat_state.ammo_max = 12
-	combat_state.ammo_current = 12
+	combat_state.equipped_weapon_id = ItemCatalog.ITEM_WEAPON_PISTOL
+	WeaponCatalog.apply_to_combat_state(combat_state)
 
 func set_target_actor(actor: Player) -> void:
 	_target_actor = actor

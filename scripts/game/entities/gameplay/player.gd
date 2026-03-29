@@ -52,10 +52,10 @@ func _setup_runtime_state() -> void:
 	inventory_ref = InventoryState.new()
 	faction_state = FactionState.new(FactionState.FactionType.PLAYER)
 	aim_state = AimState.new()
-	combat_state.equipped_weapon_id = "game:item/weapon/pistol"
-	combat_state.projectile_definition_id = ProjectileCatalog.BULLET
-	combat_state.ammo_max = 15
-	combat_state.ammo_current = 15
+	inventory_ref.add_item(ItemCatalog.ITEM_WEAPON_PISTOL, 1)
+	inventory_ref.add_item(ItemCatalog.ITEM_MED_BANDAGE, 2)
+	combat_state.equipped_weapon_id = ItemCatalog.ITEM_WEAPON_PISTOL
+	WeaponCatalog.apply_to_combat_state(combat_state)
 
 func _get_aim_direction() -> Vector2:
 	if _using_gamepad_aim and aim_direction.length_squared() > AIM_EPSILON:

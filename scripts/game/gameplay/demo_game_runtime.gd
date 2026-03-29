@@ -30,6 +30,8 @@ const MIN_HIP_FIRE_AXIS_DISTANCE := 32.0
 const MIN_AIM_TRANSITION_SEC := 0.01
 
 func _ready() -> void:
+	ItemCatalog.ensure_registry()
+	WeaponCatalog.ensure_registry()
 	EntityCatalog.ensure_registry()
 	ProjectileCatalog.ensure_registry()
 	_spawn_runtime_entities()

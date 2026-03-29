@@ -76,8 +76,9 @@ Effects are tag-driven: `game:tag/med_bandage`, `game:tag/med_painkiller`, etc.
 
 ### 4.2 Combat (Ranged + Melee)
 **Ranged weapons**
-- Caliber + fire mode determined by tags (e.g. `game:tag/caliber_9x19`, `game:tag/firemode_auto`)
-- Basic recoil/spread model
+- Weapon behavior is item-driven: combat runtime resolves `equipped_weapon_id` (`game:item/...`) to a `WeaponDefinition` from `core:weapon`.
+- `WeaponDefinition` controls projectile ID, magazine size, fire interval, reload duration, spread profile, recoil profile, and pellets-per-shot.
+- Caliber + fire mode still use tags/data (e.g. `game:tag/caliber_9x19`, `game:tag/firemode_auto`) but are now expressed through item + weapon registry data.
 - Basic armor vs penetration model (lightweight)
 
 **Melee**
@@ -183,6 +184,19 @@ Items in inventory should be **pure data**, not Nodes, for performance and save 
   - per-stack placement (`x`, `y`, `rotated`)
 
 **World drops:** when an item is dropped, spawn a **world pickup node** referencing `item_id` and display data.
+
+### 5.5 Concrete Runtime Status (Current Project)
+Current implementation in this repository now includes:
+- `ItemDefinition` (`core:item`) — canonical item schema (`id`, category, size, weight, stack, tags).
+- `ItemStack` — runtime stack record (`item_id`, `count`, `durability`, `custom_data`).
+- `GridInventory` — lightweight inventory container with `width`, `height`, stack list, and total-weight computation.
+- `InventoryState` now owns a `GridInventory` and keeps `current_weight` synchronized.
+- `WeaponDefinition` (`core:weapon`) — data-driven weapon profile bound to an item ID.
+- `WeaponCatalog.apply_to_combat_state(...)` — maps equipped item → combat parameters (projectile, ammo, spread, recoil, reload timing).
+
+Built-in examples:
+- Items: `game:item/weapon/pistol`, `game:item/weapon/creature`, `game:item/med/bandage`, `game:item/ammo/9x19`
+- Weapons: `game:weapon/pistol`, `game:weapon/creature_organ`
 
 ### 5.4 POI Data Model (Open World + Fragments)
 POI registry entries include:
