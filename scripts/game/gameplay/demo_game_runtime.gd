@@ -22,8 +22,10 @@ var _projectiles: Node2D = null
 var _pause_pressed_last_frame: bool = false
 var _inventory_menu: InventoryMenu = null
 var _inventory_pressed_last_frame: bool = false
+var _player_hud: PlayerHUD = null
 
 const GUIDE_ACTION_PAUSE := &"pe_pause"
+const GUIDE_ACTION_INVENTORY := &"pe_inventory"
 const GUIDE_ACTION_AIM_AXIS_OPTIONAL := &"pe_aim_axis"
 const AIM_AXIS_EPSILON := 0.0001
 const AIM_DISTANCE_EPSILON := 0.0001
@@ -49,6 +51,7 @@ func _ready() -> void:
 	_default_mouse_mode = Input.mouse_mode
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	_setup_inventory_menu()
+	_setup_player_hud()
 	print("[DEBUG][DemoGame] _ready | actors=%d" % _get_runtime_actors().size())
 
 func _exit_tree() -> void:
@@ -193,11 +196,11 @@ func _setup_inventory_menu() -> void:
 	_inventory_menu.held_item_changed.connect(_on_held_item_changed)
 
 func _poll_inventory_input() -> void:
-	var is_pressed := Input.is_key_pressed(KEY_TAB)
-	if is_pressed and not _inventory_pressed_last_frame:
+	var is_triggered := GuideInputRuntime.is_action_triggered(GUIDE_ACTION_INVENTORY)
+	if is_triggered and not _inventory_pressed_last_frame:
 		if _inventory_menu != null:
 			_inventory_menu.toggle()
-	_inventory_pressed_last_frame = is_pressed
+	_inventory_pressed_last_frame = is_triggered
 
 func _on_held_item_changed(item_id: String) -> void:
 	if _player == null or _player.combat_state == null:
@@ -207,3 +210,16 @@ func _on_held_item_changed(item_id: String) -> void:
 	_player.combat_state.equipped_weapon_id = item_id
 	WeaponCatalog.apply_to_combat_state(_player.combat_state)
 	print("[DEBUG][DemoGame] Held item changed to: %s" % item_id)
+
+func _setup_player_hud() -> void:
+	var hud_scene := load("res://scenes/game_scene/player_hud.tscn")
+	if hud_scene == null:
+		push_warning("[DemoGame] Failed to load player_hud.tscn")
+		return
+	_player_hud = hud_scene.instantiate() as PlayerHUD
+	if _player_hud == null:
+		return
+	add_child(_player_hud)
+	if _player != null and _player.inventory_ref != null and _player.inventory_ref.inventory != null:
+		_player_hud.bind_inventory(_player.inventory_ref.inventory)
+	_player_hud.hotbar_selection_changed.connect(_on_held_item_changed)
