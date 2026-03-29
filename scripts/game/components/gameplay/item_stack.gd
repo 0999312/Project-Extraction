@@ -9,4 +9,3 @@ extends Resource
 func _init(id: String = "", initial_count: int = 1) -> void:
 	item_id = id
 	count = maxi(1, initial_count)
-

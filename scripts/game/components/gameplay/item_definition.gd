@@ -9,4 +9,3 @@ extends Resource
 @export var weight: float = 0.0
 @export var max_stack: int = 1
 @export var tags: Array[String] = []
-

@@ -93,4 +93,3 @@ static func _get_registry() -> ItemRegistry:
 		return null
 	var registry := RegistryManager.get_registry(REGISTRY_TYPE)
 	return registry if registry is ItemRegistry else null
-
