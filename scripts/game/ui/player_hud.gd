@@ -76,7 +76,7 @@ func _refresh_bars() -> void:
 	if h != null:
 		hp_bar.max_value = h.max_hp
 		hp_bar.value = h.current_hp
-		var fill := _sb_hp_healthy if (h.current_hp / h.max_hp) >= 0.5 else _sb_hp_injured
+		var fill := _sb_hp_healthy if (h.max_hp > 0.0 and (h.current_hp / h.max_hp) >= 0.5) else _sb_hp_injured
 		hp_bar.add_theme_stylebox_override("fill", fill)
 		hp_label.text = "%d/%d" % [int(h.current_hp), int(h.max_hp)]
 

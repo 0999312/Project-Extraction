@@ -19,7 +19,7 @@ func _init(def: BuffDefinition) -> void:
 
 ## Returns true once the duration has expired (permanent buffs never expire).
 func is_expired() -> bool:
-	return remaining_duration >= 0.0 and remaining_duration <= 0.0
+	return remaining_duration >= 0.0 and remaining_duration <= 0.001
 
 ## Advances the timer by delta seconds and returns remaining damage to apply.
 func tick(delta: float) -> float:
