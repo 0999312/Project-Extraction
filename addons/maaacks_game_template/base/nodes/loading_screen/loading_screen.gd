@@ -2,7 +2,7 @@ class_name LoadingScreen
 extends CanvasLayer
 ## Scene for displaying the progress of a loading scene to the player.
 
-const STALLED_ON_WEB = "\nIf running in a browser, try clicking out of the window, \nand then click back into the window. It might unstick.\nLasty, you may try refreshing the page.\n\n"
+const STALLED_ON_WEB_KEY := "ui.loading.stalled_web_hint"
 
 enum StallStage{STARTED, WAITING, STILL_WAITING, GIVE_UP}
 
@@ -11,18 +11,18 @@ enum StallStage{STARTED, WAITING, STILL_WAITING, GIVE_UP}
 @export_group("State Messages")
 @export_subgroup("In Progress")
 ## Default text to show when loading.
-@export var _in_progress : String = "Loading..."
+@export var _in_progress : String = "ui.loading.in_progress"
 ## Next text to show when loading has stalled.
-@export var _in_progress_waiting : String = "Still Loading..."
+@export var _in_progress_waiting : String = "ui.loading.in_progress_waiting"
 ## Last text to show when loading has stalled.
-@export var _in_progress_still_waiting : String = "Still Loading... (%d seconds)"
+@export var _in_progress_still_waiting : String = "ui.loading.in_progress_still_waiting"
 @export_subgroup("Completed")
 ## Default text to show when loading has completed.
-@export var _complete : String = "Loading Complete!"
+@export var _complete : String = "ui.loading.complete"
 ## Next text to show if opening the scene has stalled.
-@export var _complete_waiting : String = "Any Moment Now..."
+@export var _complete_waiting : String = "ui.loading.complete_waiting"
 ## Last text to show if opening the scene has stalled.
-@export var _complete_still_waiting : String = "Any Moment Now... (%d seconds)"
+@export var _complete_still_waiting : String = "ui.loading.complete_still_waiting"
 
 var _stall_stage : StallStage = StallStage.STARTED
 var _scene_loading_complete : bool = false
@@ -38,6 +38,12 @@ var _total_loading_progress : float = 0.0 :
 		_total_loading_progress = value
 		%ProgressBar.value = _total_loading_progress
 var _loading_start_time : int
+
+func _txt(key : String, args : Dictionary = {}) -> String:
+	var localized := tr(key)
+	if args.is_empty():
+		return localized
+	return localized.format(args)
 
 func update_total_loading_progress() -> void:
 	_total_loading_progress = _scene_loading_progress
@@ -69,17 +75,19 @@ func _show_loading_stalled_error_message() -> void:
 	if %StalledMessage.visible:
 		return
 	if _scene_loading_progress == 0:
-		%StalledMessage.dialog_text = "Stalled at start. You may try waiting or restarting.\n"
+		%StalledMessage.dialog_text = _txt("ui.loading.stalled_at_start")
 	else:
-		%StalledMessage.dialog_text = "Stalled at %d%%. You may try waiting or restarting.\n" % (_scene_loading_progress * 100.0)
+		%StalledMessage.dialog_text = _txt("ui.loading.stalled_at_progress", {
+			"progress": int(round(_scene_loading_progress * 100.0))
+		})
 	if OS.has_feature("web"):
-		%StalledMessage.dialog_text += STALLED_ON_WEB
+		%StalledMessage.dialog_text += _txt(STALLED_ON_WEB_KEY)
 	%StalledMessage.popup()
 
 func _show_scene_switching_error_message() -> void:
 	if %ErrorMessage.visible:
 		return
-	%ErrorMessage.dialog_text = "Loading Error: Failed to switch scenes."
+	%ErrorMessage.dialog_text = _txt("ui.loading.error_failed_to_switch_scenes")
 	%ErrorMessage.popup()
 
 func _hide_popups() -> void:
@@ -87,26 +95,24 @@ func _hide_popups() -> void:
 	%StalledMessage.hide()
 
 func get_progress_message() -> String:
-	var _progress_message : String
+	var progress_key : String
 	match _stall_stage:
 		StallStage.STARTED:
 			if _scene_loading_complete:
-				_progress_message = _complete
+				progress_key = _complete
 			else:
-				_progress_message = _in_progress
+				progress_key = _in_progress
 		StallStage.WAITING:
 			if _scene_loading_complete:
-				_progress_message = _complete_waiting
+				progress_key = _complete_waiting
 			else:
-				_progress_message = _in_progress_waiting
+				progress_key = _in_progress_waiting
 		StallStage.STILL_WAITING, StallStage.GIVE_UP:
 			if _scene_loading_complete:
-				_progress_message = _complete_still_waiting
+				progress_key = _complete_still_waiting
 			else:
-				_progress_message = _in_progress_still_waiting
-	if _progress_message.contains("%d"):
-		_progress_message = _progress_message % _get_seconds_waiting()
-	return _progress_message
+				progress_key = _in_progress_still_waiting
+	return _txt(progress_key, {"seconds": _get_seconds_waiting()})
 
 func _update_progress_messaging() -> void:
 	%ProgressLabel.text = get_progress_message()
@@ -128,7 +134,7 @@ func _process(_delta : float) -> void:
 			_set_scene_loading_complete()
 			_update_progress_messaging()
 		ResourceLoader.THREAD_LOAD_FAILED:
-			%ErrorMessage.dialog_text = "Loading Error: %d" % status
+			%ErrorMessage.dialog_text = _txt("ui.loading.error_status", {"status": status})
 			%ErrorMessage.popup()
 			set_process(false)
 		ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:

@@ -39,10 +39,34 @@
     },
     "main_menu": {
       "title": "ProjectExtraction",
+      "title_placeholder": "Title",
+      "subtitle": "Subtitle",
+      "new_game": "New Game",
+      "options": "Options",
+      "credits": "Credits",
+      "exit": "Exit",
       "continue": "Continue",
       "level_select": "Level Select",
+      "confirm_exit_text": "Really exit the game?",
       "confirm_new_game_text": "Are you sure you want to start a new game?\n\nAll progress in the current game will be lost.",
       "confirm_new_game_title": "New Game"
+    },
+    "loading": {
+      "in_progress": "Loading...",
+      "in_progress_waiting": "Still Loading...",
+      "in_progress_still_waiting": "Still Loading... ({seconds} seconds)",
+      "complete": "Loading Complete!",
+      "complete_waiting": "Any Moment Now...",
+      "complete_still_waiting": "Any Moment Now... ({seconds} seconds)",
+      "error_title": "Loading Error",
+      "stalled_title": "Loading Stalled",
+      "try_waiting": "Try Waiting",
+      "reload": "Reload",
+      "stalled_at_start": "Stalled at start. You may try waiting or restarting.\n",
+      "stalled_at_progress": "Stalled at {progress}%. You may try waiting or restarting.\n",
+      "stalled_web_hint": "\nIf running in a browser, try clicking out of the window, \nand then click back into the window. It might unstick.\nLasty, you may try refreshing the page.\n\n",
+      "error_failed_to_switch_scenes": "Loading Error: Failed to switch scenes.",
+      "error_status": "Loading Error: {status}"
     },
     "result": {
       "game_won": {

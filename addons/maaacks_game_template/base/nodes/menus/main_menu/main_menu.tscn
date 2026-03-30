@@ -56,7 +56,7 @@ anchor_right = 1.0
 offset_bottom = 67.0
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 48
-text = "Title"
+text = "ui.main_menu.title_placeholder"
 horizontal_alignment = 1
 vertical_alignment = 1
 script = ExtResource("7_j7612")
@@ -76,7 +76,7 @@ anchor_right = 1.0
 offset_bottom = 34.0
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 24
-text = "Subtitle"
+text = "ui.main_menu.subtitle"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -113,22 +113,22 @@ script = ExtResource("4_l1ebe")
 [node name="NewGameButton" type="Button" parent="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer" unique_id=2044537792]
 unique_name_in_owner = true
 layout_mode = 2
-text = "New Game"
+text = "ui.main_menu.new_game"
 
 [node name="OptionsButton" type="Button" parent="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer" unique_id=1486236076]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Options"
+text = "ui.main_menu.options"
 
 [node name="CreditsButton" type="Button" parent="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer" unique_id=301223169]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Credits"
+text = "ui.main_menu.credits"
 
 [node name="ExitButton" type="Button" parent="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer" unique_id=1750454379]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Exit"
+text = "ui.main_menu.exit"
 
 [node name="VersionMargin" type="MarginContainer" parent="." unique_id=1732528471]
 layout_mode = 1
@@ -172,7 +172,7 @@ offset_top = -80.0
 offset_right = 150.0
 offset_bottom = 80.0
 ui_cancel_closes = false
-text = "Really exit the game?"
+text = "ui.main_menu.confirm_exit_text"
 title_visible = false
 
 [connection signal="pressed" from="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer/NewGameButton" to="." method="_on_new_game_button_pressed"]

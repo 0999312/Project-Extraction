@@ -39,10 +39,34 @@
     },
     "main_menu": {
       "title": "ProjectExtraction",
+      "title_placeholder": "标题",
+      "subtitle": "副标题",
+      "new_game": "新游戏",
+      "options": "选项",
+      "credits": "制作人员",
+      "exit": "退出",
       "continue": "继续",
       "level_select": "关卡选择",
+      "confirm_exit_text": "确定要退出游戏吗？",
       "confirm_new_game_text": "确定要开始新游戏吗？\n\n当前游戏进度将会丢失。",
       "confirm_new_game_title": "新游戏"
+    },
+    "loading": {
+      "in_progress": "加载中...",
+      "in_progress_waiting": "仍在加载...",
+      "in_progress_still_waiting": "仍在加载...（{seconds} 秒）",
+      "complete": "加载完成！",
+      "complete_waiting": "即将完成...",
+      "complete_still_waiting": "即将完成...（{seconds} 秒）",
+      "error_title": "加载错误",
+      "stalled_title": "加载停滞",
+      "try_waiting": "继续等待",
+      "reload": "重新加载",
+      "stalled_at_start": "加载从一开始就卡住了。你可以继续等待或重新启动。\n",
+      "stalled_at_progress": "加载在 {progress}% 时卡住了。你可以继续等待或重新启动。\n",
+      "stalled_web_hint": "\n如果你正在浏览器中运行，请先点击窗口外部，\n再重新点击回窗口，可能可以解除卡住状态。\n最后，也可以尝试刷新页面。\n\n",
+      "error_failed_to_switch_scenes": "加载错误：切换场景失败。",
+      "error_status": "加载错误：{status}"
     },
     "result": {
       "game_won": {
