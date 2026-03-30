@@ -299,12 +299,12 @@ func _refresh_equipment_panel() -> void:
 				var has_item := not item_id.is_empty()
 				item_label.text = _get_item_display_name(item_id) if has_item else _txt("ui.inventory.empty")
 				item_label.add_theme_color_override("font_color", Color.WHITE if has_item else Color(0.75, 0.75, 0.75, 1.0))
-			var label_key := str(refs.get("label_key", ""))
-			var label_text := _txt(label_key) if not label_key.is_empty() else _make_readable_item_id(slot_key)
 			var panel := refs.get("panel") as PanelContainer
 			if panel != null:
 				var is_drag_source := _dragged_equipment_slot_key == slot_key and not _dragged_equipment_item_id.is_empty()
 				panel.add_theme_stylebox_override("panel", _make_equip_stylebox(not item_id.is_empty() or is_drag_source))
+				var label_key := str(refs.get("label_key", ""))
+				var label_text := _txt(label_key) if not label_key.is_empty() else _make_readable_item_id(slot_key)
 				panel.tooltip_text = _build_equipment_slot_tooltip(slot_key, label_text, item_id)
 
 func _get_item_display_name(item_id: String) -> String:
