@@ -602,6 +602,8 @@ func _refresh_hotbar_ui() -> void:
 		slot.tooltip_text = "Hotbar %d: %s" % [i + 1, _get_item_display_name(_grid.hotbar_slots[i])]
 
 func _can_assign_item_to_hotbar(slot_index: int, item_id: String) -> bool:
+	if _grid == null:
+		return false
 	if slot_index < 0:
 		return false
 	if slot_index >= 3:
@@ -611,6 +613,8 @@ func _can_assign_item_to_hotbar(slot_index: int, item_id: String) -> bool:
 func _sync_equipment_from_hotbar() -> void:
 	if _grid == null or _equipment == null:
 		return
+	if _grid.hotbar_slots.size() < EquipmentState.HOTBAR_SLOT_KEYS.size():
+		push_warning("[InventoryMenu] hotbar slot count is smaller than equipment-backed hotbar slot count.")
 	for i in range(mini(_grid.hotbar_slots.size(), EquipmentState.HOTBAR_SLOT_KEYS.size())):
 		_sync_equipment_slot_from_hotbar(i)
 
