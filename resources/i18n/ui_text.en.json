@@ -163,7 +163,7 @@
         "headset": "Headset",
         "armor": "Armor",
         "backpack": "Backpack",
-        "tactical_vest": "Vest"
+        "tactical_vest": "Tactical Vest"
       },
       "tooltip": {
         "slot_summary": "{0}: {1}",

@@ -1,6 +1,8 @@
 class_name EquipmentRules
 extends RefCounted
 
+const WEAPON_ONLY_HOTBAR_SLOT_COUNT := 3
+
 
 static func can_equip_item_to_slot(slot_key: String, item_id: String, equipment: EquipmentState = null) -> bool:
 	if item_id.is_empty():
@@ -28,6 +30,6 @@ static func can_equip_item_to_slot(slot_key: String, item_id: String, equipment:
 static func can_assign_item_to_hotbar(slot_index: int, item_id: String) -> bool:
 	if slot_index < 0 or item_id.is_empty():
 		return false
-	if slot_index >= 3:
+	if slot_index >= WEAPON_ONLY_HOTBAR_SLOT_COUNT:
 		return true
 	return ItemCatalog.has_tag(item_id, "weapon")
