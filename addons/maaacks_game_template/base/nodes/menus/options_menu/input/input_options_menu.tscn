@@ -34,7 +34,7 @@ alignment = 1
 
 [node name="Label" type="Label" parent="VBoxContainer/InputMappingContainer" unique_id=1142261578]
 layout_mode = 2
-text = "Actions & Inputs"
+text = "ui.input.actions_and_inputs"
 horizontal_alignment = 1
 
 [node name="InputActionsList" parent="VBoxContainer/InputMappingContainer" unique_id=2089976301 instance=ExtResource("4_lf2nw")]
@@ -52,35 +52,35 @@ alignment = 1
 
 [node name="ResetButton" type="Button" parent="VBoxContainer/InputMappingContainer/HBoxContainer" unique_id=14998312]
 layout_mode = 2
-text = "Reset"
+text = "ui.input.reset"
 
 [node name="KeyDeletionConfirmation" parent="." unique_id=1120617858 instance=ExtResource("7_5j1ya")]
 visible = false
 custom_minimum_size = Vector2(420, 200)
 layout_mode = 2
-text = "Are you sure you want to remove KEY from ACTION?"
-title = "Remove Key"
+text = "ui.input.key_deletion_confirmation_placeholder"
+title = "ui.input.remove_key_title"
 
 [node name="ResetConfirmation" parent="." unique_id=1967398625 instance=ExtResource("7_5j1ya")]
 visible = false
 custom_minimum_size = Vector2(420, 200)
 layout_mode = 2
-text = "Are you sure you want to reset controls back to the defaults?"
-title = "Reset to Default"
+text = "ui.input.reset_controls_confirmation"
+title = "ui.input.reset_to_default_title"
 
 [node name="OneInputMinimumMessage" parent="." unique_id=1110523665 instance=ExtResource("8_jtpjy")]
 visible = false
 custom_minimum_size = Vector2(420, 200)
 layout_mode = 2
 update_content = true
-title = "One Input Minimum"
+title = "ui.input.one_input_minimum_title"
 
 [node name="AlreadyAssignedMessage" parent="." unique_id=574954440 instance=ExtResource("8_jtpjy")]
 visible = false
 custom_minimum_size = Vector2(420, 200)
 layout_mode = 2
 update_content = true
-title = "Already Assigned"
+title = "ui.input.already_assigned_title"
 
 [node name="KeyAssignmentWindow" parent="." unique_id=751125317 instance=ExtResource("7_r3r3g")]
 visible = false

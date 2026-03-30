@@ -21,12 +21,19 @@
       "main_menu": "主菜单",
       "restart": "重新开始",
       "menu": "菜单",
+      "close": "关闭",
+      "cancel": "取消",
+      "confirm": "确认",
       "back": "返回",
       "win": "胜利",
       "lose": "失败",
       "tutorial": "教程",
       "yes": "是",
       "no": "否",
+      "disabled": "禁用",
+      "enabled": "启用",
+      "adaptive": "自适应",
+      "mailbox": "三重缓冲",
       "confirm_main_menu_text": "要返回主菜单吗？",
       "confirm_exit_game_text": "要退出游戏吗？"
     },
@@ -99,11 +106,46 @@
       "restored_defaults": "已恢复默认设置。",
       "rebind_cancelled": "已取消重新绑定。",
       "bound_action": "已绑定“{0}”。",
+      "listening_for_input": "正在监听输入...",
+      "focus_here_to_assign": "聚焦此处以分配输入。",
+      "press_again_to_confirm": "再次按下以确认...",
+      "none": "无",
+      "assign_key_for_action": "为 {action} 指定按键",
+      "remove_key_for_action": "移除 {action} 的按键",
+      "already_assigned": "{key} 已分配给 {action}。",
+      "already_assigned_title": "已被占用",
+      "one_input_minimum": "{action} 至少需要保留一个已分配的按键或按钮。",
+      "one_input_minimum_title": "至少保留一个输入",
+      "key_deletion_confirmation": "确定要从 {action} 中移除 {key} 吗？",
+      "key_deletion_confirmation_placeholder": "确定要从 ACTION 中移除 KEY 吗？",
+      "set_input": "设置输入",
+      "remove_key_title": "移除按键",
+      "reset": "重置",
+      "reset_controls_confirmation": "确定要将控制设置重置为默认值吗？",
+      "reset_to_default_title": "重置为默认",
+      "actions_and_inputs": "操作与输入",
+      "mouse_sensitivity_label": "鼠标灵敏度",
+      "joypad_sensitivity_label": "手柄灵敏度",
       "mouse_sensitivity": "鼠标灵敏度：",
       "joypad_sensitivity": "手柄灵敏度："
     },
     "audio": {
-      "input_device": "输入设备："
+      "input_device": "输入设备：",
+      "input_device_label": "输入设备",
+      "mute_label": "静音"
+    },
+    "video": {
+      "fullscreen_label": "全屏",
+      "resolution_label": "分辨率",
+      "v_sync_label": "垂直同步",
+      "select_resolution_tooltip": "选择屏幕分辨率",
+      "camera_shake": {
+        "label": "镜头抖动",
+        "normal": "正常",
+        "reduced": "减少",
+        "minimal": "最低",
+        "none": "无"
+      }
     },
     "inventory": {
       "title": "物品栏",
@@ -134,6 +176,7 @@
     "options": {
       "language": {
         "label": "语言",
+        "option_label": "语言",
         "english": "English",
         "chinese_simplified": "简体中文"
       },

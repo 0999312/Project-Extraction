@@ -21,12 +21,19 @@
       "main_menu": "Main Menu",
       "restart": "Restart",
       "menu": "Menu",
+      "close": "Close",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
       "back": "Back",
       "win": "Win",
       "lose": "Lose",
       "tutorial": "Tutorial",
       "yes": "Yes",
       "no": "No",
+      "disabled": "Disabled",
+      "enabled": "Enabled",
+      "adaptive": "Adaptive",
+      "mailbox": "Mailbox",
       "confirm_main_menu_text": "Exit to the main menu?",
       "confirm_exit_game_text": "Exit the game?"
     },
@@ -99,11 +106,46 @@
       "restored_defaults": "Restored defaults.",
       "rebind_cancelled": "Rebind cancelled.",
       "bound_action": "Bound \"{0}\".",
+      "listening_for_input": "Listening for input...",
+      "focus_here_to_assign": "Focus here to assign inputs.",
+      "press_again_to_confirm": "Press again to confirm...",
+      "none": "None",
+      "assign_key_for_action": "Assign Key for {action}",
+      "remove_key_for_action": "Remove Key for {action}",
+      "already_assigned": "{key} already assigned to {action}.",
+      "already_assigned_title": "Already Assigned",
+      "one_input_minimum": "{action} must have at least one key or button assigned.",
+      "one_input_minimum_title": "One Input Minimum",
+      "key_deletion_confirmation": "Are you sure you want to remove {key} from {action}?",
+      "key_deletion_confirmation_placeholder": "Are you sure you want to remove KEY from ACTION?",
+      "set_input": "Set Input",
+      "remove_key_title": "Remove Key",
+      "reset": "Reset",
+      "reset_controls_confirmation": "Are you sure you want to reset controls back to the defaults?",
+      "reset_to_default_title": "Reset to Default",
+      "actions_and_inputs": "Actions & Inputs",
+      "mouse_sensitivity_label": "Mouse Sensitivity",
+      "joypad_sensitivity_label": "Joypad Sensitivity",
       "mouse_sensitivity": "Mouse Sensitivity :",
       "joypad_sensitivity": "Joypad Sensitivity :"
     },
     "audio": {
-      "input_device": "Input Device :"
+      "input_device": "Input Device :",
+      "input_device_label": "Input Device",
+      "mute_label": "Mute"
+    },
+    "video": {
+      "fullscreen_label": "Fullscreen",
+      "resolution_label": "Resolution",
+      "v_sync_label": "V-Sync",
+      "select_resolution_tooltip": "Select a screen size",
+      "camera_shake": {
+        "label": "Camera Shake",
+        "normal": "Normal",
+        "reduced": "Reduced",
+        "minimal": "Minimal",
+        "none": "None"
+      }
     },
     "inventory": {
       "title": "INVENTORY",
@@ -134,6 +176,7 @@
     "options": {
       "language": {
         "label": "Language",
+        "option_label": "Language",
         "english": "English",
         "chinese_simplified": "简体中文"
       },

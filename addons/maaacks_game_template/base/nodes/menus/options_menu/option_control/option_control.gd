@@ -34,7 +34,7 @@ const OptionSectionNames : Dictionary = {
 		var _update_config : bool = option_name.to_pascal_case() == key and not lock_config_names
 		option_name = value
 		if is_inside_tree():
-			%OptionLabel.text = "%s%s" % [option_name, label_suffix]
+			%OptionLabel.text = "%s%s" % [tr(option_name), label_suffix]
 		if _update_config:
 			key = option_name.to_pascal_case()
 ## Defines what section in the config file this option belongs under.

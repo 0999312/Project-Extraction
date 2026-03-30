@@ -6,7 +6,7 @@
 [node name="AudioInputOptionControl" unique_id=1342985187 instance=ExtResource("1_lfo7w")]
 visible = false
 script = ExtResource("2_m6bxx")
-option_name = "Input Device"
+option_name = "ui.audio.input_device_label"
 option_section = 2
 key = "InputDevice"
 section = "AudioSettings"

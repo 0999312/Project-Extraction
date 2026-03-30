@@ -1,9 +1,12 @@
 @tool
 extends Control
 
-const ALREADY_ASSIGNED_TEXT : String = "{key} already assigned to {action}."
-const ONE_INPUT_MINIMUM_TEXT : String = "%s must have at least one key or button assigned."
-const KEY_DELETION_TEXT : String = "Are you sure you want to remove {key} from {action}?"
+const ALREADY_ASSIGNED_TEXT_KEY : String = "ui.input.already_assigned"
+const ONE_INPUT_MINIMUM_TEXT_KEY : String = "ui.input.one_input_minimum"
+const KEY_DELETION_TEXT_KEY : String = "ui.input.key_deletion_confirmation"
+const ASSIGN_KEY_TITLE_KEY : String = "ui.input.assign_key_for_action"
+const REMOVE_KEY_TITLE_KEY : String = "ui.input.remove_key_for_action"
+const NO_INPUT_TEXT_KEY : String = "ui.input.none"
 
 @export_enum("List", "Tree") var remapping_mode : int = 0 :
 	set(value):
@@ -17,7 +20,7 @@ const KEY_DELETION_TEXT : String = "Are you sure you want to remove {key} from {
 					%InputActionsList.hide()
 					%InputActionsTree.show()
 
-@onready var assignment_placeholder_text = $KeyAssignmentWindow.text
+@onready var assignment_placeholder_text = tr(NO_INPUT_TEXT_KEY)
 
 var last_input_readable_name
 
@@ -48,7 +51,7 @@ func _on_key_assignment_window_confirmed() -> void:
 	_add_action_event()
 
 func _open_key_assignment_window(action_name : String, readable_input_name : String = assignment_placeholder_text) -> void:
-	$KeyAssignmentWindow.title = tr("Assign Key for {action}").format({action = action_name})
+	$KeyAssignmentWindow.title = tr(ASSIGN_KEY_TITLE_KEY).format({action = action_name})
 	$KeyAssignmentWindow.text = readable_input_name
 	$KeyAssignmentWindow.confirm_button.disabled = true
 	$KeyAssignmentWindow.show()
@@ -57,16 +60,16 @@ func _on_input_actions_tree_add_button_clicked(action_name) -> void:
 	_open_key_assignment_window(action_name)
 
 func _on_input_actions_tree_remove_button_clicked(action_name, input_name) -> void:
-	$KeyDeletionConfirmation.title = tr("Remove Key for {action}").format({action = action_name})
-	$KeyDeletionConfirmation.text = tr(KEY_DELETION_TEXT).format({key = input_name, action = action_name})
+	$KeyDeletionConfirmation.title = tr(REMOVE_KEY_TITLE_KEY).format({action = action_name})
+	$KeyDeletionConfirmation.text = tr(KEY_DELETION_TEXT_KEY).format({key = input_name, action = action_name})
 	$KeyDeletionConfirmation.show()
 
 func _popup_already_assigned(action_name, input_name) -> void:
-	$AlreadyAssignedMessage.text = tr(ALREADY_ASSIGNED_TEXT).format({key = input_name, action = action_name})
+	$AlreadyAssignedMessage.text = tr(ALREADY_ASSIGNED_TEXT_KEY).format({key = input_name, action = action_name})
 	$AlreadyAssignedMessage.show()
 
 func _popup_minimum_reached(action_name : String) -> void:
-	$OneInputMinimumMessage.text = ONE_INPUT_MINIMUM_TEXT % action_name
+	$OneInputMinimumMessage.text = tr(ONE_INPUT_MINIMUM_TEXT_KEY).format({action = action_name})
 	$OneInputMinimumMessage.show()
 
 func _on_input_actions_tree_already_assigned(action_name, input_name) -> void:

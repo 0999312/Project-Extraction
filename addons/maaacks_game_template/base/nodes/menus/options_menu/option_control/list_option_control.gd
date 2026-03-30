@@ -72,7 +72,7 @@ func set_value(value : Variant) -> void:
 func _set_option_list(option_titles_list : Array) -> void:
 	%OptionButton.clear()
 	for option_title in option_titles_list:
-		%OptionButton.add_item(option_title)
+		%OptionButton.add_item(tr(option_title))
 
 func disable_option(option_index : int, disabled : bool = true) -> void:
 	%OptionButton.set_item_disabled(option_index, disabled)
