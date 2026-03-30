@@ -301,9 +301,7 @@ func _get_item_display_name(item_id: String) -> String:
 	var item_def := ItemCatalog.get_item_definition(item_id)
 	if item_def != null and not item_def.display_name.is_empty():
 		return item_def.display_name
-	var fallback := item_id.get_file()
-	if fallback.is_empty():
-		fallback = item_id
+	var fallback := item_id.get_file() if item_id.contains("/") else item_id
 	if fallback.contains(":"):
 		fallback = fallback.get_slice(":", 1)
 	return fallback.replace("_", " ").capitalize()
@@ -429,7 +427,9 @@ func _refresh_hotbar_ui() -> void:
 		slot.tooltip_text = "Hotbar %d: %s" % [i + 1, _get_item_display_name(_grid.hotbar_slots[i])]
 
 func _can_assign_item_to_hotbar(slot_index: int, item_id: String) -> bool:
-	if slot_index < 0 or slot_index >= 3:
+	if slot_index < 0:
+		return false
+	if slot_index >= 3:
 		return true
 	return ItemCatalog.has_tag(item_id, "weapon")
 

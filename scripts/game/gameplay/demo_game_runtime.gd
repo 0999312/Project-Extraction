@@ -231,6 +231,8 @@ func _on_held_item_changed(item_id: String) -> void:
 		return
 	if item_id.is_empty():
 		return
+	# Non-weapon items can still be selected in hotbar slots 3-8, but only
+	# registered weapon items should drive combat_state.equipped_weapon_id.
 	if WeaponCatalog.get_weapon_for_item(item_id) == null:
 		return
 	_player.combat_state.equipped_weapon_id = item_id
