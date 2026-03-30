@@ -301,6 +301,9 @@ func _get_item_display_name(item_id: String) -> String:
 	var item_def := ItemCatalog.get_item_definition(item_id)
 	if item_def != null and not item_def.display_name.is_empty():
 		return item_def.display_name
+	return _make_readable_item_id(item_id)
+
+static func _make_readable_item_id(item_id: String) -> String:
 	var fallback := item_id.get_file() if item_id.contains("/") else item_id
 	if fallback.contains(":"):
 		fallback = fallback.get_slice(":", 1)
