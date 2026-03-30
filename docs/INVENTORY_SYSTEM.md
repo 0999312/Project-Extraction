@@ -4,7 +4,7 @@
 
 ## 1. Overview
 
-The inventory system is a **Tetris-style grid inventory** where items occupy rectangular cells defined by their `size_w × size_h`. Players can **drag and drop** items to place, move, or swap them. The system now generates **equipment-based grids** — each container equipment (backpack, tactical vest) owns its own grid. The system also includes a **hotbar** (quick-access slots) and a **held item** indicator.
+The inventory system is a **Tetris-style grid inventory** where items occupy rectangular cells defined by their `size_w × size_h`. Players can **drag and drop** items to place and move them. The system now generates **equipment-based grids** — each container equipment (backpack, tactical vest) owns its own grid. The system also includes a **hotbar** (quick-access slots) and a **held item** indicator.
 
 ## 2. Data Model
 
@@ -88,7 +88,7 @@ The hotbar references items **already placed** in the grid. Setting a hotbar slo
 
 - **Pick up**: Click on an occupied cell → the placement is removed from the grid and attached to the cursor as a floating sprite.
 - **Drop**: Click on an empty area in the grid → attempt `can_place`; if valid, `place_item`; if not, return to original position.
-- **Swap**: If drop target overlaps exactly one other item, swap positions (if both fit).
+- **Invalid placement fallback**: If the drop target is invalid, the item returns to its original position when possible; otherwise the grid attempts to auto-place it in the first valid slot.
 - **Right-click rotate**: While holding an item, right-click to toggle `rotated` (swap w/h).
 
 ### 5.6 Hotbar Interaction

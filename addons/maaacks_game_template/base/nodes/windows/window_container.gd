@@ -15,14 +15,14 @@ signal opened
 		if update_content and is_inside_tree():
 			description_label.text = text
 
-@export var close_button_text : String = "Close" :
+@export var close_button_text : String = "ui.common.close" :
 	set(value):
 		close_button_text = value
 		if update_content and is_inside_tree():
 			close_button.text = close_button_text
 
 @export_subgroup("Title")
-@export var title : String = "Menu" :
+@export var title : String = "ui.common.menu" :
 	set(value):
 		title = value
 		if update_content and is_inside_tree():

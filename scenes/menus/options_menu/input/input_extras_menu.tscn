@@ -33,7 +33,7 @@ alignment = 1
 
 [node name="MouseSensitivityControl" parent="VBoxContainer/MarginContainer/VBoxContainer" unique_id=643274346 instance=ExtResource("2_goqr1")]
 layout_mode = 2
-option_name = "Mouse Sensitivity"
+option_name = "ui.input.mouse_sensitivity_label"
 option_section = 1
 key = "MouseSensitivity"
 section = "InputSettings"
@@ -48,7 +48,7 @@ tick_count = 8
 
 [node name="JoypadSensitivityControl" parent="VBoxContainer/MarginContainer/VBoxContainer" unique_id=1262184387 instance=ExtResource("2_goqr1")]
 layout_mode = 2
-option_name = "Joypad Sensitivity"
+option_name = "ui.input.joypad_sensitivity_label"
 option_section = 1
 key = "JoypadSensitivity"
 section = "InputSettings"

@@ -21,21 +21,52 @@
       "main_menu": "Main Menu",
       "restart": "Restart",
       "menu": "Menu",
+      "close": "Close",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
       "back": "Back",
       "win": "Win",
       "lose": "Lose",
       "tutorial": "Tutorial",
       "yes": "Yes",
       "no": "No",
+      "disabled": "Disabled",
+      "enabled": "Enabled",
+      "adaptive": "Adaptive",
+      "mailbox": "Mailbox",
       "confirm_main_menu_text": "Exit to the main menu?",
       "confirm_exit_game_text": "Exit the game?"
     },
     "main_menu": {
       "title": "ProjectExtraction",
+      "title_placeholder": "Title",
+      "subtitle": "Subtitle",
+      "new_game": "New Game",
+      "options": "Options",
+      "credits": "Credits",
+      "exit": "Exit",
       "continue": "Continue",
       "level_select": "Level Select",
+      "confirm_exit_text": "Really exit the game?",
       "confirm_new_game_text": "Are you sure you want to start a new game?\n\nAll progress in the current game will be lost.",
       "confirm_new_game_title": "New Game"
+    },
+    "loading": {
+      "in_progress": "Loading...",
+      "in_progress_waiting": "Still Loading...",
+      "in_progress_still_waiting": "Still Loading... ({seconds} seconds)",
+      "complete": "Loading Complete!",
+      "complete_waiting": "Any Moment Now...",
+      "complete_still_waiting": "Any Moment Now... ({seconds} seconds)",
+      "error_title": "Loading Error",
+      "stalled_title": "Loading Stalled",
+      "try_waiting": "Try Waiting",
+      "reload": "Reload",
+      "stalled_at_start": "Stalled at start. You may try waiting or restarting.\n",
+      "stalled_at_progress": "Stalled at {progress}%. You may try waiting or restarting.\n",
+      "stalled_web_hint": "\nIf running in a browser, try clicking out of the window, \nand then click back into the window. It might unstick.\nLasty, you may try refreshing the page.\n\n",
+      "error_failed_to_switch_scenes": "Loading Error: Failed to switch scenes.",
+      "error_status": "Loading Error: {status}"
     },
     "result": {
       "game_won": {
@@ -84,6 +115,11 @@
       "action_hotbar_9": "Hotbar Slot 9",
       "action_hotbar_next": "Next Hotbar Slot",
       "action_hotbar_prev": "Previous Hotbar Slot",
+      "context_player": "Player",
+      "category_movement": "Movement",
+      "category_combat": "Combat",
+      "category_system": "System",
+      "category_inventory": "Inventory",
       "rebind": "Rebind",
       "clear": "Clear",
       "reset_defaults": "Reset Defaults",
@@ -94,15 +130,77 @@
       "restored_defaults": "Restored defaults.",
       "rebind_cancelled": "Rebind cancelled.",
       "bound_action": "Bound \"{0}\".",
+      "listening_for_input": "Listening for input...",
+      "focus_here_to_assign": "Focus here to assign inputs.",
+      "press_again_to_confirm": "Press again to confirm...",
+      "none": "None",
+      "assign_key_for_action": "Assign Key for {action}",
+      "remove_key_for_action": "Remove Key for {action}",
+      "already_assigned": "{key} already assigned to {action}.",
+      "already_assigned_title": "Already Assigned",
+      "one_input_minimum": "{action} must have at least one key or button assigned.",
+      "one_input_minimum_title": "One Input Minimum",
+      "key_deletion_confirmation": "Are you sure you want to remove {key} from {action}?",
+      "key_deletion_confirmation_placeholder": "Are you sure you want to remove KEY from ACTION?",
+      "set_input": "Set Input",
+      "remove_key_title": "Remove Key",
+      "reset": "Reset",
+      "reset_controls_confirmation": "Are you sure you want to reset controls back to the defaults?",
+      "reset_to_default_title": "Reset to Default",
+      "actions_and_inputs": "Actions & Inputs",
+      "mouse_sensitivity_label": "Mouse Sensitivity",
+      "joypad_sensitivity_label": "Joypad Sensitivity",
       "mouse_sensitivity": "Mouse Sensitivity :",
       "joypad_sensitivity": "Joypad Sensitivity :"
     },
     "audio": {
-      "input_device": "Input Device :"
+      "input_device": "Input Device :",
+      "input_device_label": "Input Device",
+      "mute_label": "Mute"
+    },
+    "video": {
+      "fullscreen_label": "Fullscreen",
+      "resolution_label": "Resolution",
+      "v_sync_label": "V-Sync",
+      "select_resolution_tooltip": "Select a screen size",
+      "camera_shake": {
+        "label": "Camera Shake",
+        "normal": "Normal",
+        "reduced": "Reduced",
+        "minimal": "Minimal",
+        "none": "None"
+      }
+    },
+    "inventory": {
+      "title": "INVENTORY",
+      "hotbar_title": "HOTBAR",
+      "equipment_title": "EQUIPMENT",
+      "empty": "Empty",
+      "section": {
+        "default_backpack": "Backpack (default)"
+      },
+      "slot": {
+        "primary_weapon": "Primary",
+        "secondary_weapon": "Secondary",
+        "melee_weapon": "Melee",
+        "helmet": "Helmet",
+        "headset": "Headset",
+        "armor": "Armor",
+        "backpack": "Backpack",
+        "tactical_vest": "Tactical Vest"
+      },
+      "tooltip": {
+        "slot_summary": "{0}: {1}",
+        "drag_unequip": "Left-click to drag / unequip",
+        "locked_container": "Container slots stay locked while bound to active storage",
+        "drop_to_equip": "Drop a dragged inventory item here to equip"
+      },
+      "hotbar_slot_tooltip": "Hotbar {0}: {1}"
     },
     "options": {
       "language": {
         "label": "Language",
+        "option_label": "Language",
         "english": "English",
         "chinese_simplified": "简体中文"
       },
@@ -175,5 +273,93 @@
   "None": "None",
   "Please Confirm...": "Please Confirm...",
   "Cancel": "Cancel",
-  "OK": "OK"
+  "OK": "OK",
+  "logs": {
+    "audio": {
+      "registry_resolve_failed_startup": "[AudioCatalog] Unable to resolve audio registry during startup registration.",
+      "registry_resolve_failed_gameplay": "[AudioCatalog] Unable to resolve audio registry during gameplay registration.",
+      "folder_path_missing": "[AudioCatalog] Audio folder path is empty.",
+      "folder_missing": "[AudioCatalog] Audio folder not found: {0}",
+      "resource_missing": "[AudioCatalog] Audio resource not found: {0}",
+      "resource_invalid": "[AudioCatalog] Audio resource is not a valid AudioStream: {0}"
+    },
+    "demo_game": {
+      "player_hud_load_failed": "[DemoGame] Failed to load player_hud.tscn"
+    },
+    "inventory": {
+      "hotbar_slot_count_mismatch": "[InventoryMenu] hotbar slot count is smaller than equipment-backed hotbar slot count."
+    },
+    "buff_component": {
+      "unknown_buff_id": "[BuffComponent] Unknown buff id: {0}"
+    },
+    "human_actor": {
+      "right_hand_missing": "HumanActor.attach_weapon: RightHand node not found.",
+      "left_hand_missing": "HumanActor.attach_left_hand_item: LeftHand node not found."
+    },
+    "entity_catalog": {
+      "registry_unresolved": "[EntityCatalog] Unable to resolve entity registry.",
+      "json_missing": "[EntityCatalog] Entity JSON not found: {0}",
+      "json_open_failed": "[EntityCatalog] Failed to open entity JSON: {0}",
+      "json_parse_failed": "[EntityCatalog] JSON parse error in {0}: {1}",
+      "json_root_invalid": "[EntityCatalog] Entity JSON root must be a Dictionary.",
+      "scene_missing": "[EntityCatalog] Missing scene for entity '{0}': {1}",
+      "scene_invalid": "[EntityCatalog] Scene is not a PackedScene: {0}"
+    },
+    "item_catalog": {
+      "registry_unresolved": "[ItemCatalog] Unable to resolve item registry.",
+      "items_dir_missing": "[ItemCatalog] Item resource directory not found: {0}",
+      "tags_dir_missing": "[ItemCatalog] Item tags directory not found: {0}",
+      "tag_open_failed": "[ItemCatalog] Failed to open tag file: {0}",
+      "tag_parse_failed": "[ItemCatalog] JSON parse error in {0}: {1}",
+      "tag_root_invalid": "[ItemCatalog] Tag file root must be a Dictionary: {0}",
+      "tag_values_invalid": "[ItemCatalog] Tag 'values' must be an Array: {0}"
+    },
+    "weapon_catalog": {
+      "registry_unresolved": "[WeaponCatalog] Unable to resolve weapon registry.",
+      "weapons_dir_missing": "[WeaponCatalog] Weapon resource directory not found: {0}"
+    },
+    "projectile_catalog": {
+      "registry_unresolved": "[ProjectileCatalog] Unable to resolve projectile registry.",
+      "json_missing": "[ProjectileCatalog] Projectile JSON not found: {0}",
+      "json_open_failed": "[ProjectileCatalog] Failed to open projectile JSON: {0}",
+      "json_parse_failed": "[ProjectileCatalog] JSON parse error in {0}: {1}",
+      "json_root_invalid": "[ProjectileCatalog] Projectile JSON root must be a Dictionary.",
+      "script_missing": "[ProjectileCatalog] Missing script for projectile '{0}': {1}",
+      "script_invalid": "[ProjectileCatalog] Projectile script is invalid: {0}",
+      "script_instance_invalid": "[ProjectileCatalog] Projectile script did not instantiate a Projectile: {0}"
+    },
+    "buff_catalog": {
+      "registry_unresolved": "[BuffCatalog] Unable to resolve buff registry.",
+      "buffs_dir_missing": "[BuffCatalog] Buff resource directory not found: {0}"
+    },
+    "loading_screen_shader": {
+      "path_access_failed": "[LoadingScreenWithShaderCaching] Failed to access path: {0}",
+      "path_list_failed": "[LoadingScreenWithShaderCaching] Failed to list path: {0}"
+    },
+    "registry": {
+      "validator": {
+        "item_registry_missing": "[RegistryValidator] Item registry is unavailable.",
+        "item_entry_invalid": "[RegistryValidator] Item entry is invalid: {0}",
+        "item_id_missing": "[RegistryValidator] Item id is missing for entry: {0}",
+        "item_icon_missing": "[RegistryValidator] Item icon is missing for '{0}': {1}",
+        "weapon_registry_missing": "[RegistryValidator] Weapon registry is unavailable.",
+        "weapon_entry_invalid": "[RegistryValidator] Weapon entry is invalid: {0}",
+        "weapon_item_missing": "[RegistryValidator] Weapon '{0}' references missing item '{1}'.",
+        "weapon_projectile_missing": "[RegistryValidator] Weapon '{0}' references missing projectile '{1}'.",
+        "weapon_icon_missing": "[RegistryValidator] Weapon icon is missing for '{0}': {1}",
+        "entity_registry_missing": "[RegistryValidator] Entity registry is unavailable.",
+        "entity_entry_invalid": "[RegistryValidator] Entity entry is invalid: {0}",
+        "entity_scene_missing": "[RegistryValidator] Entity '{0}' references missing scene '{1}'.",
+        "entity_scene_invalid": "[RegistryValidator] Entity '{0}' scene is not a PackedScene: {1}",
+        "projectile_registry_missing": "[RegistryValidator] Projectile registry is unavailable.",
+        "projectile_entry_invalid": "[RegistryValidator] Projectile entry is invalid: {0}",
+        "projectile_script_missing": "[RegistryValidator] Projectile '{0}' references missing script '{1}'.",
+        "projectile_script_invalid": "[RegistryValidator] Projectile '{0}' script is invalid: {1}",
+        "projectile_sprite_missing": "[RegistryValidator] Projectile '{0}' sprite is missing: {1}",
+        "buff_registry_missing": "[RegistryValidator] Buff registry is unavailable.",
+        "buff_entry_invalid": "[RegistryValidator] Buff entry is invalid: {0}",
+        "buff_id_missing": "[RegistryValidator] Buff id is missing for entry: {0}"
+      }
+    }
+  }
 }

@@ -39,6 +39,7 @@ func _ready() -> void:
 	WeaponCatalog.ensure_registry()
 	EntityCatalog.ensure_registry()
 	ProjectileCatalog.ensure_registry()
+	RegistryValidator.validate_all()
 	_spawn_runtime_entities()
 	_setup_crosshair()
 	_projectiles = get_node_or_null("Projectiles")
@@ -242,7 +243,7 @@ func _on_held_item_changed(item_id: String) -> void:
 func _setup_player_hud() -> void:
 	var hud_scene := load("res://scenes/game_scene/player_hud.tscn")
 	if hud_scene == null:
-		push_warning("[DemoGame] Failed to load player_hud.tscn")
+		LocalizedText.warn("logs.demo_game.player_hud_load_failed")
 		return
 	_player_hud = hud_scene.instantiate() as PlayerHUD
 	if _player_hud == null:

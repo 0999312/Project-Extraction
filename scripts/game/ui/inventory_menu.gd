@@ -20,21 +20,20 @@ const EQUIP_SLOT_SIZE := Vector2(64, 64)
 const EQUIP_BG_COLOR := Color(0.08, 0.08, 0.08, 0.85)
 const EQUIP_BORDER_COLOR := Color(0.5, 0.5, 0.5, 0.8)
 const EQUIP_BORDER_COLOR_ACTIVE := Color(0.3, 0.85, 0.3, 0.9)
-const EQUIP_EMPTY_TEXT := "Empty"
 const EQUIPMENT_LAYOUT := [
 	[
-		{"slot_key": "primary_weapon", "label": "Primary"},
-		{"slot_key": "secondary_weapon", "label": "Secondary"},
-		{"slot_key": "melee_weapon", "label": "Melee"},
+		{"slot_key": "primary_weapon", "label_key": "ui.inventory.slot.primary_weapon"},
+		{"slot_key": "secondary_weapon", "label_key": "ui.inventory.slot.secondary_weapon"},
+		{"slot_key": "melee_weapon", "label_key": "ui.inventory.slot.melee_weapon"},
 	],
 	[
-		{"slot_key": "helmet", "label": "Helmet"},
-		{"slot_key": "headset", "label": "Headset"},
-		{"slot_key": "armor", "label": "Armor"},
+		{"slot_key": "helmet", "label_key": "ui.inventory.slot.helmet"},
+		{"slot_key": "headset", "label_key": "ui.inventory.slot.headset"},
+		{"slot_key": "armor", "label_key": "ui.inventory.slot.armor"},
 	],
 	[
-		{"slot_key": "backpack", "label": "Backpack"},
-		{"slot_key": "tactical_vest", "label": "Vest"},
+		{"slot_key": "backpack", "label_key": "ui.inventory.slot.backpack"},
+		{"slot_key": "tactical_vest", "label_key": "ui.inventory.slot.tactical_vest"},
 	],
 ]
 
@@ -53,6 +52,10 @@ var _dragged_equipment_item_id: String = ""
 
 signal inventory_toggled(is_open: bool)
 signal held_item_changed(item_id: String)
+
+
+func _txt(key: String, args: Array = []) -> String:
+	return LocalizedText.text(key, args)
 
 func _ready() -> void:
 	layer = 20
@@ -174,7 +177,7 @@ func _build_ui() -> void:
 	hbox_main.add_child(vbox_right)
 
 	_title_label = Label.new()
-	_title_label.text = "INVENTORY"
+	_title_label.text = _txt("ui.inventory.title")
 	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title_label.add_theme_font_size_override("font_size", 22)
 	vbox_right.add_child(_title_label)
@@ -186,7 +189,7 @@ func _build_ui() -> void:
 
 	# Hotbar section
 	var hotbar_label := Label.new()
-	hotbar_label.text = "HOTBAR"
+	hotbar_label.text = _txt("ui.inventory.hotbar_title")
 	hotbar_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox_right.add_child(hotbar_label)
 
@@ -219,7 +222,7 @@ func _build_equipment_panel(parent: Control) -> void:
 	panel.add_child(vbox)
 
 	var equip_title := Label.new()
-	equip_title.text = "EQUIPMENT"
+	equip_title.text = _txt("ui.inventory.equipment_title")
 	equip_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	equip_title.add_theme_font_size_override("font_size", 18)
 	vbox.add_child(equip_title)
@@ -230,10 +233,10 @@ func _build_equipment_panel(parent: Control) -> void:
 		row.add_theme_constant_override("separation", 8)
 		vbox.add_child(row)
 		for entry in row_entries:
-			_add_equip_slot(row, entry["slot_key"], entry["label"])
+			_add_equip_slot(row, entry["slot_key"], entry["label_key"])
 	_refresh_equipment_panel()
 
-func _add_equip_slot(parent: Control, slot_key: String, label_text: String) -> void:
+func _add_equip_slot(parent: Control, slot_key: String, label_key: String) -> void:
 	var slot := PanelContainer.new()
 	slot.custom_minimum_size = EQUIP_SLOT_SIZE
 	slot.add_theme_stylebox_override("panel", _make_equip_stylebox(false))
@@ -248,7 +251,7 @@ func _add_equip_slot(parent: Control, slot_key: String, label_text: String) -> v
 	slot.add_child(vbox)
 
 	var title_label := Label.new()
-	title_label.text = label_text
+	title_label.text = _txt(label_key)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	title_label.add_theme_font_size_override("font_size", 10)
@@ -256,7 +259,7 @@ func _add_equip_slot(parent: Control, slot_key: String, label_text: String) -> v
 	vbox.add_child(title_label)
 
 	var item_label := Label.new()
-	item_label.text = EQUIP_EMPTY_TEXT
+	item_label.text = _txt("ui.inventory.empty")
 	item_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	item_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	item_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -268,7 +271,7 @@ func _add_equip_slot(parent: Control, slot_key: String, label_text: String) -> v
 		"panel": slot,
 		"title": title_label,
 		"value": item_label,
-		"label": label_text,
+		"label_key": label_key,
 	}
 
 static func _make_equip_stylebox(is_filled: bool) -> StyleBoxFlat:
@@ -294,17 +297,19 @@ func _refresh_equipment_panel() -> void:
 			var item_label := refs.get("value") as Label
 			if item_label != null:
 				var has_item := not item_id.is_empty()
-				item_label.text = _get_item_display_name(item_id) if has_item else EQUIP_EMPTY_TEXT
+				item_label.text = _get_item_display_name(item_id) if has_item else _txt("ui.inventory.empty")
 				item_label.add_theme_color_override("font_color", Color.WHITE if has_item else Color(0.75, 0.75, 0.75, 1.0))
 			var panel := refs.get("panel") as PanelContainer
 			if panel != null:
 				var is_drag_source := _dragged_equipment_slot_key == slot_key and not _dragged_equipment_item_id.is_empty()
 				panel.add_theme_stylebox_override("panel", _make_equip_stylebox(not item_id.is_empty() or is_drag_source))
-				panel.tooltip_text = _build_equipment_slot_tooltip(slot_key, str(refs.get("label", slot_key)), item_id)
+				var label_key := str(refs.get("label_key", ""))
+				var label_text := _txt(label_key) if not label_key.is_empty() else _make_readable_item_id(slot_key)
+				panel.tooltip_text = _build_equipment_slot_tooltip(slot_key, label_text, item_id)
 
 func _get_item_display_name(item_id: String) -> String:
 	if item_id.is_empty():
-		return EQUIP_EMPTY_TEXT
+		return _txt("ui.inventory.empty")
 	var item_def := ItemCatalog.get_item_definition(item_id)
 	if item_def != null and not item_def.display_name.is_empty():
 		return item_def.display_name
@@ -317,13 +322,13 @@ static func _make_readable_item_id(item_id: String) -> String:
 	return fallback.replace("_", " ").capitalize()
 
 func _build_equipment_slot_tooltip(slot_key: String, label_text: String, item_id: String) -> String:
-	var lines := ["%s: %s" % [label_text, item_id if not item_id.is_empty() else EQUIP_EMPTY_TEXT]]
+	var lines := [_txt("ui.inventory.tooltip.slot_summary", [label_text, item_id if not item_id.is_empty() else _txt("ui.inventory.empty")])]
 	if _can_start_equipment_drag(slot_key):
-		lines.append("Left-click to drag / unequip")
+		lines.append(_txt("ui.inventory.tooltip.drag_unequip"))
 	elif _is_container_slot(slot_key):
-		lines.append("Container slots stay locked while bound to active storage")
+		lines.append(_txt("ui.inventory.tooltip.locked_container"))
 	if _find_dragging_grid_panel() != null:
-		lines.append("Drop a dragged inventory item here to equip")
+		lines.append(_txt("ui.inventory.tooltip.drop_to_equip"))
 	return "\n".join(lines)
 
 func _on_equipment_slot_input(event: InputEvent, slot_key: String) -> void:
@@ -346,7 +351,7 @@ func _try_equip_from_grid_drag(slot_key: String) -> bool:
 	if gp == null:
 		return false
 	var item_id := gp.get_drag_item_id()
-	if item_id.is_empty() or not _can_equip_item_to_slot(slot_key, item_id):
+	if item_id.is_empty() or not EquipmentRules.can_equip_item_to_slot(slot_key, item_id, _equipment):
 		return false
 	_assign_item_to_equipment_slot(slot_key, item_id)
 	gp.commit_drag()
@@ -375,7 +380,7 @@ func _try_drop_dragged_equipment_on_slot(slot_key: String) -> bool:
 		_clear_equipment_drag()
 		_refresh_equipment_panel()
 		return true
-	if not _can_equip_item_to_slot(slot_key, _dragged_equipment_item_id):
+	if not EquipmentRules.can_equip_item_to_slot(slot_key, _dragged_equipment_item_id, _equipment):
 		return false
 	_clear_equipment_slot(_dragged_equipment_slot_key)
 	_assign_item_to_equipment_slot(slot_key, _dragged_equipment_item_id)
@@ -424,28 +429,6 @@ func _can_start_equipment_drag(slot_key: String) -> bool:
 			return false
 	return true
 
-func _can_equip_item_to_slot(slot_key: String, item_id: String) -> bool:
-	if _equipment == null or item_id.is_empty():
-		return false
-	if not _equipment.get_equipped(slot_key).is_empty():
-		return false
-	var item_def := ItemCatalog.get_item_definition(item_id)
-	match slot_key:
-		"primary_weapon", "secondary_weapon", "melee_weapon":
-			return ItemCatalog.has_tag(item_id, "weapon")
-		"armor":
-			return item_def != null and item_def.category == "armor"
-		"headset":
-			return item_def != null and item_def.category == "headset"
-		"helmet":
-			return item_def != null and item_def.category == "helmet"
-		"tactical_vest":
-			return item_def != null and item_def.category in ["vest", "tactical_vest"]
-		"backpack":
-			return item_def != null and item_def.category == "backpack"
-		_:
-			return false
-
 func _assign_item_to_equipment_slot(slot_key: String, item_id: String) -> void:
 	if _equipment == null:
 		return
@@ -486,14 +469,14 @@ func _rebuild_equipment_grids() -> void:
 	if _equipment == null:
 		# Fallback: show single grid from bound inventory
 		if _grid != null:
-			_add_grid_section("BACKPACK (default)", _grid)
+			_add_grid_section(_txt("ui.inventory.section.default_backpack"), _grid)
 		return
 
 	var containers := _equipment.get_all_container_grids()
 	for entry in containers:
 		var slot_key: String = entry["slot_key"]
 		var grid: GridInventory = entry["grid"]
-		var display := slot_key.replace("_", " ").to_upper()
+		var display := _get_equipment_slot_label(slot_key)
 		var item_id := _equipment.get_equipped(slot_key)
 		if not item_id.is_empty():
 			display = "%s — %s" % [display, _get_item_display_name(item_id)]
@@ -531,6 +514,13 @@ func _add_grid_section(title: String, grid: GridInventory) -> void:
 		return _try_drop_dragged_equipment_to_grid(gp, local_pos)
 	)
 	_grid_panels.append(gp)
+
+func _get_equipment_slot_label(slot_key: String) -> String:
+	for row_entries in EQUIPMENT_LAYOUT:
+		for entry in row_entries:
+			if str(entry["slot_key"]) == slot_key:
+				return _txt(str(entry["label_key"]))
+	return _make_readable_item_id(slot_key)
 
 # ── Hotbar ─────────────────────────────────────────────────────────────────────
 func _build_hotbar_slots() -> void:
@@ -580,7 +570,7 @@ func _on_hotbar_slot_input(event: InputEvent, slot_index: int) -> void:
 			if gp != null and gp.is_dragging():
 				any_dragging = true
 				var item_id := gp.get_drag_item_id()
-				if not item_id.is_empty() and _grid != null and _can_assign_item_to_hotbar(slot_index, item_id):
+				if not item_id.is_empty() and _grid != null and EquipmentRules.can_assign_item_to_hotbar(slot_index, item_id):
 					_grid.set_hotbar_slot(slot_index, item_id)
 					_sync_equipment_slot_from_hotbar(slot_index)
 					gp._cancel_drag()
@@ -599,22 +589,13 @@ func _refresh_hotbar_ui() -> void:
 		var slot: PanelContainer = _hotbar_slots_ui[i]
 		var is_active := (i == _grid.active_hotbar_index)
 		slot.add_theme_stylebox_override("panel", _make_hotbar_sb(is_active))
-		slot.tooltip_text = "Hotbar %d: %s" % [i + 1, _get_item_display_name(_grid.hotbar_slots[i])]
-
-func _can_assign_item_to_hotbar(slot_index: int, item_id: String) -> bool:
-	if _grid == null:
-		return false
-	if slot_index < 0:
-		return false
-	if slot_index >= 3:
-		return true
-	return ItemCatalog.has_tag(item_id, "weapon")
+		slot.tooltip_text = _txt("ui.inventory.hotbar_slot_tooltip", [i + 1, _get_item_display_name(_grid.hotbar_slots[i])])
 
 func _sync_equipment_from_hotbar() -> void:
 	if _grid == null or _equipment == null:
 		return
 	if _grid.hotbar_slots.size() < EquipmentState.HOTBAR_SLOT_KEYS.size():
-		push_warning("[InventoryMenu] hotbar slot count is smaller than equipment-backed hotbar slot count.")
+		LocalizedText.warn("logs.inventory.hotbar_slot_count_mismatch")
 	for i in range(mini(_grid.hotbar_slots.size(), EquipmentState.HOTBAR_SLOT_KEYS.size())):
 		_sync_equipment_slot_from_hotbar(i)
 

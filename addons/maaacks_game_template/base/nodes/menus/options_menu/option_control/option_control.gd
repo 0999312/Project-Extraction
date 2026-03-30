@@ -3,6 +3,12 @@ class_name OptionControl
 extends Control
 ## Generic scene for editing a value of the [PlayerConfig].
 
+static func localize_option_text(value : String) -> String:
+	if value.is_empty():
+		return ""
+	return TranslationServer.translate(value)
+
+
 signal setting_changed(value)
 
 enum OptionSections{
@@ -34,7 +40,11 @@ const OptionSectionNames : Dictionary = {
 		var _update_config : bool = option_name.to_pascal_case() == key and not lock_config_names
 		option_name = value
 		if is_inside_tree():
-			%OptionLabel.text = "%s%s" % [option_name, label_suffix]
+			var localized_option_name := localize_option_text(option_name)
+			if localized_option_name.is_empty():
+				%OptionLabel.text = localized_option_name
+			else:
+				%OptionLabel.text = "%s%s" % [localized_option_name, label_suffix]
 		if _update_config:
 			key = option_name.to_pascal_case()
 ## Defines what section in the config file this option belongs under.

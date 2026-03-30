@@ -18,7 +18,7 @@ static func ensure_registry() -> void:
 		RegistryManager.register_registry(TAG_REGISTRY_TYPE, TagRegistry.new())
 	var registry := _get_registry()
 	if registry == null:
-		push_error("[ItemCatalog] Unable to resolve item registry.")
+		LocalizedText.error("logs.item_catalog.registry_unresolved")
 		return
 	_load_items_from_resources(registry)
 	_load_tags_from_json()
@@ -26,7 +26,7 @@ static func ensure_registry() -> void:
 static func _load_items_from_resources(registry: ItemRegistry) -> void:
 	var dir := DirAccess.open(ITEMS_RESOURCE_DIR)
 	if dir == null:
-		push_warning("[ItemCatalog] Item resource directory not found: %s" % ITEMS_RESOURCE_DIR)
+		LocalizedText.warn("logs.item_catalog.items_dir_missing", [ITEMS_RESOURCE_DIR])
 		return
 	dir.list_dir_begin()
 	var file_name := dir.get_next()
@@ -49,7 +49,7 @@ static func _load_tags_from_json() -> void:
 	var registry_type_rl := ResourceLocation.new("core", REGISTRY_TYPE)
 	var dir := DirAccess.open(ITEM_TAGS_DIR)
 	if dir == null:
-		push_warning("[ItemCatalog] Item tags directory not found: %s" % ITEM_TAGS_DIR)
+		LocalizedText.warn("logs.item_catalog.tags_dir_missing", [ITEM_TAGS_DIR])
 		return
 	dir.list_dir_begin()
 	var file_name := dir.get_next()
@@ -65,21 +65,21 @@ static func _load_tags_from_json() -> void:
 static func _load_single_tag(tag_registry: TagRegistry, registry_type_rl: ResourceLocation, tag_rl: ResourceLocation, path: String) -> void:
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
-		push_warning("[ItemCatalog] Failed to open tag file: %s" % path)
+		LocalizedText.warn("logs.item_catalog.tag_open_failed", [path])
 		return
 	var json := JSON.new()
 	var err := json.parse(file.get_as_text())
 	file.close()
 	if err != OK:
-		push_error("[ItemCatalog] JSON parse error in %s: %s" % [path, json.get_error_message()])
+		LocalizedText.error("logs.item_catalog.tag_parse_failed", [path, json.get_error_message()])
 		return
 	var data: Variant = json.data
 	if not (data is Dictionary):
-		push_error("[ItemCatalog] Tag file root must be a Dictionary: %s" % path)
+		LocalizedText.error("logs.item_catalog.tag_root_invalid", [path])
 		return
 	var values: Variant = (data as Dictionary).get("values", [])
 	if not (values is Array):
-		push_error("[ItemCatalog] Tag 'values' must be an Array: %s" % path)
+		LocalizedText.error("logs.item_catalog.tag_values_invalid", [path])
 		return
 	if not tag_registry.has_entry(tag_rl):
 		tag_registry.register_tag(tag_rl, registry_type_rl)

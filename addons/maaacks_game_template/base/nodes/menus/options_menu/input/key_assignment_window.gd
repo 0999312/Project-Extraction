@@ -2,10 +2,10 @@
 extends ConfirmationOverlaidWindow
 ## Scene to confirm a new input for an action name.
 
-const LISTENING_TEXT : String = "Listening for input..."
-const FOCUS_HERE_TEXT : String = "Focus here to assign inputs."
-const CONFIRM_INPUT_TEXT : String = "Press again to confirm..."
-const NO_INPUT_TEXT : String = "None"
+const LISTENING_TEXT_KEY : String = "ui.input.listening_for_input"
+const FOCUS_HERE_TEXT_KEY : String = "ui.input.focus_here_to_assign"
+const CONFIRM_INPUT_TEXT_KEY : String = "ui.input.press_again_to_confirm"
+const NO_INPUT_TEXT_KEY : String = "ui.input.none"
 
 enum InputConfirmation {
 	SINGLE,
@@ -38,12 +38,12 @@ func _is_recordable_input(event : InputEvent) -> bool:
 		event.is_pressed()
 
 func _start_listening() -> void:
-	%InputTextEdit.placeholder_text = LISTENING_TEXT
+	%InputTextEdit.placeholder_text = tr(LISTENING_TEXT_KEY)
 	listening = true
 	%DelayTimer.start()
 
 func _stop_listening() -> void:
-	%InputTextEdit.placeholder_text = FOCUS_HERE_TEXT
+	%InputTextEdit.placeholder_text = tr(FOCUS_HERE_TEXT_KEY)
 	listening = false
 	confirming = false
 
@@ -96,7 +96,7 @@ func _process_input_event(event : InputEvent) -> void:
 	if _should_confirm_input_event(event):
 		confirming = true
 		%DelayTimer.start()
-		%InputTextEdit.placeholder_text = CONFIRM_INPUT_TEXT
+		%InputTextEdit.placeholder_text = tr(CONFIRM_INPUT_TEXT_KEY)
 
 func _on_input_text_edit_gui_input(event) -> void:
 	%InputTextEdit.set_deferred("text", "")
@@ -108,5 +108,5 @@ func _on_visibility_changed() -> void:
 		if not text.strip_edges().is_empty():
 			%InputLabel.text = text
 		else:
-			%InputLabel.text = NO_INPUT_TEXT
+			%InputLabel.text = tr(NO_INPUT_TEXT_KEY)
 		%InputTextEdit.grab_focus()

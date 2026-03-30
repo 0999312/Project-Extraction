@@ -66,7 +66,7 @@ static func ensure_registry_and_register(audio_groups: Array) -> void:
 		RegistryManager.register_registry(REGISTRY_TYPE, AudioRegistry.new())
 	var registry := _get_audio_registry()
 	if registry == null:
-		push_error("[AudioCatalog] Unable to resolve audio registry during startup registration.")
+		LocalizedText.error("logs.audio.registry_resolve_failed_startup")
 		return
 	for audio_group in audio_groups:
 		_register_entry(registry, audio_group)
@@ -79,7 +79,7 @@ static func register_gameplay_audio() -> void:
 		RegistryManager.register_registry(REGISTRY_TYPE, AudioRegistry.new())
 	var registry := _get_audio_registry()
 	if registry == null:
-		push_error("[AudioCatalog] Unable to resolve audio registry during gameplay registration.")
+		LocalizedText.error("logs.audio.registry_resolve_failed_gameplay")
 		return
 	for audio_group in GAMEPLAY_AUDIO_GROUPS:
 		_register_entry(registry, audio_group)
@@ -179,7 +179,11 @@ static func _debug_print_registry_contents(registry: AudioRegistry, phase: Strin
 
 static func _load_streams_from_files(folder_path: String, file_names: Array) -> Array:
 	var streams: Array = []
-	if folder_path.is_empty() or not DirAccess.dir_exists_absolute(folder_path):
+	if folder_path.is_empty():
+		LocalizedText.warn("logs.audio.folder_path_missing")
+		return streams
+	if not DirAccess.dir_exists_absolute(folder_path):
+		LocalizedText.warn("logs.audio.folder_missing", [folder_path])
 		return streams
 	for file_name_variant in file_names:
 		var file_name := str(file_name_variant)
@@ -187,6 +191,7 @@ static func _load_streams_from_files(folder_path: String, file_names: Array) -> 
 			continue
 		var stream_path := "%s/%s" % [folder_path, file_name]
 		if not ResourceLoader.exists(stream_path):
+			LocalizedText.warn("logs.audio.resource_missing", [stream_path])
 			continue
 		var stream := load(stream_path)
 		if stream is AudioStream:
@@ -195,6 +200,8 @@ static func _load_streams_from_files(folder_path: String, file_names: Array) -> 
 				"path": stream_path,
 				"stream": stream,
 			})
+		else:
+			LocalizedText.warn("logs.audio.resource_invalid", [stream_path])
 	return streams
 
 

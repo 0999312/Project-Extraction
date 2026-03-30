@@ -6,7 +6,7 @@ signal confirmed
 
 @onready var confirm_button : Button = %ConfirmButton
 
-@export var confirm_button_text : String = "Confirm" :
+@export var confirm_button_text : String = "ui.common.confirm" :
 	set(value):
 		confirm_button_text = value
 		if update_content and is_inside_tree():
