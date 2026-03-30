@@ -13,14 +13,14 @@ static func ensure_registry() -> void:
 		RegistryManager.register_registry(REGISTRY_TYPE, WeaponRegistry.new())
 	var registry := _get_registry()
 	if registry == null:
-		push_error("[WeaponCatalog] Unable to resolve weapon registry.")
+		LocalizedText.error("logs.weapon_catalog.registry_unresolved")
 		return
 	_load_weapons_from_resources(registry)
 
 static func _load_weapons_from_resources(registry: WeaponRegistry) -> void:
 	var dir := DirAccess.open(WEAPONS_RESOURCE_DIR)
 	if dir == null:
-		push_warning("[WeaponCatalog] Weapon resource directory not found: %s" % WEAPONS_RESOURCE_DIR)
+		LocalizedText.warn("logs.weapon_catalog.weapons_dir_missing", [WEAPONS_RESOURCE_DIR])
 		return
 	dir.list_dir_begin()
 	var file_name := dir.get_next()

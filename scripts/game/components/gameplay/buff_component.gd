@@ -24,7 +24,7 @@ func _ready() -> void:
 func apply_buff(buff_id: String) -> void:
 	var def: BuffDefinition = BuffCatalog.get_definition(buff_id)
 	if def == null:
-		push_error("[BuffComponent] Unknown buff id: %s" % buff_id)
+		LocalizedText.error("logs.buff_component.unknown_buff_id", [buff_id])
 		return
 	if _active.has(buff_id):
 		var inst: BuffInstance = _active[buff_id]

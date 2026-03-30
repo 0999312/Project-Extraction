@@ -3,7 +3,7 @@ class_name PlayerInputContext
 extends GUIDEMappingContext
 
 func _init() -> void:
-	display_name = "Player"
+	display_name = "ui.input.context_player"
 	mappings = [
 		_make_move_mapping(),
 		_make_aim_mapping(),
@@ -32,7 +32,7 @@ func _make_move_mapping() -> GUIDEActionMapping:
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.AXIS_2D
 	action.is_remappable = true
 	action.display_name = "ui.input.action_move"
-	action.display_category = "Movement"
+	action.display_category = "ui.input.category_movement"
 
 	var mapping := GUIDEActionMapping.new()
 	mapping.action = action
@@ -52,7 +52,7 @@ func _make_aim_mapping() -> GUIDEActionMapping:
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.AXIS_2D
 	action.is_remappable = true
 	action.display_name = "ui.input.action_aim"
-	action.display_category = "Combat"
+	action.display_category = "ui.input.category_combat"
 
 	var mapping := GUIDEActionMapping.new()
 	mapping.action = action
@@ -68,7 +68,7 @@ func _make_fire_mapping() -> GUIDEActionMapping:
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
 	action.is_remappable = true
 	action.display_name = "ui.input.action_fire"
-	action.display_category = "Combat"
+	action.display_category = "ui.input.category_combat"
 
 	var mapping := GUIDEActionMapping.new()
 	mapping.action = action
@@ -86,7 +86,7 @@ func _make_aim_hold_mapping() -> GUIDEActionMapping:
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
 	action.is_remappable = true
 	action.display_name = "ui.input.action_aim_hold"
-	action.display_category = "Combat"
+	action.display_category = "ui.input.category_combat"
 
 	var mapping := GUIDEActionMapping.new()
 	mapping.action = action
@@ -103,7 +103,7 @@ func _make_sprint_mapping() -> GUIDEActionMapping:
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
 	action.is_remappable = true
 	action.display_name = "ui.input.action_sprint"
-	action.display_category = "Movement"
+	action.display_category = "ui.input.category_movement"
 
 	var mapping := GUIDEActionMapping.new()
 	mapping.action = action
@@ -120,7 +120,7 @@ func _make_reload_mapping() -> GUIDEActionMapping:
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
 	action.is_remappable = true
 	action.display_name = "ui.input.action_reload"
-	action.display_category = "Combat"
+	action.display_category = "ui.input.category_combat"
 
 	var mapping := GUIDEActionMapping.new()
 	mapping.action = action
@@ -137,7 +137,7 @@ func _make_fire_mode_toggle_mapping() -> GUIDEActionMapping:
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
 	action.is_remappable = true
 	action.display_name = "ui.input.action_fire_mode_toggle"
-	action.display_category = "Combat"
+	action.display_category = "ui.input.category_combat"
 
 	var mapping := GUIDEActionMapping.new()
 	mapping.action = action
@@ -154,7 +154,7 @@ func _make_inventory_mapping() -> GUIDEActionMapping:
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
 	action.is_remappable = true
 	action.display_name = "ui.input.action_inventory"
-	action.display_category = "System"
+	action.display_category = "ui.input.category_system"
 
 	var mapping := GUIDEActionMapping.new()
 	mapping.action = action
@@ -170,7 +170,7 @@ func _make_hotbar_slot_mapping(index: int, keycode: Key) -> GUIDEActionMapping:
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
 	action.is_remappable = true
 	action.display_name = "ui.input.action_hotbar_%d" % (index + 1)
-	action.display_category = "Inventory"
+	action.display_category = "ui.input.category_inventory"
 
 	var mapping := GUIDEActionMapping.new()
 	mapping.action = action
@@ -186,7 +186,7 @@ func _make_pause_mapping() -> GUIDEActionMapping:
 	action.action_value_type = GUIDEAction.GUIDEActionValueType.BOOL
 	action.is_remappable = true
 	action.display_name = "ui.input.action_pause"
-	action.display_category = "System"
+	action.display_category = "ui.input.category_system"
 
 	var mapping := GUIDEActionMapping.new()
 	mapping.action = action

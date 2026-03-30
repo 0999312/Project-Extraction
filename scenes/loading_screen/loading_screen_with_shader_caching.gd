@@ -64,10 +64,10 @@ func _traverse_folders(dir_path:String) -> PackedStringArray:
 		dir_path += "/"
 	var dir := DirAccess.open(dir_path)
 	if not dir:
-		push_error("failed to access the path ", dir_path)
+		LocalizedText.error("logs.loading_screen_shader.path_access_failed", [dir_path])
 		return []
 	if dir.list_dir_begin() != OK:
-		push_error("failed to access the path ", dir_path)
+		LocalizedText.error("logs.loading_screen_shader.path_list_failed", [dir_path])
 		return []
 	var file_name := dir.get_next()
 	while file_name != "":

@@ -18,14 +18,14 @@ static func ensure_registry() -> void:
 		RegistryManager.register_registry(TAG_REGISTRY_TYPE, TagRegistry.new())
 	var registry := _get_buff_registry()
 	if registry == null:
-		push_error("[BuffCatalog] Unable to resolve buff registry.")
+		LocalizedText.error("logs.buff_catalog.registry_unresolved")
 		return
 	_load_buffs_from_resources(registry)
 
 static func _load_buffs_from_resources(registry: BuffRegistry) -> void:
 	var dir := DirAccess.open(BUFFS_RESOURCE_DIR)
 	if dir == null:
-		push_warning("[BuffCatalog] Buff resource directory not found: %s" % BUFFS_RESOURCE_DIR)
+		LocalizedText.warn("logs.buff_catalog.buffs_dir_missing", [BUFFS_RESOURCE_DIR])
 		return
 	dir.list_dir_begin()
 	var file_name := dir.get_next()

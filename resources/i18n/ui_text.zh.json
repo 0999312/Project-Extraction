@@ -84,6 +84,11 @@
       "action_hotbar_9": "快捷栏 9",
       "action_hotbar_next": "下一快捷栏格",
       "action_hotbar_prev": "上一快捷栏格",
+      "context_player": "玩家",
+      "category_movement": "移动",
+      "category_combat": "战斗",
+      "category_system": "系统",
+      "category_inventory": "物品栏",
       "rebind": "重新绑定",
       "clear": "清除",
       "reset_defaults": "恢复默认",
@@ -99,6 +104,32 @@
     },
     "audio": {
       "input_device": "输入设备："
+    },
+    "inventory": {
+      "title": "物品栏",
+      "hotbar_title": "快捷栏",
+      "equipment_title": "装备",
+      "empty": "空",
+      "section": {
+        "default_backpack": "背包（默认）"
+      },
+      "slot": {
+        "primary_weapon": "主武器",
+        "secondary_weapon": "副武器",
+        "melee_weapon": "近战",
+        "helmet": "头盔",
+        "headset": "耳机",
+        "armor": "护甲",
+        "backpack": "背包",
+        "tactical_vest": "弹挂"
+      },
+      "tooltip": {
+        "slot_summary": "{0}：{1}",
+        "drag_unequip": "左键拖拽 / 卸下",
+        "locked_container": "当前作为活动存储来源的容器槽会保持锁定",
+        "drop_to_equip": "将正在拖拽的物品放到这里以装备"
+      },
+      "hotbar_slot_tooltip": "快捷栏 {0}：{1}"
     },
     "options": {
       "language": {
@@ -175,5 +206,93 @@
   "None": "无",
   "Please Confirm...": "请确认...",
   "Cancel": "取消",
-  "OK": "确定"
+  "OK": "确定",
+  "logs": {
+    "audio": {
+      "registry_resolve_failed_startup": "[AudioCatalog] 启动阶段无法解析音频注册表。",
+      "registry_resolve_failed_gameplay": "[AudioCatalog] 游戏加载阶段无法解析音频注册表。",
+      "folder_path_missing": "[AudioCatalog] 音频文件夹路径为空。",
+      "folder_missing": "[AudioCatalog] 未找到音频文件夹：{0}",
+      "resource_missing": "[AudioCatalog] 未找到音频资源：{0}",
+      "resource_invalid": "[AudioCatalog] 音频资源不是有效的 AudioStream：{0}"
+    },
+    "demo_game": {
+      "player_hud_load_failed": "[DemoGame] 加载 player_hud.tscn 失败"
+    },
+    "inventory": {
+      "hotbar_slot_count_mismatch": "[InventoryMenu] 快捷栏槽位数量小于装备映射到快捷栏的槽位数量。"
+    },
+    "buff_component": {
+      "unknown_buff_id": "[BuffComponent] 未知 Buff ID：{0}"
+    },
+    "human_actor": {
+      "right_hand_missing": "HumanActor.attach_weapon：未找到 RightHand 节点。",
+      "left_hand_missing": "HumanActor.attach_left_hand_item：未找到 LeftHand 节点。"
+    },
+    "entity_catalog": {
+      "registry_unresolved": "[EntityCatalog] 无法解析实体注册表。",
+      "json_missing": "[EntityCatalog] 未找到实体 JSON：{0}",
+      "json_open_failed": "[EntityCatalog] 打开实体 JSON 失败：{0}",
+      "json_parse_failed": "[EntityCatalog] 解析 JSON 失败 {0}：{1}",
+      "json_root_invalid": "[EntityCatalog] 实体 JSON 根节点必须是 Dictionary。",
+      "scene_missing": "[EntityCatalog] 实体“{0}”引用了缺失场景：{1}",
+      "scene_invalid": "[EntityCatalog] 实体场景不是 PackedScene：{0}"
+    },
+    "item_catalog": {
+      "registry_unresolved": "[ItemCatalog] 无法解析物品注册表。",
+      "items_dir_missing": "[ItemCatalog] 未找到物品资源目录：{0}",
+      "tags_dir_missing": "[ItemCatalog] 未找到物品标签目录：{0}",
+      "tag_open_failed": "[ItemCatalog] 打开标签文件失败：{0}",
+      "tag_parse_failed": "[ItemCatalog] 解析 JSON 失败 {0}：{1}",
+      "tag_root_invalid": "[ItemCatalog] 标签文件根节点必须是 Dictionary：{0}",
+      "tag_values_invalid": "[ItemCatalog] 标签文件中的 values 必须是 Array：{0}"
+    },
+    "weapon_catalog": {
+      "registry_unresolved": "[WeaponCatalog] 无法解析武器注册表。",
+      "weapons_dir_missing": "[WeaponCatalog] 未找到武器资源目录：{0}"
+    },
+    "projectile_catalog": {
+      "registry_unresolved": "[ProjectileCatalog] 无法解析抛射物注册表。",
+      "json_missing": "[ProjectileCatalog] 未找到抛射物 JSON：{0}",
+      "json_open_failed": "[ProjectileCatalog] 打开抛射物 JSON 失败：{0}",
+      "json_parse_failed": "[ProjectileCatalog] 解析 JSON 失败 {0}：{1}",
+      "json_root_invalid": "[ProjectileCatalog] 抛射物 JSON 根节点必须是 Dictionary。",
+      "script_missing": "[ProjectileCatalog] 抛射物“{0}”引用了缺失脚本：{1}",
+      "script_invalid": "[ProjectileCatalog] 抛射物脚本无效：{0}",
+      "script_instance_invalid": "[ProjectileCatalog] 抛射物脚本未实例化为 Projectile：{0}"
+    },
+    "buff_catalog": {
+      "registry_unresolved": "[BuffCatalog] 无法解析 Buff 注册表。",
+      "buffs_dir_missing": "[BuffCatalog] 未找到 Buff 资源目录：{0}"
+    },
+    "loading_screen_shader": {
+      "path_access_failed": "[LoadingScreenWithShaderCaching] 访问路径失败：{0}",
+      "path_list_failed": "[LoadingScreenWithShaderCaching] 列出路径内容失败：{0}"
+    },
+    "registry": {
+      "validator": {
+        "item_registry_missing": "[RegistryValidator] 物品注册表不可用。",
+        "item_entry_invalid": "[RegistryValidator] 物品条目无效：{0}",
+        "item_id_missing": "[RegistryValidator] 物品条目缺少 ID：{0}",
+        "item_icon_missing": "[RegistryValidator] 物品“{0}”缺少图标资源：{1}",
+        "weapon_registry_missing": "[RegistryValidator] 武器注册表不可用。",
+        "weapon_entry_invalid": "[RegistryValidator] 武器条目无效：{0}",
+        "weapon_item_missing": "[RegistryValidator] 武器“{0}”引用了不存在的物品“{1}”。",
+        "weapon_projectile_missing": "[RegistryValidator] 武器“{0}”引用了不存在的抛射物“{1}”。",
+        "weapon_icon_missing": "[RegistryValidator] 武器“{0}”缺少图标资源：{1}",
+        "entity_registry_missing": "[RegistryValidator] 实体注册表不可用。",
+        "entity_entry_invalid": "[RegistryValidator] 实体条目无效：{0}",
+        "entity_scene_missing": "[RegistryValidator] 实体“{0}”引用了缺失场景“{1}”。",
+        "entity_scene_invalid": "[RegistryValidator] 实体“{0}”的场景不是 PackedScene：{1}",
+        "projectile_registry_missing": "[RegistryValidator] 抛射物注册表不可用。",
+        "projectile_entry_invalid": "[RegistryValidator] 抛射物条目无效：{0}",
+        "projectile_script_missing": "[RegistryValidator] 抛射物“{0}”引用了缺失脚本“{1}”。",
+        "projectile_script_invalid": "[RegistryValidator] 抛射物“{0}”的脚本无效：{1}",
+        "projectile_sprite_missing": "[RegistryValidator] 抛射物“{0}”缺少贴图资源：{1}",
+        "buff_registry_missing": "[RegistryValidator] Buff 注册表不可用。",
+        "buff_entry_invalid": "[RegistryValidator] Buff 条目无效：{0}",
+        "buff_id_missing": "[RegistryValidator] Buff 条目缺少 ID：{0}"
+      }
+    }
+  }
 }
