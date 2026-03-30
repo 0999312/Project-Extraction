@@ -67,16 +67,23 @@ sync_weapons_to_hotbar(grid)          # 将武器 ID 推送至快捷栏 0-2
 
 `InventoryMenu` 现在显示：
 
-1. **装备面板**（左侧）— 所有装备类别的占位槽（武器、护甲、耳机、头盔、容器）。
-2. **容器网格**（右侧）— 每个已装备容器对应一个 `InventoryGridPanel`，由 `EquipmentState.get_all_container_grids()` 动态生成。
+1. **装备面板**（左侧）— 所有装备类别的实时槽位（武器、护甲、耳机、头盔、容器），显示当前绑定到每个槽位的物品名称 / 物品 ID。
+2. **容器网格**（右侧）— 每个已装备容器对应一个 `InventoryGridPanel`，由 `EquipmentState.get_all_container_grids()` 动态生成，并直接绑定到玩家当前使用的物品栏资源。
 3. **快捷栏**（底部）— 9 格，前 3 格保留给武器。
 
 ### 视觉风格
 
-- **快捷栏格子**：`PanelContainer` + `StyleBoxFlat`，6 px 纯黑边框，8 px 圆角，背景透明度 = 64。选中格略微放大（56 × 56 → 64 × 64）并填充深蓝色。
+- **快捷栏格子**：`PanelContainer` + `StyleBoxFlat`，6 px 纯黑边框，8 px 圆角，背景透明度 = 64。选中格保持相同的 56 × 56 正方形尺寸，仅切换为绿色填充。
 - **物品栏网格格子**：`PanelContainer` + `StyleBoxFlat`，6 px 纯黑边框，0 px 圆角（无圆角），背景透明度 = 64。
 - 槽位渲染不使用任何贴图/材质资源。
 - 物品图标使用**按高度适宜比例缩放**（保持纵横比，缩放至格子高度，水平居中）。物品图标绘制在网格上方，**不受面板蒙版裁切**。
+
+### 运行时绑定
+
+- `DemoGameRuntime` 现在通过实例化 `scenes/game_scene/inventory_menu.tscn` 来创建物品栏界面，而不是直接 `new()` 脚本。
+- 玩家自身的 `InventoryState.inventory` 作为背包网格使用，因此物品栏界面、HUD 与玩家运行时现在共用同一份数据。
+- `EquipmentState.sync_hotbar_to_grid(grid)` 会用装备槽初始化快捷栏；`InventoryMenu` 也会把快捷栏绑定结果反向同步回对应的装备槽。
+- 快捷栏第 0–2 格仅接受带有 `weapon` 标签的物品，以保持“前三格保留给武器”的设计规则。
 
 ## 可拓展性
 

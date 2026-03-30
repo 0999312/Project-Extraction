@@ -50,6 +50,7 @@ func _setup_runtime_state() -> void:
 	velocity_state = VelocityState.new(BASE_SPEED)
 	combat_state = CombatState.new()
 	inventory_ref = InventoryState.new()
+	inventory_ref.inventory = GridInventory.new(6, 6)
 	faction_state = FactionState.new(FactionState.FactionType.PLAYER)
 	aim_state = AimState.new()
 	inventory_ref.add_item(ItemCatalog.ITEM_WEAPON_PISTOL, 1)

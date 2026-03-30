@@ -67,16 +67,23 @@ sync_weapons_to_hotbar(grid)          # push weapon IDs to hotbar slots 0-2
 
 The `InventoryMenu` now displays:
 
-1. **Equipment Panel** (left side) — placeholder slots for all gear categories (weapons, armor, headset, helmet, containers).
-2. **Container Grids** (right side) — one `InventoryGridPanel` per equipped container, dynamically generated from `EquipmentState.get_all_container_grids()`.
+1. **Equipment Panel** (left side) — live slots for all gear categories (weapons, armor, headset, helmet, containers), showing the currently bound equipment item ID / display name for each slot.
+2. **Container Grids** (right side) — one `InventoryGridPanel` per equipped container, dynamically generated from `EquipmentState.get_all_container_grids()` and bound to the player's active inventory resources.
 3. **Hotbar** (bottom) — 9 slots, first 3 reserved for weapons.
 
 ### Visual Style
 
-- **Hotbar slots**: `PanelContainer` + `StyleBoxFlat`, 6 px pure-black border, 8 px corner radius, background alpha = 64. Selected slot is slightly enlarged (64 × 64 → from 56 × 56) with a deep-blue fill.
+- **Hotbar slots**: `PanelContainer` + `StyleBoxFlat`, 6 px pure-black border, 8 px corner radius, background alpha = 64. Selected slot keeps the same square footprint (56 × 56) and switches to a green fill.
 - **Inventory grid cells**: `PanelContainer` + `StyleBoxFlat`, 6 px pure-black border, 0 px corner radius (no rounding), background alpha = 64.
 - No texture/material assets are used for slot rendering.
 - Item icon textures are rendered with **fit-by-height** scaling (maintain aspect ratio, scale to cell height, centre horizontally). Item icons are drawn above the grid and are **not clipped** by the panel mask.
+
+### Runtime Binding
+
+- `DemoGameRuntime` instantiates `scenes/game_scene/inventory_menu.tscn` rather than constructing the menu script directly.
+- The player's `InventoryState.inventory` is used as the backpack grid, so the inventory scene, HUD, and player runtime now all point at the same data.
+- `EquipmentState.sync_hotbar_to_grid(grid)` initializes the hotbar from equipment-backed slots, and `InventoryMenu` mirrors hotbar assignments back into the corresponding equipment slots.
+- Hotbar slots 0–2 only accept items tagged as `weapon`, preserving the design rule that those slots are reserved for weapons.
 
 ## Extensibility
 

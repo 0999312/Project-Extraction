@@ -1,6 +1,6 @@
 # HUD & Hotbar System Design
 
-> Version 0.2 – 2026-03-29
+> Version 0.3 – 2026-03-30
 
 ## 1. Overview
 
@@ -20,13 +20,13 @@ The `PlayerHUD` scene (`scenes/game_scene/player_hud.tscn`) is loaded at runtime
 
 | Property | Normal Slot | Selected Slot |
 |----------|------------|---------------|
-| Size | 56 × 56 px | 64 × 64 px |
+| Size | 56 × 56 px | 56 × 56 px |
 | Rendering | `PanelContainer` + `StyleBoxFlat` | `PanelContainer` + `StyleBoxFlat` |
-| Background | Black, alpha = 64 | Deep blue (0, 0, 0.3), alpha = 64 |
+| Background | Black, alpha = 64 | Green (0, 1, 0), alpha = 64 |
 | Border | 6 px, pure black | 6 px, pure black |
 | Corner radius | 8 px | 8 px |
 
-Each slot is a `PanelContainer` with a `StyleBoxFlat` theme override. **No texture/material assets** are used. The selected slot is visually distinguished by a larger size and a deep-blue fill colour.
+Each slot is a `PanelContainer` with a `StyleBoxFlat` theme override. **No texture/material assets** are used. The selected slot keeps the same square footprint as every other slot and is visually distinguished only by a semi-transparent green fill colour.
 
 ### 3.2 Key Bindings
 

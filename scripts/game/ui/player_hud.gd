@@ -10,9 +10,8 @@ const COLOR_THIRST      := Color(0.196, 0.784, 0.941, 1)   # water-blue / cyan
 
 # ── Hotbar visual constants (no texture, pure StyleBoxFlat) ──────────────────
 const HOTBAR_SLOT_SIZE := Vector2(56, 56)
-const HOTBAR_SLOT_SELECTED_SIZE := Vector2(64, 64)
 const HOTBAR_BG_COLOR := Color(0.0, 0.0, 0.0, 64.0 / 255.0)        # alpha = 64
-const HOTBAR_SELECTED_BG_COLOR := Color(0.0, 0.0, 0.3, 64.0 / 255.0) # deep blue, alpha = 64
+const HOTBAR_SELECTED_BG_COLOR := Color(0.0, 1.0, 0.0, 64.0 / 255.0) # green, alpha = 64
 const HOTBAR_BORDER_COLOR := Color(0.0, 0.0, 0.0, 1.0)               # pure black
 const HOTBAR_BORDER_WIDTH := 6
 const HOTBAR_CORNER_RADIUS := 8
@@ -105,12 +104,8 @@ func _update_hotbar_selection() -> void:
 		active_index = _grid.active_hotbar_index
 	for i in range(_hotbar_slots_ui.size()):
 		var slot := _hotbar_slots_ui[i]
-		if i == active_index:
-			slot.custom_minimum_size = HOTBAR_SLOT_SELECTED_SIZE
-			slot.add_theme_stylebox_override("panel", _make_hotbar_stylebox(true))
-		else:
-			slot.custom_minimum_size = HOTBAR_SLOT_SIZE
-			slot.add_theme_stylebox_override("panel", _make_hotbar_stylebox(false))
+		slot.custom_minimum_size = HOTBAR_SLOT_SIZE
+		slot.add_theme_stylebox_override("panel", _make_hotbar_stylebox(i == active_index))
 
 func _poll_hotbar_input() -> void:
 	for i in range(HOTBAR_SLOT_COUNT):

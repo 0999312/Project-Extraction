@@ -1,5 +1,32 @@
 # Project Extraction — Progress
 
+## Update 16 — Hotbar Square Layout + Inventory Scene/Player Inventory Binding
+
+### Changes
+
+- **Hotbar visuals updated to fixed-size squares**:
+  - HUD hotbar slots now remain `56 × 56` in both normal and selected states.
+  - Selected hotbar slots now change only their fill colour to semi-transparent green (`alpha = 64`); they no longer grow in size.
+  - Inventory-menu hotbar styling was updated to match the HUD.
+- **Inventory scene is now bound to the player's real inventory**:
+  - `DemoGameRuntime` now instantiates `scenes/game_scene/inventory_menu.tscn` instead of constructing the menu purely via `InventoryMenu.new()`.
+  - The player's `InventoryState.inventory` is now used as the backpack grid, so the player runtime, HUD, and inventory menu all share the same inventory data.
+  - Player startup inventory was normalized to the documented default backpack size of `6 × 6`.
+- **Equipment panel now mirrors live equipment state**:
+  - The inventory menu's equipment panel now shows the currently bound item name / fallback label for each visible equipment slot.
+  - Backpack and vest grid sections now display the equipped container name alongside grid dimensions.
+  - Hotbar slot assignments are mirrored back into `EquipmentState`, keeping weapon / usable-slot state aligned with the inventory UI.
+- **Hotbar reservation rules tightened**:
+  - Hotbar slots `0–2` now only accept items tagged as `weapon`, matching the equipment-system design.
+  - Selecting a non-weapon hotbar item no longer overwrites `combat_state.equipped_weapon_id`.
+- **Updated documentation**:
+  - Updated `HUD_HOTBAR_DESIGN.md` / `HUD_HOTBAR_DESIGN_ZH.md`.
+  - Updated `EQUIPMENT_SYSTEM.md` / `EQUIPMENT_SYSTEM_ZH.md`.
+  - Updated `INVENTORY_SYSTEM.md` / `INVENTORY_SYSTEM_ZH.md`.
+  - Updated progress documents.
+
+---
+
 ## Update 15 — Equipment System + UI Overhaul (No Textures)
 
 ### Changes

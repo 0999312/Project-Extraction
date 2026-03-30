@@ -1,5 +1,32 @@
 # Project Extraction — 开发进度
 
+## 更新 16 — 快捷栏正方形布局 + 物品栏场景/玩家库存绑定
+
+### 变更内容
+
+- **快捷栏视觉更新为固定正方形**：
+  - HUD 快捷栏在普通态与选中态下都保持 `56 × 56`。
+  - 选中快捷栏格现在只会把填充色切换为半透明绿色（`alpha = 64`），不再放大尺寸。
+  - 物品栏菜单中的快捷栏样式也已同步到与 HUD 一致。
+- **物品栏场景现在绑定到玩家真实库存**：
+  - `DemoGameRuntime` 现在会实例化 `scenes/game_scene/inventory_menu.tscn`，而不是仅通过 `InventoryMenu.new()` 构造菜单。
+  - 玩家自身的 `InventoryState.inventory` 现在作为背包网格使用，因此玩家运行时、HUD 与物品栏菜单共享同一份库存数据。
+  - 玩家初始库存尺寸已整理为文档规定的默认背包大小 `6 × 6`。
+- **装备面板现在镜像实时装备状态**：
+  - 物品栏菜单的装备面板现在会显示每个可见装备槽当前绑定的物品名称 / 回退标签。
+  - 背包与弹挂的网格标题现在会同时展示已装备容器名称与网格尺寸。
+  - 快捷栏槽位绑定结果会反向同步回 `EquipmentState`，使武器 / 可用物槽位状态与物品栏界面保持一致。
+- **快捷栏保留规则进一步收紧**：
+  - 快捷栏 `0–2` 号槽位现在只接受带有 `weapon` 标签的物品，和装备系统设计保持一致。
+  - 选中非武器快捷栏物品时，不再覆盖 `combat_state.equipped_weapon_id`。
+- **文档已同步更新**：
+  - 更新 `HUD_HOTBAR_DESIGN.md` / `HUD_HOTBAR_DESIGN_ZH.md`。
+  - 更新 `EQUIPMENT_SYSTEM.md` / `EQUIPMENT_SYSTEM_ZH.md`。
+  - 更新 `INVENTORY_SYSTEM.md` / `INVENTORY_SYSTEM_ZH.md`。
+  - 更新进度文档。
+
+---
+
 ## 更新 15 — 装备系统 + UI 全面重构（无贴图）
 
 ### 变更内容
