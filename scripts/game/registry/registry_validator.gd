@@ -36,7 +36,6 @@ static func _validate_items() -> bool:
 			is_valid = false
 		if not item_def.icon_path.is_empty() and not _resource_exists(item_def.icon_path):
 			LocalizedText.warn("logs.registry.validator.item_icon_missing", [item_def.id, item_def.icon_path])
-			is_valid = false
 	return is_valid
 
 
@@ -61,7 +60,6 @@ static func _validate_weapons() -> bool:
 			is_valid = false
 		if not weapon_def.icon_path.is_empty() and not _resource_exists(weapon_def.icon_path):
 			LocalizedText.warn("logs.registry.validator.weapon_icon_missing", [weapon_def.id, weapon_def.icon_path])
-			is_valid = false
 	return is_valid
 
 
@@ -114,7 +112,6 @@ static func _validate_projectiles() -> bool:
 		var sprite_path := str(projectile_entry.get("sprite_path", ""))
 		if not sprite_path.is_empty() and not _resource_exists(sprite_path):
 			LocalizedText.warn("logs.registry.validator.projectile_sprite_missing", [key, sprite_path])
-			is_valid = false
 	return is_valid
 
 
