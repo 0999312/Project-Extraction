@@ -55,7 +55,8 @@ static func _validate_weapons() -> bool:
 		if ItemCatalog.get_item_definition(weapon_def.item_id) == null:
 			LocalizedText.error("logs.registry.validator.weapon_item_missing", [weapon_def.id, weapon_def.item_id])
 			is_valid = false
-		if ProjectileCatalog.get_projectile_definition(weapon_def.projectile_definition_id).is_empty():
+		var projectile_def := ProjectileCatalog.get_projectile_definition(weapon_def.projectile_definition_id)
+		if projectile_def.is_empty():
 			LocalizedText.error("logs.registry.validator.weapon_projectile_missing", [weapon_def.id, weapon_def.projectile_definition_id])
 			is_valid = false
 		if not weapon_def.icon_path.is_empty() and not _resource_exists(weapon_def.icon_path):

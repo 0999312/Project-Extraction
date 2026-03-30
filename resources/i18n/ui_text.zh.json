@@ -163,7 +163,7 @@
         "headset": "耳机",
         "armor": "护甲",
         "backpack": "背包",
-        "tactical_vest": "弹挂"
+        "tactical_vest": "战术背心"
       },
       "tooltip": {
         "slot_summary": "{0}：{1}",

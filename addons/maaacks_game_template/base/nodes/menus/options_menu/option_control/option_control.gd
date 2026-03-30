@@ -6,12 +6,7 @@ extends Control
 static func localize_option_text(value : String) -> String:
 	if value.is_empty():
 		return ""
-	var localized := TranslationServer.translate(value)
-	if localized != value or not value.contains("."):
-		return localized
-	var fallback := value.get_slice(".", value.get_slice_count(".") - 1)
-	fallback = fallback.trim_suffix("_label")
-	return fallback.replace("_", " ").capitalize()
+	return TranslationServer.translate(value)
 
 
 signal setting_changed(value)
