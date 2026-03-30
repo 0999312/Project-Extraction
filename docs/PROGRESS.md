@@ -1,5 +1,28 @@
 # Project Extraction — Progress
 
+## Update 17 — Equipment Slot Drag/Unequip Flow + Minimal Vector Theme Palette Pass
+
+### Changes
+
+- **Equipment panel now supports drag-based equip / unequip**:
+  - Inventory items can now be dragged from a container grid onto compatible equipment slots to equip them.
+  - Equipped items can now be dragged back out of non-backpack equipment slots and dropped into a container grid to unequip them.
+  - Dragging an equipped item between compatible equipment slots now rebinds the item to the new slot.
+  - The backpack slot remains locked while it is the active storage source for the inventory UI, preventing the primary bound backpack grid from being detached accidentally.
+- **Reused the existing inventory drag/drop flow with minimal code churn**:
+  - `InventoryGridPanel` gained a lightweight external-drop hook for accepting items dragged out of equipment slots.
+  - Equipment-slot interactions were added in `InventoryMenu` instead of rewriting the grid drag logic.
+- **Updated `minimal_vector.tres` palette without touching finalized button colors**:
+  - Kept `Button` normal / hover / pressed / focus colors unchanged.
+  - Updated non-button theme elements such as panel backgrounds, tab surfaces, scrollbar colors, progress-bar background, and line-edit selection/fill colors.
+  - The revised palette pulls closer to the supplied reference image: brighter cyan blues, vivid greens, warm orange-browns, and saturated yellow tab accents.
+- **Updated documentation**:
+  - Updated `EQUIPMENT_SYSTEM.md` / `EQUIPMENT_SYSTEM_ZH.md`.
+  - Updated `INVENTORY_SYSTEM.md` / `INVENTORY_SYSTEM_ZH.md`.
+  - Updated progress documents.
+
+---
+
 ## Update 16 — Hotbar Square Layout + Inventory Scene/Player Inventory Binding
 
 ### Changes

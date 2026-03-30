@@ -68,6 +68,8 @@ The hotbar references items **already placed** in the grid. Setting a hotbar slo
 
 - Displays bound slots for all equipment categories: Primary Weapon, Secondary Weapon, Melee Weapon, Helmet, Headset, Armor, Backpack, Vest.
 - Each slot mirrors the current `EquipmentState` value and shows the equipped item's display name (or a readable fallback if the item is data-only).
+- Dragging an inventory item from a grid onto a compatible equipment slot equips it.
+- Equipped items can be dragged back from non-backpack equipment slots into a grid cell to unequip them.
 
 ### 5.3 Grid Panels
 

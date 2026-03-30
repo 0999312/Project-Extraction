@@ -81,20 +81,20 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scrollbar_grabber"]
-bg_color = Color(1, 1, 1, 1)
+bg_color = Color(0.98039216, 0.9529412, 0.7019608, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scrollbar_grabber_hl"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scrollbar_grabber_pressed"]
-bg_color = Color(0.267, 0.267, 0.267, 1)
+bg_color = Color(0.7411765, 0.39215687, 0.08235294, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scrollbar_track"]
-bg_color = Color(0.039, 0.039, 0.039, 1)
+bg_color = Color(0.14901961, 0.54901963, 0.78039217, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.3, 0.3, 0.3, 1)
+border_color = Color(0.039215688, 0.19607843, 0.3019608, 1)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_blank"]
 
@@ -103,7 +103,7 @@ content_margin_left = 4.0
 content_margin_top = 4.0
 content_margin_right = 4.0
 content_margin_bottom = 4.0
-bg_color = Color(0.9529412, 0.9529412, 0.9529412, 1)
+bg_color = Color(1, 0.96862745, 0.8784314, 1)
 border_width_left = 6
 border_width_top = 6
 border_width_right = 6
@@ -119,7 +119,7 @@ content_margin_left = 4.0
 content_margin_top = 4.0
 content_margin_right = 4.0
 content_margin_bottom = 4.0
-bg_color = Color(1, 1, 1, 1)
+bg_color = Color(1, 1, 0.9607843, 1)
 border_width_left = 6
 border_width_top = 6
 border_width_right = 6
@@ -135,7 +135,7 @@ content_margin_left = 4.0
 content_margin_top = 4.0
 content_margin_right = 4.0
 content_margin_bottom = 4.0
-bg_color = Color(0.8, 0.4, 0, 1)
+bg_color = Color(0.85882354, 0.47058824, 0.07058824, 1)
 border_width_left = 6
 border_width_top = 6
 border_width_right = 6
@@ -151,7 +151,7 @@ content_margin_left = 4.0
 content_margin_top = 4.0
 content_margin_right = 4.0
 content_margin_bottom = 4.0
-bg_color = Color(0, 0.4, 0, 1)
+bg_color = Color(0.4392157, 0.6392157, 0.18039216, 1)
 border_width_left = 6
 border_width_top = 6
 border_width_right = 6
@@ -163,7 +163,7 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_bg"]
-bg_color = Color(1, 1, 1, 1)
+bg_color = Color(0.98039216, 0.92941177, 0.72156864, 1)
 border_width_left = 6
 border_width_top = 6
 border_width_right = 6
@@ -191,7 +191,7 @@ content_margin_left = 4.0
 content_margin_top = 4.0
 content_margin_right = 4.0
 content_margin_bottom = 4.0
-bg_color = Color(0.4, 0.6, 0.8, 1)
+bg_color = Color(0.27058825, 0.67058825, 0.9019608, 1)
 border_width_left = 6
 border_width_top = 6
 border_width_right = 6
@@ -220,14 +220,14 @@ content_margin_left = 6.0
 content_margin_top = 4.0
 content_margin_right = 6.0
 content_margin_bottom = 4.0
-bg_color = Color(0.165, 0.165, 0.165, 1)
+bg_color = Color(0.9647059, 0.72156864, 0.18039216, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_selected"]
 content_margin_left = 6.0
 content_margin_top = 4.0
 content_margin_right = 6.0
 content_margin_bottom = 4.0
-bg_color = Color(0.21333332, 0.8, 0, 1)
+bg_color = Color(1, 0.8392157, 0.23921569, 1)
 border_width_left = 6
 border_width_top = 6
 border_width_right = 6
@@ -238,7 +238,7 @@ content_margin_left = 6.0
 content_margin_top = 4.0
 content_margin_right = 6.0
 content_margin_bottom = 4.0
-bg_color = Color(0.039, 0.039, 0.039, 1)
+bg_color = Color(0.4392157, 0.61960787, 0.8784314, 1)
 
 [resource]
 Button/colors/font_color = Color(0.941, 0.941, 0.941, 1)
@@ -266,7 +266,7 @@ LineEdit/colors/cursor_color = Color(0, 0, 0, 1)
 LineEdit/colors/font_color = Color(1, 1, 1, 1)
 LineEdit/colors/font_outline_color = Color(0, 0, 0, 1)
 LineEdit/colors/font_placeholder_color = Color(0.5, 0.5, 0.5, 1)
-LineEdit/colors/selection_color = Color(0, 0.898, 1, 0.4)
+LineEdit/colors/selection_color = Color(0.09019608, 0.7411765, 0.9490196, 0.45)
 LineEdit/constants/outline_size = 10
 LineEdit/styles/focus = SubResource("StyleBoxFlat_lineedit_focus")
 LineEdit/styles/normal = SubResource("StyleBoxFlat_lineedit_normal")

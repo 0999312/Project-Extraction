@@ -48,6 +48,8 @@ var _equipment: EquipmentState = null
 var _root_panel: PanelContainer = null
 var _title_label: Label = null
 var _grids_vbox: VBoxContainer = null
+var _dragged_equipment_slot_key: String = ""
+var _dragged_equipment_item_id: String = ""
 
 signal inventory_toggled(is_open: bool)
 signal held_item_changed(item_id: String)
@@ -110,6 +112,7 @@ func close() -> void:
 	for gp in _grid_panels:
 		if gp != null and gp.is_dragging():
 			gp._cancel_drag()
+	_clear_equipment_drag()
 	_is_open = false
 	visible = false
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
@@ -234,6 +237,9 @@ func _add_equip_slot(parent: Control, slot_key: String, label_text: String) -> v
 	var slot := PanelContainer.new()
 	slot.custom_minimum_size = EQUIP_SLOT_SIZE
 	slot.add_theme_stylebox_override("panel", _make_equip_stylebox(false))
+	slot.gui_input.connect(func(event: InputEvent) -> void:
+		_on_equipment_slot_input(event, slot_key)
+	)
 
 	var vbox := VBoxContainer.new()
 	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -292,8 +298,9 @@ func _refresh_equipment_panel() -> void:
 				item_label.add_theme_color_override("font_color", Color.WHITE if has_item else Color(0.75, 0.75, 0.75, 1.0))
 			var panel := refs.get("panel") as PanelContainer
 			if panel != null:
-				panel.add_theme_stylebox_override("panel", _make_equip_stylebox(not item_id.is_empty()))
-				panel.tooltip_text = "%s: %s" % [refs.get("label", slot_key), item_id if not item_id.is_empty() else EQUIP_EMPTY_TEXT]
+				var is_drag_source := _dragged_equipment_slot_key == slot_key and not _dragged_equipment_item_id.is_empty()
+				panel.add_theme_stylebox_override("panel", _make_equip_stylebox(not item_id.is_empty() or is_drag_source))
+				panel.tooltip_text = _build_equipment_slot_tooltip(slot_key, str(refs.get("label", slot_key)), item_id)
 
 func _get_item_display_name(item_id: String) -> String:
 	if item_id.is_empty():
@@ -308,6 +315,165 @@ static func _make_readable_item_id(item_id: String) -> String:
 	if fallback.contains(":"):
 		fallback = fallback.get_slice(":", 1)
 	return fallback.replace("_", " ").capitalize()
+
+func _build_equipment_slot_tooltip(slot_key: String, label_text: String, item_id: String) -> String:
+	var lines := ["%s: %s" % [label_text, item_id if not item_id.is_empty() else EQUIP_EMPTY_TEXT]]
+	if _can_start_equipment_drag(slot_key):
+		lines.append("Left-click to drag / unequip")
+	elif _is_container_slot(slot_key):
+		lines.append("Container slots stay locked while bound to active storage")
+	if _find_dragging_grid_panel() != null:
+		lines.append("Drop a dragged inventory item here to equip")
+	return "\n".join(lines)
+
+func _on_equipment_slot_input(event: InputEvent, slot_key: String) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if not mb.pressed or mb.button_index != MOUSE_BUTTON_LEFT:
+		return
+	if _try_equip_from_grid_drag(slot_key):
+		get_viewport().set_input_as_handled()
+		return
+	if _try_drop_dragged_equipment_on_slot(slot_key):
+		get_viewport().set_input_as_handled()
+		return
+	if _try_begin_equipment_drag(slot_key):
+		get_viewport().set_input_as_handled()
+
+func _try_equip_from_grid_drag(slot_key: String) -> bool:
+	var gp := _find_dragging_grid_panel()
+	if gp == null:
+		return false
+	var item_id := gp.get_drag_item_id()
+	if item_id.is_empty() or not _can_equip_item_to_slot(slot_key, item_id):
+		return false
+	_assign_item_to_equipment_slot(slot_key, item_id)
+	gp.commit_drag()
+	_refresh_hotbar_ui()
+	_refresh_equipment_panel()
+	return true
+
+func _try_begin_equipment_drag(slot_key: String) -> bool:
+	if not _can_start_equipment_drag(slot_key):
+		return false
+	if _dragged_equipment_slot_key == slot_key and not _dragged_equipment_item_id.is_empty():
+		_clear_equipment_drag()
+		_refresh_equipment_panel()
+		return true
+	if _find_dragging_grid_panel() != null:
+		return false
+	_dragged_equipment_slot_key = slot_key
+	_dragged_equipment_item_id = _equipment.get_equipped(slot_key)
+	_refresh_equipment_panel()
+	return true
+
+func _try_drop_dragged_equipment_on_slot(slot_key: String) -> bool:
+	if _dragged_equipment_item_id.is_empty():
+		return false
+	if slot_key == _dragged_equipment_slot_key:
+		_clear_equipment_drag()
+		_refresh_equipment_panel()
+		return true
+	if not _can_equip_item_to_slot(slot_key, _dragged_equipment_item_id):
+		return false
+	_clear_equipment_slot(_dragged_equipment_slot_key)
+	_assign_item_to_equipment_slot(slot_key, _dragged_equipment_item_id)
+	_clear_equipment_drag()
+	_refresh_hotbar_ui()
+	_refresh_equipment_panel()
+	return true
+
+func _find_dragging_grid_panel() -> InventoryGridPanel:
+	for gp in _grid_panels:
+		if gp != null and gp.is_dragging():
+			return gp
+	return null
+
+func _try_drop_dragged_equipment_to_grid(gp: InventoryGridPanel, local_pos: Vector2) -> bool:
+	if gp == null or not _has_dragged_equipment_item():
+		return false
+	if _is_container_slot(_dragged_equipment_slot_key) and gp.get_grid() == _equipment.get_container_grid(_dragged_equipment_slot_key):
+		return true
+	var stack := ItemStack.new(_dragged_equipment_item_id, 1)
+	if gp.try_place_external_stack(stack, local_pos):
+		_clear_equipment_slot(_dragged_equipment_slot_key)
+		_clear_equipment_drag()
+		_refresh_hotbar_ui()
+		_refresh_equipment_panel()
+	return true
+
+func _has_dragged_equipment_item() -> bool:
+	return not _dragged_equipment_slot_key.is_empty() and not _dragged_equipment_item_id.is_empty()
+
+func _clear_equipment_drag() -> void:
+	_dragged_equipment_slot_key = ""
+	_dragged_equipment_item_id = ""
+
+func _can_start_equipment_drag(slot_key: String) -> bool:
+	if _equipment == null:
+		return false
+	var item_id := _equipment.get_equipped(slot_key)
+	if item_id.is_empty():
+		return false
+	if slot_key == "backpack":
+		return false
+	if _is_container_slot(slot_key):
+		var container_grid := _equipment.get_container_grid(slot_key)
+		if container_grid != null and not container_grid.placements.is_empty():
+			return false
+	return true
+
+func _can_equip_item_to_slot(slot_key: String, item_id: String) -> bool:
+	if _equipment == null or item_id.is_empty():
+		return false
+	if not _equipment.get_equipped(slot_key).is_empty():
+		return false
+	var item_def := ItemCatalog.get_item_definition(item_id)
+	match slot_key:
+		"primary_weapon", "secondary_weapon", "melee_weapon":
+			return ItemCatalog.has_tag(item_id, "weapon")
+		"armor":
+			return item_def != null and item_def.category == "armor"
+		"headset":
+			return item_def != null and item_def.category == "headset"
+		"helmet":
+			return item_def != null and item_def.category == "helmet"
+		"tactical_vest":
+			return item_def != null and item_def.category in ["vest", "tactical_vest"]
+		"backpack":
+			return item_def != null and item_def.category == "backpack"
+		_:
+			return false
+
+func _assign_item_to_equipment_slot(slot_key: String, item_id: String) -> void:
+	if _equipment == null:
+		return
+	_equipment.equip(slot_key, item_id)
+	var hotbar_index := _get_hotbar_index_for_equipment_slot(slot_key)
+	if hotbar_index >= 0 and _grid != null:
+		_grid.set_hotbar_slot(hotbar_index, item_id)
+		_emit_held_item_if_active(hotbar_index)
+
+func _clear_equipment_slot(slot_key: String) -> void:
+	if _equipment == null:
+		return
+	var hotbar_index := _get_hotbar_index_for_equipment_slot(slot_key)
+	if hotbar_index >= 0 and _grid != null:
+		_grid.set_hotbar_slot(hotbar_index, "")
+		_emit_held_item_if_active(hotbar_index)
+	_equipment.unequip(slot_key)
+
+func _get_hotbar_index_for_equipment_slot(slot_key: String) -> int:
+	return EquipmentState.HOTBAR_SLOT_KEYS.find(slot_key)
+
+static func _is_container_slot(slot_key: String) -> bool:
+	return slot_key in ["backpack", "tactical_vest"]
+
+func _emit_held_item_if_active(hotbar_index: int) -> void:
+	if _grid == null or hotbar_index != _grid.active_hotbar_index:
+		return
+	held_item_changed.emit(_grid.get_active_item_id())
 
 # ── Equipment-based grid generation ────────────────────────────────────────────
 func _rebuild_equipment_grids() -> void:
@@ -361,6 +527,9 @@ func _add_grid_section(title: String, grid: GridInventory) -> void:
 	gp.clip_contents = true
 	panel.add_child(gp)
 	gp.setup(grid, null)
+	gp.set_external_drop_handler(func(local_pos: Vector2) -> bool:
+		return _try_drop_dragged_equipment_to_grid(gp, local_pos)
+	)
 	_grid_panels.append(gp)
 
 # ── Hotbar ─────────────────────────────────────────────────────────────────────
@@ -403,6 +572,9 @@ static func _make_hotbar_sb(is_selected: bool) -> StyleBoxFlat:
 
 func _on_hotbar_slot_input(event: InputEvent, slot_index: int) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if _has_dragged_equipment_item():
+			get_viewport().set_input_as_handled()
+			return
 		var any_dragging := false
 		for gp in _grid_panels:
 			if gp != null and gp.is_dragging():
