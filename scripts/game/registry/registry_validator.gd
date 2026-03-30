@@ -137,6 +137,6 @@ static func _validate_buffs() -> bool:
 static func _resource_exists(path: String) -> bool:
 	if path.is_empty():
 		return false
-	if ResourceLoader.exists(path):
-		return true
-	return ResourceLoader.load(path) != null
+	if path.begins_with("uid://"):
+		return ResourceLoader.load(path) != null
+	return ResourceLoader.exists(path)

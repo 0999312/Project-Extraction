@@ -299,10 +299,7 @@ func _refresh_equipment_panel() -> void:
 				var has_item := not item_id.is_empty()
 				item_label.text = _get_item_display_name(item_id) if has_item else _txt("ui.inventory.empty")
 				item_label.add_theme_color_override("font_color", Color.WHITE if has_item else Color(0.75, 0.75, 0.75, 1.0))
-			var title_label := refs.get("title") as Label
 			var label_key := str(refs.get("label_key", ""))
-			if title_label != null and not label_key.is_empty():
-				title_label.text = _txt(label_key)
 			var panel := refs.get("panel") as PanelContainer
 			if panel != null:
 				var is_drag_source := _dragged_equipment_slot_key == slot_key and not _dragged_equipment_item_id.is_empty()
