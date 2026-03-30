@@ -41,7 +41,10 @@ const OptionSectionNames : Dictionary = {
 		option_name = value
 		if is_inside_tree():
 			var localized_option_name := localize_option_text(option_name)
-			%OptionLabel.text = localized_option_name if localized_option_name.is_empty() else "%s%s" % [localized_option_name, label_suffix]
+			if localized_option_name.is_empty():
+				%OptionLabel.text = localized_option_name
+			else:
+				%OptionLabel.text = "%s%s" % [localized_option_name, label_suffix]
 		if _update_config:
 			key = option_name.to_pascal_case()
 ## Defines what section in the config file this option belongs under.

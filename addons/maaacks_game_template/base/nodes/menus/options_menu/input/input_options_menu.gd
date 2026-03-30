@@ -20,11 +20,12 @@ const NO_INPUT_TEXT_KEY : String = "ui.input.none"
 					%InputActionsList.hide()
 					%InputActionsTree.show()
 
-@onready var assignment_placeholder_text = tr(NO_INPUT_TEXT_KEY)
+var assignment_placeholder_text : String = ""
 
 var last_input_readable_name
 
 func _ready() -> void:
+	assignment_placeholder_text = tr(NO_INPUT_TEXT_KEY)
 	remapping_mode = remapping_mode
 
 func _add_action_event() -> void:
