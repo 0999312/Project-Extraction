@@ -66,8 +66,10 @@ The hotbar references items **already placed** in the grid. Setting a hotbar slo
 
 ### 5.2 Equipment Panel
 
-- Displays placeholder slots for all equipment categories: Primary Weapon, Secondary Weapon, Melee Weapon, Helmet, Headset, Armor, Backpack, Vest.
-- Currently shows labels only (no drag-drop interaction yet — placeholder UI).
+- Displays bound slots for all equipment categories: Primary Weapon, Secondary Weapon, Melee Weapon, Helmet, Headset, Armor, Backpack, Vest.
+- Each slot mirrors the current `EquipmentState` value and shows the equipped item's display name (or a readable fallback if the item is data-only).
+- Dragging an inventory item from a grid onto a compatible equipment slot equips it.
+- Equipped items can be dragged back from non-backpack equipment slots into a grid cell to unequip them.
 
 ### 5.3 Grid Panels
 
@@ -92,10 +94,11 @@ The hotbar references items **already placed** in the grid. Setting a hotbar slo
 ### 5.6 Hotbar Interaction
 
 - The 9 hotbar slots are displayed at the bottom.
-- Hotbar slot style: **6 px pure-black border, 8 px corner radius**, background alpha = 64. Selected slot has deep-blue fill and is slightly enlarged.
+- Hotbar slot style: **6 px pure-black border, 8 px corner radius**, background alpha = 64. Selected slot keeps the same fixed square size and switches to a green fill.
 - Dragging an item onto a hotbar slot assigns it.
+- Hotbar slots 0–2 only accept items tagged as `weapon`, matching the equipment-system reservation for weapon slots.
 - Clicking a hotbar slot number key (1–9) selects the active slot.
-- The active slot's item becomes the player's **held item** (`combat_state.equipped_weapon_id`).
+- When the active slot contains a registered weapon item, that item becomes the player's combat **held weapon** (`combat_state.equipped_weapon_id`).
 
 ## 6. File Manifest
 
@@ -110,6 +113,6 @@ The hotbar references items **already placed** in the grid. Setting a hotbar slo
 
 ## 7. Integration
 
-- `DemoGameRuntime._ready()` creates an `EquipmentState` with default backpack (6×6) and tactical vest (3×2), adds an `InventoryMenu`, and binds both the inventory grid and equipment state.
-- `PlayerHUD` hotbar display updates from the backpack `GridInventory.hotbar_slots`.
+- `DemoGameRuntime._ready()` instantiates `scenes/game_scene/inventory_menu.tscn`, creates an `EquipmentState` with default backpack (6×6) and tactical vest (3×2), and binds both the equipment state and the player's actual `InventoryState.inventory`.
+- `PlayerHUD` hotbar display updates from the same backpack `GridInventory.hotbar_slots` used by the inventory menu.
 - The equipment system is fully extensible for future container types and mod support.

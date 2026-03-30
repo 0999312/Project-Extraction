@@ -10,6 +10,7 @@ const ITEM_BG_COLOR := Color(0.45, 0.55, 0.65, 0.5)
 
 var _grid: GridInventory = null
 var _slots: Array[InventorySlot] = []
+var _external_drop_handler: Callable = Callable()
 
 # Drag state
 var _dragging: bool = false
@@ -64,6 +65,9 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var mb: InputEventMouseButton = event
 		if mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed:
+			if _external_drop_handler.is_valid() and _external_drop_handler.call(mb.position):
+				accept_event()
+				return
 			_handle_left_click(mb.position)
 			accept_event()
 		elif mb.button_index == MOUSE_BUTTON_RIGHT and mb.pressed and _dragging:
@@ -138,10 +142,32 @@ func _clear_drag() -> void:
 func is_dragging() -> bool:
 	return _dragging
 
+func get_grid() -> GridInventory:
+	return _grid
+
+func set_external_drop_handler(handler: Callable) -> void:
+	_external_drop_handler = handler
+
+func commit_drag() -> void:
+	if not _dragging:
+		return
+	_clear_drag()
+
 func get_drag_item_id() -> String:
 	if _drag_placement.is_empty():
 		return ""
 	return str(_drag_placement.get("item_id", ""))
+
+func try_place_external_stack(stack: ItemStack, local_pos: Vector2, rotated: bool = false) -> bool:
+	if _grid == null or stack == null:
+		return false
+	var gx := int(local_pos.x) / CELL_SIZE
+	var gy := int(local_pos.y) / CELL_SIZE
+	if not _grid._is_in_bounds(gx, gy):
+		return false
+	if not _grid.can_place(stack.item_id, gx, gy, rotated):
+		return false
+	return _grid.place_item(stack, gx, gy, rotated)
 
 func _draw() -> void:
 	if _grid == null:

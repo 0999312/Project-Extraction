@@ -186,25 +186,38 @@ func _is_relaxed_state() -> bool:
 	return get_tree().paused
 
 func _setup_inventory_menu() -> void:
-	# Create default equipment state: backpack (6×6) + tactical vest (3×2)
-	_player_equipment = EquipmentState.new()
-	var backpack_grid := GridInventory.new(6, 6)
-	_player_equipment.equip("backpack", "default_backpack")
-	_player_equipment.set_container_grid("backpack", backpack_grid)
-	var vest_grid := GridInventory.new(3, 2)
-	_player_equipment.equip("tactical_vest", "default_tactical_vest")
-	_player_equipment.set_container_grid("tactical_vest", vest_grid)
-
-	# Use backpack as the primary inventory for hotbar binding
-	_inventory_menu = InventoryMenu.new()
+	var backpack_grid := _get_player_backpack_grid()
+	_player_equipment = _build_player_equipment(backpack_grid)
+	var inventory_menu_scene := load("res://scenes/game_scene/inventory_menu.tscn")
+	if inventory_menu_scene != null:
+		_inventory_menu = inventory_menu_scene.instantiate() as InventoryMenu
+	else:
+		_inventory_menu = InventoryMenu.new()
 	_inventory_menu.name = "InventoryMenu"
 	add_child(_inventory_menu)
 	_inventory_menu.bind_inventory(backpack_grid)
 	_inventory_menu.bind_equipment(_player_equipment)
-
-	if _player != null and _player.combat_state != null and not _player.combat_state.equipped_weapon_id.is_empty():
-		backpack_grid.set_hotbar_slot(0, _player.combat_state.equipped_weapon_id)
 	_inventory_menu.held_item_changed.connect(_on_held_item_changed)
+
+func _get_player_backpack_grid() -> GridInventory:
+	if _player != null:
+		var inventory_ref := _player.get_inventory_ref()
+		if inventory_ref != null:
+			if inventory_ref.inventory == null:
+				inventory_ref.inventory = GridInventory.new(6, 6)
+			return inventory_ref.inventory
+	return GridInventory.new(6, 6)
+
+func _build_player_equipment(backpack_grid: GridInventory) -> EquipmentState:
+	var equipment := EquipmentState.new()
+	if _player != null and _player.combat_state != null and not _player.combat_state.equipped_weapon_id.is_empty():
+		equipment.equip("primary_weapon", _player.combat_state.equipped_weapon_id)
+	equipment.equip("backpack", "default_backpack")
+	equipment.set_container_grid("backpack", backpack_grid)
+	equipment.equip("tactical_vest", "default_tactical_vest")
+	equipment.set_container_grid("tactical_vest", GridInventory.new(3, 2))
+	equipment.sync_hotbar_to_grid(backpack_grid)
+	return equipment
 
 func _poll_inventory_input() -> void:
 	var is_triggered := GuideInputRuntime.is_action_triggered(GUIDE_ACTION_INVENTORY)
@@ -217,6 +230,10 @@ func _on_held_item_changed(item_id: String) -> void:
 	if _player == null or _player.combat_state == null:
 		return
 	if item_id.is_empty():
+		return
+	# Non-weapon items can still be selected in hotbar slots 3-8, but only
+	# registered weapon items should drive combat_state.equipped_weapon_id.
+	if WeaponCatalog.get_weapon_for_item(item_id) == null:
 		return
 	_player.combat_state.equipped_weapon_id = item_id
 	WeaponCatalog.apply_to_combat_state(_player.combat_state)

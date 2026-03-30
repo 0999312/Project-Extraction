@@ -31,6 +31,18 @@ const SLOT_KEYS: PackedStringArray = [
 	"tactical_vest",
 ]
 
+const HOTBAR_SLOT_KEYS: PackedStringArray = [
+	"primary_weapon",
+	"secondary_weapon",
+	"melee_weapon",
+	"hotbar_usable_1",
+	"hotbar_usable_2",
+	"hotbar_usable_3",
+	"hotbar_usable_4",
+	"hotbar_usable_5",
+	"hotbar_usable_6",
+]
+
 ## Maps slot_key → item_id (or "" if empty).
 @export var slots: Dictionary = {}
 
@@ -83,6 +95,18 @@ func get_all_container_grids() -> Array[Dictionary]:
 		if container_grids.has(key):
 			result.append({"slot_key": key, "grid": container_grids[key]})
 	return result
+
+static func get_hotbar_slot_key(index: int) -> String:
+	if index < 0 or index >= HOTBAR_SLOT_KEYS.size():
+		return ""
+	return HOTBAR_SLOT_KEYS[index]
+
+## Sync all equipment-backed hotbar slots → GridInventory.hotbar_slots[0..8].
+func sync_hotbar_to_grid(grid: GridInventory) -> void:
+	if grid == null:
+		return
+	for i in range(mini(HOTBAR_SLOT_KEYS.size(), grid.hotbar_slots.size())):
+		grid.hotbar_slots[i] = get_equipped(HOTBAR_SLOT_KEYS[i])
 
 ## Sync weapon slots → hotbar_slots[0..2] on a GridInventory.
 func sync_weapons_to_hotbar(grid: GridInventory) -> void:
