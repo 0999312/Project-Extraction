@@ -1,5 +1,18 @@
 # Project Extraction — 开发进度
 
+## 更新 18 — Minimal Vector 主题设计文档补全
+
+### 变更内容
+
+- **将当前 `minimal_vector` 主题提炼为独立设计文档**：
+  - 新增 `MINIMAL_VECTOR_THEME_DESIGN.md` 与 `MINIMAL_VECTOR_THEME_DESIGN_ZH.md`。
+  - 记录了主题的作用范围、配色结构、控件覆盖情况以及后续修改准则。
+  - 明确区分了全局主题资源与游戏内局部样式覆写（背包格子、快捷栏格子、装备占位槽）的边界。
+- **不改动实现逻辑**：
+  - 本次更新仅补充文档，不修改现有主题资源和游戏 UI 行为。
+
+---
+
 ## 更新 17 — 装备槽拖拽卸下流程 + Minimal Vector 主题配色整理
 
 ### 变更内容

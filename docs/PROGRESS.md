@@ -1,5 +1,18 @@
 # Project Extraction — Progress
 
+## Update 18 — Minimal Vector Theme Design Documentation
+
+### Changes
+
+- **Extracted the current `minimal_vector` theme into a dedicated design document**:
+  - Added `MINIMAL_VECTOR_THEME_DESIGN.md` and `MINIMAL_VECTOR_THEME_DESIGN_ZH.md`.
+  - Documented the theme's scope, palette structure, control coverage, and editing guidelines.
+  - Explicitly recorded the boundary between the global theme resource and gameplay-local UI style overrides (inventory slots, hotbar slots, equipment placeholders).
+- **Kept implementation unchanged**:
+  - This update is documentation-only and does not alter the existing theme resource or gameplay UI behaviour.
+
+---
+
 ## Update 17 — Equipment Slot Drag/Unequip Flow + Minimal Vector Theme Palette Pass
 
 ### Changes
