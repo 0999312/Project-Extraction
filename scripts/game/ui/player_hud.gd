@@ -1,5 +1,7 @@
 class_name PlayerHUD
-extends CanvasLayer
+extends Control
+## Player HUD overlay managed via UIManager.add_overlay().
+## Displays health/stamina/energy/thirst bars and hotbar.
 
 # ── Color constants for the health bar ────────────────────────────────────────
 const COLOR_HP_HEALTHY  := Color(0.133, 0.694, 0.298, 1)   # green  ≥ 50 %

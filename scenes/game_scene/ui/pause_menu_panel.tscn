@@ -1,0 +1,108 @@
+[gd_scene format=3 uid="uid://c7pause_menu_panel"]
+
+[ext_resource type="Script" path="res://scripts/game/ui/pause_menu_panel.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://bh3sehmvmyc7n" path="res://scenes/windows/pause_menu_options_window.tscn" id="2_options"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_bg"]
+bg_color = Color(0.05, 0.05, 0.05, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8, 0.8, 0.8, 0.7)
+content_margin_left = 24.0
+content_margin_top = 16.0
+content_margin_right = 24.0
+content_margin_bottom = 16.0
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="PauseMenuPanel" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+options_menu_scene = ExtResource("2_options")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(280, 360)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel_bg")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "ui.pause.title"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonsMargin" type="MarginContainer" parent="CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_right = 16
+
+[node name="MenuButtons" type="VBoxContainer" parent="CenterContainer/PanelContainer/VBoxContainer/ButtonsMargin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="ResumeButton" type="Button" parent="CenterContainer/PanelContainer/VBoxContainer/ButtonsMargin/MenuButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ui.pause.resume"
+
+[node name="RestartButton" type="Button" parent="CenterContainer/PanelContainer/VBoxContainer/ButtonsMargin/MenuButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ui.pause.restart"
+
+[node name="OptionsButton" type="Button" parent="CenterContainer/PanelContainer/VBoxContainer/ButtonsMargin/MenuButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ui.pause.options"
+
+[node name="MainMenuButton" type="Button" parent="CenterContainer/PanelContainer/VBoxContainer/ButtonsMargin/MenuButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ui.pause.main_menu"
+
+[node name="ExitButton" type="Button" parent="CenterContainer/PanelContainer/VBoxContainer/ButtonsMargin/MenuButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ui.pause.exit_game"
+
+[node name="RestartConfirmation" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "ui.pause.confirm_restart_title"
+dialog_text = "ui.pause.confirm_restart_text"
+
+[node name="MainMenuConfirmation" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "ui.common.confirm_exit_title"
+dialog_text = "ui.pause.confirm_main_menu_text"
+
+[node name="ExitConfirmation" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "ui.common.confirm_exit_title"
+dialog_text = "ui.pause.confirm_exit_game_text"

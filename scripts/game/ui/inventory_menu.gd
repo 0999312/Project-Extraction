@@ -1,7 +1,7 @@
 class_name InventoryMenu
-extends CanvasLayer
-## Tetris-style inventory menu. Toggled via pe_inventory (Tab).
-## While open: pauses gameplay input, shows mouse cursor.
+extends UIPanel
+## Tetris-style inventory menu managed by UIManager.
+## Opened via UIManager.open_panel(), closed via UIManager.back().
 ## Generates separate grid panels per container equipment
 ## (backpack 6×6, tactical vest 3×2) and mirrors equipment slot state.
 
@@ -37,7 +37,6 @@ const EQUIPMENT_LAYOUT := [
 	],
 ]
 
-var _is_open: bool = false
 var _grid_panels: Array[InventoryGridPanel] = []
 var _hotbar_container: HBoxContainer = null
 var _hotbar_slots_ui: Array[Control] = []
@@ -50,7 +49,6 @@ var _grids_vbox: VBoxContainer = null
 var _dragged_equipment_slot_key: String = ""
 var _dragged_equipment_item_id: String = ""
 
-signal inventory_toggled(is_open: bool)
 signal held_item_changed(item_id: String)
 
 
@@ -58,9 +56,6 @@ func _txt(key: String, args: Array = []) -> String:
 	return LocalizedText.text(key, args)
 
 func _ready() -> void:
-	layer = 20
-	visible = false
-	_is_open = false
 	_build_ui()
 
 func bind_inventory(grid: GridInventory) -> void:
@@ -93,39 +88,34 @@ func _on_equipment_changed(_slot_key: String) -> void:
 	_rebuild_equipment_grids()
 	_refresh_hotbar_ui()
 
-func toggle() -> void:
-	if _is_open:
-		close()
-	else:
-		open()
+# ── UIPanel lifecycle ──────────────────────────────────────────────────────────
 
-func open() -> void:
-	if _is_open:
-		return
-	_is_open = true
-	visible = true
+func _on_open(data: Dictionary = {}) -> void:
+	var grid: GridInventory = data.get("grid") as GridInventory
+	if grid != null:
+		bind_inventory(grid)
+	var equip: EquipmentState = data.get("equipment") as EquipmentState
+	if equip != null:
+		bind_equipment(equip)
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	_rebuild_equipment_grids()
 	_refresh_hotbar_ui()
-	inventory_toggled.emit(true)
 
-func close() -> void:
-	if not _is_open:
-		return
+func _on_close() -> void:
 	for gp in _grid_panels:
 		if gp != null and gp.is_dragging():
 			gp._cancel_drag()
 	_clear_equipment_drag()
-	_is_open = false
-	visible = false
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-	inventory_toggled.emit(false)
 
 func is_open() -> bool:
-	return _is_open
+	return UIManager.is_panel_open(UICatalog.id(UICatalog.PANEL_INVENTORY))
 
-func _input(event: InputEvent) -> void:
-	if not _is_open:
+func _unhandled_input(event: InputEvent) -> void:
+	# ESC closes inventory via UIManager.back() — prevents pause menu conflict
+	if event.is_action_pressed("ui_cancel"):
+		UIManager.back(UILayer.NORMAL)
+		get_viewport().set_input_as_handled()
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
 		var key_event: InputEventKey = event
