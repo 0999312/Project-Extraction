@@ -6,4 +6,3 @@ func _validate_entry(entry: Variant) -> bool:
 
 func _get_expected_type_name() -> String:
 	return "WeaponDefinition"
-

@@ -1,14 +1,14 @@
 {
 	"game:entity/player": {
-		"scene_path": "res://scenes/entities/player.tscn",
+		"scene_path": "res://prefabs/entity/player.tscn",
 		"class_name": "Player"
 	},
 	"game:entity/human_enemy": {
-		"scene_path": "res://scenes/entities/human_enemy.tscn",
+		"scene_path": "res://prefabs/entity/human_enemy.tscn",
 		"class_name": "HumanEnemy"
 	},
 	"game:entity/non_human_enemy": {
-		"scene_path": "res://scenes/entities/non_human_enemy.tscn",
+		"scene_path": "res://prefabs/entity/non_human_enemy.tscn",
 		"class_name": "NonHumanEnemy"
 	}
 }

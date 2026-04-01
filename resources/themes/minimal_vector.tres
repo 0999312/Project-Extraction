@@ -220,7 +220,13 @@ content_margin_left = 6.0
 content_margin_top = 4.0
 content_margin_right = 6.0
 content_margin_bottom = 4.0
-bg_color = Color(0.9647059, 0.72156864, 0.18039216, 1)
+bg_color = Color(0, 0.92655486, 0.14961779, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_selected"]
 content_margin_left = 6.0
@@ -232,6 +238,8 @@ border_width_left = 6
 border_width_top = 6
 border_width_right = 6
 border_color = Color(0.05, 0.05, 0.05, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_unselected"]
 content_margin_left = 6.0
@@ -239,6 +247,15 @@ content_margin_top = 4.0
 content_margin_right = 6.0
 content_margin_bottom = 4.0
 bg_color = Color(0.4392157, 0.61960787, 0.8784314, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [resource]
 Button/colors/font_color = Color(0.941, 0.941, 0.941, 1)
@@ -278,10 +295,12 @@ ProgressBar/colors/font_outline_color = Color(0, 0, 0, 1)
 ProgressBar/constants/outline_size = 10
 ProgressBar/styles/background = SubResource("StyleBoxFlat_progress_bg")
 ProgressBar/styles/fill = SubResource("StyleBoxFlat_progress_fill")
-TabContainer/colors/font_disabled_color = Color(0, 0, 0, 1)
+TabContainer/colors/font_disabled_color = Color(1, 1, 1, 1)
 TabContainer/colors/font_hovered_color = Color(1, 1, 1, 1)
-TabContainer/colors/font_selected_color = Color(0.039, 0.039, 0.039, 1)
+TabContainer/colors/font_outline_color = Color(0, 0, 0, 1)
+TabContainer/colors/font_selected_color = Color(1, 1, 1, 1)
 TabContainer/colors/font_unselected_color = Color(0.941, 0.941, 0.941, 1)
+TabContainer/constants/outline_size = 8
 TabContainer/styles/panel = SubResource("StyleBoxFlat_tab_panel")
 TabContainer/styles/tab_disabled = SubResource("StyleBoxFlat_l1cu4")
 TabContainer/styles/tab_focus = SubResource("StyleBoxEmpty_blank")

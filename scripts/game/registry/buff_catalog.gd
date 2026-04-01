@@ -64,7 +64,7 @@ static func get_definition(buff_id: String) -> BuffDefinition:
 	var registry := _get_buff_registry()
 	if registry == null:
 		return null
-	var entry := registry.get_entry(rl)
+	var entry : BuffDefinition = registry.get_entry(rl)
 	return entry if entry is BuffDefinition else null
 
 static func has_tag(buff_id: String, tag_name: String) -> bool:

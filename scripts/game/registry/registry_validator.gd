@@ -72,7 +72,7 @@ static func _validate_entities() -> bool:
 	var is_valid := true
 	for key in registry.get_all_keys():
 		var rl := ResourceLocation.from_string(key)
-		var entry := registry.get_entry(rl)
+		var entry : Dictionary = registry.get_entry(rl)
 		if not (entry is Dictionary):
 			LocalizedText.error("logs.registry.validator.entity_entry_invalid", [key])
 			is_valid = false
@@ -97,7 +97,7 @@ static func _validate_projectiles() -> bool:
 	var is_valid := true
 	for key in registry.get_all_keys():
 		var rl := ResourceLocation.from_string(key)
-		var entry := registry.get_entry(rl)
+		var entry : Dictionary = registry.get_entry(rl)
 		if not (entry is Dictionary):
 			LocalizedText.error("logs.registry.validator.projectile_entry_invalid", [key])
 			is_valid = false

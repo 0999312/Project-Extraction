@@ -1,0 +1,74 @@
+[gd_scene format=3 uid="uid://b8e0ghhkjbg1d"]
+
+[ext_resource type="Script" uid="uid://dt8h86u3di5gl" path="res://scripts/game/entities/gameplay/player.gd" id="1_pejtq"]
+[ext_resource type="Texture2D" uid="uid://derwqk8pvukje" path="res://assets/game/textures/entities/ball/ball_shadow.png" id="2_10icu"]
+[ext_resource type="Texture2D" uid="uid://ca6gr7lukemuk" path="res://assets/game/textures/entities/ball/ball_right.png" id="3_xebd6"]
+[ext_resource type="Texture2D" uid="uid://gtnpwtfb288i" path="res://assets/game/textures/entities/ball/ball_hand.png" id="4_2wvt6"]
+[ext_resource type="Texture2D" uid="uid://c4dqlhsvoq23a" path="res://assets/game/textures/items/rifle.png" id="5_udyuk"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5u6hq"]
+radius = 7.0
+height = 60.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_wls55"]
+radius = 31.016125
+
+[node name="Player" type="CharacterBody2D" unique_id=209863306]
+texture_filter = 1
+collision_layer = 2
+collision_mask = 10
+script = ExtResource("1_pejtq")
+
+[node name="ShadowSprite" type="Sprite2D" parent="." unique_id=1239432533]
+texture_filter = 1
+texture_repeat = 1
+position = Vector2(0, -25)
+texture = ExtResource("2_10icu")
+
+[node name="GroundCollision" type="CollisionShape2D" parent="." unique_id=570426844]
+visible = false
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_5u6hq")
+
+[node name="BodySprite" type="Sprite2D" parent="." unique_id=238874539]
+texture_filter = 1
+texture_repeat = 1
+position = Vector2(0, -25)
+texture = ExtResource("3_xebd6")
+
+[node name="HitCollision" type="Area2D" parent="." unique_id=1993467086]
+visible = false
+position = Vector2(0, -25)
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape2D" parent="HitCollision" unique_id=1050335618]
+shape = SubResource("CircleShape2D_wls55")
+
+[node name="AimPivot" type="Node2D" parent="." unique_id=1851131436]
+position = Vector2(0, -25)
+
+[node name="Item" type="Node2D" parent="AimPivot" unique_id=1434703914]
+
+[node name="LeftHand" type="Node2D" parent="AimPivot/Item" unique_id=310082360]
+z_index = -1
+texture_filter = 1
+position = Vector2(46, 6)
+
+[node name="HandSprite" type="Sprite2D" parent="AimPivot/Item/LeftHand" unique_id=451316381]
+texture_filter = 1
+texture = ExtResource("4_2wvt6")
+
+[node name="ItemPivot" type="Node2D" parent="AimPivot/Item" unique_id=768456789]
+position = Vector2(29, 7)
+
+[node name="ItemSprite" type="Sprite2D" parent="AimPivot/Item/ItemPivot" unique_id=1280651079]
+texture_filter = 1
+texture_repeat = 1
+texture = ExtResource("5_udyuk")
+
+[node name="RightHand" type="Node2D" parent="AimPivot/Item" unique_id=390575034]
+position = Vector2(21, 7)
+
+[node name="HandSprite" type="Sprite2D" parent="AimPivot/Item/RightHand" unique_id=1013986953]
+texture_filter = 1
+texture = ExtResource("4_2wvt6")
