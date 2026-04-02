@@ -1,5 +1,31 @@
 # Project Extraction — 开发进度
 
+## 更新 22 — 手持物渲染映射 + 上层无枪械短路
+
+### 变更内容
+
+- **新增手持物渲染配置资源与映射解析**：
+  - 在 `resources/registries/held_item_render_configs/` 下新增 `HeldItemRenderConfig` 资源。
+  - 新增基于注册表 key / `ResourceLocation` 字符串的 JSON 映射表。
+  - 实现 `HeldItemRenderCatalog`，按“武器 RL -> 物品 RL -> 默认渲染配置”优先级解析。
+- **设计层仍允许 JSON / Dictionary Resource 二选一，本次实现选择 JSON**：
+  - 保持映射层独立于物品/武器注册表。
+  - 统一沿用 RL 字符串作为映射 key。
+- **将无枪械 fire 短路责任落实到更上层调用方**：
+  - `DemoGameRuntime` 现在会在调用 `CombatFireRuntime` 之前过滤 fire / reload 请求。
+  - 选择非武器手持物时，会清空 `equipped_weapon_id`，不再沿用旧枪械继续射击。
+  - `CombatFireRuntime` 继续只处理已通过上层筛选的有效发射请求。
+- **把人形角色的手持物视觉接入渲染配置解析**：
+  - `HumanActor` 现在按实际的 `AimPivot/Item/...` 场景层级读取节点。
+  - 手持物 Sprite 改为通过渲染配置映射解析，而非依赖场景内写死贴图。
+- **统一该流程中的缺失资源表述**：
+  - 手持物贴图缺失统一视为 **Sprite 缺失贴图**，并回退到默认渲染配置。
+- **更新文档**：
+  - 新增 `HELD_ITEM_RENDER_DESIGN.md` / `HELD_ITEM_RENDER_DESIGN_ZH.md`。
+  - 更新物品 / 武器注册表文档与进度文档。
+
+---
+
 ## 更新 21 — 物品栏设计整改（移除形状、隐藏武器快捷栏、场景化布局）
 
 ### 变更内容

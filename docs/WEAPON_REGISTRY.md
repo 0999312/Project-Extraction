@@ -12,7 +12,7 @@
 - **Entry namespace(s):** `game`
 - **Entry ID naming convention:** `game:weapon/<name>` (e.g. `game:weapon/pistol`)
 - **Required tag naming convention:** none
-- **Cross-registry references:** `item_id` references `core:item`; `projectile_definition_id` references projectile registry IDs
+- **Cross-registry references:** `item_id` references `core:item`; `projectile_definition_id` references projectile registry IDs; held-item render mappings may reference weapon RLs as keys
 
 ## 3. Load Timing and Lifecycle
 
@@ -43,6 +43,7 @@
 
 - `WeaponCatalog.get_weapon_for_item(item_id)` resolves equipped item to weapon profile.
 - `WeaponCatalog.apply_to_combat_state(combat_state)` applies profile fields to combat runtime.
+- `HeldItemRenderCatalog.get_render_config_for(weapon_id, item_id)` resolves held-item visuals with weapon-first priority.
 
 ## 6. Current Built-in Entries
 
@@ -54,5 +55,6 @@
 - `scripts/game/components/combat/weapon_definition.gd`
 - `scripts/game/registry/weapon_registry.gd`
 - `scripts/game/registry/weapon_catalog.gd`
+- `scripts/game/registry/held_item_render_catalog.gd`
 - `resources/registries/weapons/*.tres`
-
+- `resources/registries/held_item_render_configs/held_item_render_mappings.json`

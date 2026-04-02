@@ -12,7 +12,7 @@
 - **条目命名空间：** `game`
 - **条目 ID 命名规范：** `game:item/<类别>/<名称>`（例如 `game:item/weapon/pistol`）
 - **标签命名规范：** 标签通过 MSF TagRegistry 管理，路径为 `game:tag/item/<标签名>`。标签定义在 `resources/registries/tags/items/` 下的独立 JSON 文件中，在物品注册完成后加载。运行时使用 `ItemCatalog.has_tag()` 和 `ItemCatalog.get_items_with_tag()` 查询。
-- **跨注册表引用：** 武器注册表通过 `WeaponDefinition.item_id` 引用物品 ID
+- **跨注册表引用：** 武器注册表通过 `WeaponDefinition.item_id` 引用物品 ID；手持物渲染映射也可使用物品 RL 作为 key
 
 ## 3. 加载时机与生命周期
 
@@ -46,7 +46,7 @@
 
 - **查询 API：** `ItemCatalog.get_item_definition(item_id)`
 - **标签查询：** `ItemCatalog.has_tag(item_id, tag_name)`、`ItemCatalog.get_items_with_tag(tag_name)`
-- **典型调用方：** `InventoryState`、`GridInventory`、武器映射流程
+- **典型调用方：** `InventoryState`、`GridInventory`、武器映射流程、手持物渲染回退映射
 - **缓存策略：** 通过 `RegistryManager` 进行注册表查找
 - **失败处理：** 返回 `null` 并记录错误日志
 
@@ -62,6 +62,7 @@
 - `scripts/game/components/gameplay/item_definition.gd`
 - `scripts/game/registry/item_registry.gd`
 - `scripts/game/registry/item_catalog.gd`
+- `scripts/game/registry/held_item_render_catalog.gd`
 - `resources/registries/items/*.tres`
 - `resources/registries/tags/items/*.json` – 标签定义文件（每个 JSON 将标签映射到物品条目）
-
+- `resources/registries/held_item_render_configs/held_item_render_mappings.json` – 手持物物品 RL → 渲染配置 RL 映射

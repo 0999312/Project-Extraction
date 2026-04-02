@@ -38,6 +38,7 @@ func _ready() -> void:
 	WeaponCatalog.ensure_registry()
 	EntityCatalog.ensure_registry()
 	ProjectileCatalog.ensure_registry()
+	HeldItemRenderCatalog.ensure_loaded()
 	UICatalog.ensure_registry()
 	RegistryValidator.validate_all()
 	_spawn_runtime_entities()
@@ -89,8 +90,10 @@ func _physics_process(delta: float) -> void:
 	var inventory_open := UIManager.is_panel_open(UICatalog.id(UICatalog.PANEL_INVENTORY))
 	if not inventory_open:
 		_update_crosshair_and_camera_target()
-		_combat_fire_system.process(_get_runtime_actors(), _projectiles, delta)
-		_projectile_motion_system.process(_projectiles, _get_runtime_actors(), delta)
+		var actors := _get_runtime_actors()
+		_prepare_fire_requests(actors)
+		_combat_fire_system.process(actors, _projectiles, delta)
+		_projectile_motion_system.process(_projectiles, actors, delta)
 
 func _get_runtime_actors() -> Array:
 	var actors: Array = []
@@ -246,15 +249,41 @@ func _poll_inventory_input() -> void:
 func _on_held_item_changed(item_id: String) -> void:
 	if _player == null or _player.combat_state == null:
 		return
+	_player.sync_held_item_visual("", item_id)
 	if item_id.is_empty():
+		_player.combat_state.equipped_weapon_id = ""
+		_player.combat_state.wants_fire = false
+		_player.combat_state.wants_reload = false
 		return
-	# Non-weapon items can still be selected in hotbar slots 3-8, but only
-	# registered weapon items should drive combat_state.equipped_weapon_id.
-	if WeaponCatalog.get_weapon_for_item(item_id) == null:
+	var weapon_def := WeaponCatalog.get_weapon_for_item(item_id)
+	if weapon_def == null:
+		_player.combat_state.equipped_weapon_id = ""
+		_player.combat_state.wants_fire = false
+		_player.combat_state.wants_reload = false
 		return
 	_player.combat_state.equipped_weapon_id = item_id
 	WeaponCatalog.apply_to_combat_state(_player.combat_state)
 	print("[DEBUG][DemoGame] Held item changed to: %s" % item_id)
+
+func _prepare_fire_requests(actors: Array) -> void:
+	for actor_variant in actors:
+		if not (actor_variant is BiologicalActor):
+			continue
+		var actor := actor_variant as BiologicalActor
+		var combat := actor.get_combat_state()
+		if combat == null:
+			continue
+		if not _has_usable_weapon(combat.equipped_weapon_id):
+			combat.wants_fire = false
+			combat.wants_reload = false
+			combat.wants_fire_mode_toggle = false
+			combat.is_reloading = false
+			combat.reload_progress = 0.0
+
+func _has_usable_weapon(item_id: String) -> bool:
+	if item_id.is_empty():
+		return false
+	return WeaponCatalog.get_weapon_for_item(item_id) != null
 
 func _setup_player_hud() -> void:
 	var hud_scene := load("res://scenes/game_scene/player_hud.tscn")

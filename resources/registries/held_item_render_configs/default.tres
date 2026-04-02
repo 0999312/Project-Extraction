@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="HeldItemRenderConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/components/rendering/held_item_render_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "game:held_item_render/default"
+sprite_path = "res://assets/game/textures/items/null_item.png"
+sprite_offset = Vector2(0, 0)
+sprite_scale = Vector2(1, 1)
+sprite_rotation_deg = 0.0

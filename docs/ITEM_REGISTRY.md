@@ -12,7 +12,7 @@
 - **Entry namespace(s):** `game`
 - **Entry ID naming convention:** `game:item/<category>/<name>` (e.g. `game:item/weapon/pistol`)
 - **Tag naming convention:** Tags are managed via MSF TagRegistry under `game:tag/item/<tag_name>`. Tags are defined in standalone JSON files in `resources/registries/tags/items/`, loaded after items are registered. At runtime use `ItemCatalog.has_tag()` and `ItemCatalog.get_items_with_tag()`.
-- **Cross-registry references:** Weapon registry entries reference item IDs (`WeaponDefinition.item_id`)
+- **Cross-registry references:** Weapon registry entries reference item IDs (`WeaponDefinition.item_id`); held-item render mappings may reference item RLs as keys
 
 ## 3. Load Timing and Lifecycle
 
@@ -46,7 +46,7 @@
 
 - **Lookup API:** `ItemCatalog.get_item_definition(item_id)`
 - **Tag queries:** `ItemCatalog.has_tag(item_id, tag_name)`, `ItemCatalog.get_items_with_tag(tag_name)`
-- **Typical caller(s):** `InventoryState`, `GridInventory`, weapon mapping
+- **Typical caller(s):** `InventoryState`, `GridInventory`, weapon mapping, held-item render mapping fallback
 - **Caching strategy:** registry lookup via `RegistryManager`
 - **Failure behavior:** `null` return + error log on invalid registry state
 
@@ -62,6 +62,7 @@
 - `scripts/game/components/gameplay/item_definition.gd`
 - `scripts/game/registry/item_registry.gd`
 - `scripts/game/registry/item_catalog.gd`
+- `scripts/game/registry/held_item_render_catalog.gd`
 - `resources/registries/items/*.tres`
 - `resources/registries/tags/items/*.json` – tag definition files (each JSON maps a tag to item entries)
-
+- `resources/registries/held_item_render_configs/held_item_render_mappings.json` – held-item item RL → render config RL mappings

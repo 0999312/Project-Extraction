@@ -294,6 +294,7 @@
     },
     "human_actor": {
       "right_hand_missing": "HumanActor.attach_weapon: RightHand node not found.",
+      "item_pivot_missing": "HumanActor.attach_weapon: ItemPivot node not found.",
       "left_hand_missing": "HumanActor.attach_left_hand_item: LeftHand node not found."
     },
     "entity_catalog": {
@@ -328,6 +329,13 @@
       "script_invalid": "[ProjectileCatalog] Projectile script is invalid: {0}",
       "script_instance_invalid": "[ProjectileCatalog] Projectile script did not instantiate a Projectile: {0}"
     },
+    "held_item_render_catalog": {
+      "configs_dir_missing": "[HeldItemRenderCatalog] Held item render config directory not found: {0}",
+      "json_missing": "[HeldItemRenderCatalog] Held item render mapping JSON not found: {0}",
+      "json_open_failed": "[HeldItemRenderCatalog] Failed to open held item render mapping JSON: {0}",
+      "json_parse_failed": "[HeldItemRenderCatalog] JSON parse error in {0}: {1}",
+      "json_root_invalid": "[HeldItemRenderCatalog] Held item render mapping JSON root must be a Dictionary."
+    },
     "buff_catalog": {
       "registry_unresolved": "[BuffCatalog] Unable to resolve buff registry.",
       "buffs_dir_missing": "[BuffCatalog] Buff resource directory not found: {0}"
@@ -355,7 +363,11 @@
         "projectile_entry_invalid": "[RegistryValidator] Projectile entry is invalid: {0}",
         "projectile_script_missing": "[RegistryValidator] Projectile '{0}' references missing script '{1}'.",
         "projectile_script_invalid": "[RegistryValidator] Projectile '{0}' script is invalid: {1}",
-        "projectile_sprite_missing": "[RegistryValidator] Projectile '{0}' sprite is missing: {1}",
+        "projectile_sprite_missing": "[RegistryValidator] Projectile '{0}' Sprite missing texture: {1}",
+        "held_item_render_default_missing": "[RegistryValidator] Held item render default config is missing: {0}",
+        "held_item_render_weapon_missing": "[RegistryValidator] Held item render weapon mapping references missing weapon '{0}'.",
+        "held_item_render_item_missing": "[RegistryValidator] Held item render item mapping references missing item '{0}'.",
+        "held_item_render_sprite_missing": "[RegistryValidator] Held item render config '{0}' Sprite missing texture: {1}",
         "buff_registry_missing": "[RegistryValidator] Buff registry is unavailable.",
         "buff_entry_invalid": "[RegistryValidator] Buff entry is invalid: {0}",
         "buff_id_missing": "[RegistryValidator] Buff id is missing for entry: {0}"
