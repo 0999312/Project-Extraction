@@ -54,13 +54,10 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	_setup_equipment_and_inventory()
 	_setup_player_hud()
-	# Subscribe to UI events for held-item sync
-	EventBus.subscribe(&"UICloseEvent", _on_ui_close_event)
 	print("[DEBUG][DemoGame] _ready | actors=%d" % _get_runtime_actors().size())
 
 func _exit_tree() -> void:
 	Input.set_mouse_mode(_default_mouse_mode)
-	EventBus.unsubscribe(&"UICloseEvent", _on_ui_close_event)
 	# Clean up UIManager overlays
 	var hud_id := UICatalog.id(UICatalog.OVERLAY_PLAYER_HUD)
 	if UIManager.get_overlay(hud_id) != null:
@@ -276,10 +273,3 @@ func _setup_player_hud() -> void:
 		if bp_grid != null:
 			_player_hud.bind_inventory(bp_grid)
 	_player_hud.hotbar_selection_changed.connect(_on_held_item_changed)
-
-func _on_ui_close_event(event: UICloseEvent) -> void:
-	# When inventory closes, restore mouse mode
-	var inv_id := UICatalog.id(UICatalog.PANEL_INVENTORY)
-	if event.panel_id != null and event.panel_id.to_string() == inv_id.to_string():
-		# Mouse mode already handled by InventoryMenu._on_close()
-		pass
