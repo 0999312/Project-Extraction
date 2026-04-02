@@ -72,8 +72,11 @@ func _get_main_menu_path() -> String:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
+		var vp := get_viewport()
 		_on_resume_pressed()
-		get_viewport().set_input_as_handled()
+		if vp != null:
+			vp.set_input_as_handled()
+
 
 # ── Button callbacks ───────────────────────────────────────────────────────────
 
