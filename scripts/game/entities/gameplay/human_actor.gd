@@ -58,7 +58,7 @@ func attach_weapon(weapon_node: Node2D) -> void:
 	if _item_pivot == null:
 		LocalizedText.error("logs.human_actor.right_hand_missing")
 		return
-	_clear_dynamic_children(_item_pivot, _item_sprite)
+	_clear_children_except(_item_pivot, _item_sprite)
 	if _item_sprite != null:
 		_item_sprite.visible = false
 	_item_pivot.add_child(weapon_node)
@@ -67,7 +67,7 @@ func attach_left_hand_item(item_node: Node2D) -> void:
 	if _left_hand == null:
 		LocalizedText.error("logs.human_actor.left_hand_missing")
 		return
-	_clear_dynamic_children(_left_hand, _left_hand_sprite)
+	_clear_children_except(_left_hand, _left_hand_sprite)
 	_left_hand.add_child(item_node)
 
 func get_muzzle_position() -> Vector2:
@@ -78,7 +78,7 @@ func get_muzzle_position() -> Vector2:
 func sync_held_item_visual(weapon_id: String, item_id: String = "") -> void:
 	if _item_sprite == null:
 		return
-	_clear_dynamic_children(_item_pivot, _item_sprite)
+	_clear_children_except(_item_pivot, _item_sprite)
 	var resolved_weapon_id := weapon_id
 	var resolved_item_id := item_id
 	if resolved_weapon_id.is_empty() and not resolved_item_id.is_empty():
@@ -129,7 +129,7 @@ func _clear_held_item_visual() -> void:
 	_item_sprite.rotation = 0.0
 	_item_sprite.visible = false
 
-func _clear_dynamic_children(parent: Node, preserved_child: Node = null) -> void:
+func _clear_children_except(parent: Node, preserved_child: Node = null) -> void:
 	if parent == null:
 		return
 	for child in parent.get_children():

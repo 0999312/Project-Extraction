@@ -274,13 +274,12 @@ func _prepare_fire_requests(actors: Array) -> void:
 		var combat := actor.get_combat_state()
 		if combat == null:
 			continue
-		if _has_usable_weapon(combat.equipped_weapon_id):
-			continue
-		combat.wants_fire = false
-		combat.wants_reload = false
-		combat.wants_fire_mode_toggle = false
-		combat.is_reloading = false
-		combat.reload_progress = 0.0
+		if not _has_usable_weapon(combat.equipped_weapon_id):
+			combat.wants_fire = false
+			combat.wants_reload = false
+			combat.wants_fire_mode_toggle = false
+			combat.is_reloading = false
+			combat.reload_progress = 0.0
 
 func _has_usable_weapon(item_id: String) -> bool:
 	if item_id.is_empty():
