@@ -1,26 +1,26 @@
 [gd_scene format=3 uid="uid://stwg6ms0feo4"]
 
 [ext_resource type="Script" uid="uid://cuu3ju36f808b" path="res://scripts/game/ui/inventory_menu.gd" id="1"]
-[ext_resource type="Theme" path="res://resources/themes/minimal_vector.tres" id="2"]
+[ext_resource type="Theme" uid="uid://b1ja4tvqptipj" path="res://resources/themes/minimal_vector.tres" id="2"]
 
 [sub_resource type="StyleBoxFlat" id="equip_panel_sb"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
 bg_color = Color(0.05, 0.05, 0.05, 0.92)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.8, 0.8, 0.8, 0.7)
-content_margin_left = 12.0
-content_margin_top = 12.0
-content_margin_right = 12.0
-content_margin_bottom = 12.0
 
 [node name="InventoryMenu" type="CanvasLayer" unique_id=1270329089]
 layer = 20
 script = ExtResource("1")
 
-[node name="Root" type="Control" parent="."]
-layout_mode = 1
+[node name="Root" type="Control" parent="." unique_id=1884071546]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -29,7 +29,7 @@ grow_vertical = 2
 mouse_filter = 1
 theme = ExtResource("2")
 
-[node name="Background" type="ColorRect" parent="Root"]
+[node name="Background" type="ColorRect" parent="Root" unique_id=1575842022]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -39,7 +39,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0.55)
 
-[node name="Scroll" type="ScrollContainer" parent="Root"]
+[node name="Scroll" type="ScrollContainer" parent="Root" unique_id=1571482389]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -48,51 +48,51 @@ grow_horizontal = 2
 grow_vertical = 2
 horizontal_scroll_mode = 0
 
-[node name="Center" type="CenterContainer" parent="Root/Scroll"]
+[node name="Center" type="CenterContainer" parent="Root/Scroll" unique_id=1149718234]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="HBoxMain" type="HBoxContainer" parent="Root/Scroll/Center"]
+[node name="HBoxMain" type="HBoxContainer" parent="Root/Scroll/Center" unique_id=1806244714]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 16
+alignment = 1
 
-[node name="EquipmentPanel" type="PanelContainer" parent="Root/Scroll/Center/HBoxMain"]
+[node name="EquipmentPanel" type="PanelContainer" parent="Root/Scroll/Center/HBoxMain" unique_id=1399612023]
 layout_mode = 2
 theme_override_styles/panel = SubResource("equip_panel_sb")
 
-[node name="EquipmentVBox" type="VBoxContainer" parent="Root/Scroll/Center/HBoxMain/EquipmentPanel"]
+[node name="EquipmentVBox" type="VBoxContainer" parent="Root/Scroll/Center/HBoxMain/EquipmentPanel" unique_id=1583832613]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="EquipmentTitle" type="Label" parent="Root/Scroll/Center/HBoxMain/EquipmentPanel/EquipmentVBox"]
+[node name="EquipmentTitle" type="Label" parent="Root/Scroll/Center/HBoxMain/EquipmentPanel/EquipmentVBox" unique_id=224992257]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Equipment"
 horizontal_alignment = 1
 
-[node name="VBoxRight" type="VBoxContainer" parent="Root/Scroll/Center/HBoxMain"]
+[node name="VBoxRight" type="VBoxContainer" parent="Root/Scroll/Center/HBoxMain" unique_id=824707159]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 12
+alignment = 1
 
-[node name="TitleLabel" type="Label" parent="Root/Scroll/Center/HBoxMain/VBoxRight"]
+[node name="TitleLabel" type="Label" parent="Root/Scroll/Center/HBoxMain/VBoxRight" unique_id=1388882868]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Inventory"
 horizontal_alignment = 1
 
-[node name="GridsVBox" type="VBoxContainer" parent="Root/Scroll/Center/HBoxMain/VBoxRight"]
+[node name="GridsVBox" type="VBoxContainer" parent="Root/Scroll/Center/HBoxMain/VBoxRight" unique_id=308118603]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="HotbarLabel" type="Label" parent="Root/Scroll/Center/HBoxMain/VBoxRight"]
+[node name="HotbarLabel" type="Label" parent="Root/Scroll/Center/HBoxMain/VBoxRight" unique_id=930277768]
 layout_mode = 2
 text = "Hotbar"
 horizontal_alignment = 1
 
-[node name="HotbarContainer" type="HBoxContainer" parent="Root/Scroll/Center/HBoxMain/VBoxRight"]
+[node name="HotbarContainer" type="HBoxContainer" parent="Root/Scroll/Center/HBoxMain/VBoxRight" unique_id=894501239]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 4
+alignment = 1

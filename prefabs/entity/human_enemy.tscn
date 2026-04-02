@@ -14,25 +14,26 @@ height = 60.0
 radius = 31.575306
 
 [node name="HumanEnemy" type="CharacterBody2D" unique_id=911570360]
-position = Vector2(0, -25)
 collision_layer = 2
 collision_mask = 2
 script = ExtResource("1_ggxiw")
 
 [node name="ShadowSprite" type="Sprite2D" parent="." unique_id=1800785662]
 texture_filter = 1
+position = Vector2(0, -25)
 texture = ExtResource("2_0p38p")
 
 [node name="GroundCollision" type="CollisionShape2D" parent="." unique_id=1009001793]
-position = Vector2(0, 25)
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_7kbbi")
 
 [node name="BodySprite" type="Sprite2D" parent="." unique_id=374179198]
 texture_filter = 1
+position = Vector2(0, -25)
 texture = ExtResource("3_56cjw")
 
 [node name="HitCollision" type="Area2D" parent="." unique_id=1476033526]
+position = Vector2(0, -25)
 collision_mask = 0
 
 [node name="Shape" type="CollisionShape2D" parent="HitCollision" unique_id=556398935]
@@ -40,24 +41,27 @@ visible = false
 shape = SubResource("CircleShape2D_ijes7")
 
 [node name="AimPivot" type="Node2D" parent="." unique_id=1932016506]
+position = Vector2(0, -25)
 
-[node name="LeftHand" type="Node2D" parent="AimPivot" unique_id=2036267543]
-position = Vector2(38, -2)
+[node name="Item" type="Node2D" parent="AimPivot" unique_id=6755719]
 
-[node name="HandSprite" type="Sprite2D" parent="AimPivot/LeftHand" unique_id=1498182459]
+[node name="RightHand" type="Node2D" parent="AimPivot/Item" unique_id=259504300]
+position = Vector2(35, 0)
+
+[node name="HandSprite" type="Sprite2D" parent="AimPivot/Item/RightHand" unique_id=1904375956]
 texture_filter = 1
 texture = ExtResource("4_b3fg0")
 
-[node name="Item" type="Node2D" parent="AimPivot" unique_id=1983651547]
+[node name="ItemPivot" type="Node2D" parent="AimPivot/Item" unique_id=1983651547]
 position = Vector2(42, -2)
 
-[node name="ItemSprite" type="Sprite2D" parent="AimPivot/Item" unique_id=2063357642]
+[node name="ItemSprite" type="Sprite2D" parent="AimPivot/Item/ItemPivot" unique_id=2063357642]
 texture_filter = 1
 texture = ExtResource("5_suwib")
 
-[node name="RightHand" type="Node2D" parent="AimPivot" unique_id=259504300]
-position = Vector2(35, 0)
+[node name="LeftHand" type="Node2D" parent="AimPivot/Item" unique_id=2036267543]
+position = Vector2(38, -2)
 
-[node name="HandSprite" type="Sprite2D" parent="AimPivot/RightHand" unique_id=1904375956]
+[node name="HandSprite" type="Sprite2D" parent="AimPivot/Item/LeftHand" unique_id=1498182459]
 texture_filter = 1
 texture = ExtResource("4_b3fg0")
