@@ -1,6 +1,6 @@
 # 物品栏系统设计 – 俄罗斯方块式拖拽网格
 
-> 版本 0.2 – 2026-03-29
+> 版本 0.3 – 2026-04-01
 
 ## 1. 概述
 
@@ -58,11 +58,15 @@
 
 ## 5. UI 架构
 
-### 5.1 InventoryMenu（CanvasLayer）
+### 5.1 InventoryMenu（UIPanel — MSF 管理）
 
-- 通过 **Tab** 键切换（输入动作 `pe_inventory`）。
+- 通过 `UIManager.open_panel()` / `UIManager.back()` 在 `UILayer.NORMAL`（层级 100）上打开/关闭。
+- 通过 **Tab** 键切换（输入动作 `pe_inventory`），在 `DemoGameRuntime._poll_inventory_input()` 中处理。
+- **ESC 键关闭物品栏**：`_unhandled_input()` 消费 `ui_cancel` 并调用 `UIManager.back(UILayer.NORMAL)`。
 - 打开时：暂停游戏输入，显示鼠标光标。
 - 包含 **装备面板**（左侧）、**容器网格**（右侧）和 **快捷栏条带**（底部）。
+- 数据（网格、装备）通过 `_on_open(data)` 字典传递。
+- 使用 `CacheMode.CACHE` 以在打开/关闭周期间保留状态。
 
 ### 5.2 装备面板
 
@@ -106,13 +110,15 @@
 |------|------|------|
 | `scripts/game/components/gameplay/grid_inventory.gd` | 数据 | 基于格子的网格与放置记录 |
 | `scripts/game/components/gameplay/equipment_state.gd` | 数据 | 装备槽位 + 容器网格 |
-| `scripts/game/ui/inventory_menu.gd` | UI 脚本 | 装备面板 + 容器网格 + 快捷栏 |
+| `scripts/game/ui/inventory_menu.gd` | UI 脚本 | 装备面板 + 容器网格 + 快捷栏（继承 UIPanel） |
 | `scripts/game/ui/inventory_grid_panel.gd` | UI 脚本 | 网格渲染 + 拖拽 |
 | `scripts/game/ui/inventory_slot.gd` | UI 脚本 | 单格视觉（StyleBoxFlat，无贴图） |
-| `scenes/game_scene/inventory_menu.tscn` | 场景 | 物品栏菜单场景 |
+| `scenes/game_scene/ui/inventory_panel.tscn` | 场景 | 物品栏面板场景（UIPanel 根节点） |
+| `scripts/game/registry/ui_catalog.gd` | 注册表 | UI 面板注册目录 |
 
 ## 7. 集成
 
-- `DemoGameRuntime._ready()` 现在会实例化 `scenes/game_scene/inventory_menu.tscn`，创建默认背包（6×6）与战术弹挂（3×2）的 `EquipmentState`，并把它与玩家自身的 `InventoryState.inventory` 绑定起来。
+- `DemoGameRuntime._ready()` 调用 `UICatalog.ensure_registry()` 将 `game:ui/inventory` 注册到 `UIRegistry`。
+- `DemoGameRuntime._poll_inventory_input()` 通过 `UIManager.open_panel()` 打开物品栏，并传入网格和装备数据。
 - `PlayerHUD` 的快捷栏显示与物品栏界面共用同一份背包 `GridInventory.hotbar_slots` 数据。
 - 装备系统支持未来新增容器类型和 Mod 拓展。

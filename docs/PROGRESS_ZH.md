@@ -1,5 +1,36 @@
 # Project Extraction — 开发进度
 
+## 更新 19 — MSF UIManager 集成 / UI 系统重构
+
+### 变更内容
+
+- **将所有游戏 UI 重构为使用 MSF `UIManager` 栈式面板管理**：
+  - `PlayerHUD` 从 `CanvasLayer` 改为 `Control`，通过 `UIManager.add_overlay()` 注册在 `UILayer.SCENE`。
+  - `InventoryMenu` 从 `CanvasLayer` 改为 `UIPanel`，通过 `UIManager.open_panel()` / `UIManager.back()` 在 `UILayer.NORMAL` 管理。
+  - 新增 `PauseMenuPanel` 继承 `UIPanel`，通过 `UIManager.open_panel()` 在 `UILayer.POPUP` 打开。
+  - 从 `DemoGame.tscn` 中移除了旧的 Maaacks `PauseMenuController` 依赖。
+- **修复了物品栏与暂停菜单的 ESC 按键冲突**：
+  - `InventoryMenu._unhandled_input()` 现在消费 `ui_cancel` 以通过 `UIManager.back(NORMAL)` 关闭物品栏。
+  - `PauseMenuPanel._unhandled_input()` 消费 `ui_cancel` 以通过 `UIManager.back(POPUP)` 关闭暂停。
+  - `DemoGameRuntime._poll_pause_input()` 仅在没有其他面板打开时才打开暂停菜单。
+  - 栈式层级排序保证正确的输入优先级。
+- **引入 `UICatalog` 实现注册表驱动的 UI 面板注册**：
+  - 遵循与 `ItemCatalog`、`WeaponCatalog` 等相同的目录模式。
+  - 注册 `game:ui/pause_menu`（POPUP，CacheMode.NONE）和 `game:ui/inventory`（NORMAL，CacheMode.CACHE）。
+- **将脚本构建的 UI 转换为 Godot 场景**：
+  - 新增 `scenes/game_scene/ui/pause_menu_panel.tscn`，包含完整按钮布局和确认对话框。
+  - 新增 `scenes/game_scene/ui/inventory_panel.tscn` 作为物品栏的 UIPanel 根节点。
+  - 更新 `scenes/game_scene/player_hud.tscn` 根节点从 `CanvasLayer` 改为 `Control`。
+- **按 MSF 模式进行结构改进**：
+  - 所有 HUD 元素现使用 `mouse_filter = MOUSE_FILTER_IGNORE` 避免阻挡输入。
+  - 物品栏数据（网格、装备）通过 `_on_open(data)` 字典传递，而非直接方法调用。
+  - 面板生命周期回调取代手动的打开/关闭/切换。
+- **新增文档**：
+  - 新增 `UI_SYSTEM_REFACTOR.md` / `UI_SYSTEM_REFACTOR_ZH.md`。
+  - 更新进度文档。
+
+---
+
 ## 更新 18 — Minimal Vector 主题设计文档补全
 
 ### 变更内容

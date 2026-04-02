@@ -1,6 +1,6 @@
 # Inventory System Design – Tetris-Style Drag & Drop Grid
 
-> Version 0.2 – 2026-03-29
+> Version 0.3 – 2026-04-01
 
 ## 1. Overview
 
@@ -58,11 +58,15 @@ The hotbar references items **already placed** in the grid. Setting a hotbar slo
 
 ## 5. UI Architecture
 
-### 5.1 InventoryMenu (CanvasLayer)
+### 5.1 InventoryMenu (UIPanel — MSF Managed)
 
-- Toggled with the **Tab** key (input action `pe_inventory`).
+- Opened/closed via `UIManager.open_panel()` / `UIManager.back()` on `UILayer.NORMAL` (layer 100).
+- Toggled with the **Tab** key (input action `pe_inventory`) in `DemoGameRuntime._poll_inventory_input()`.
+- **ESC key closes inventory**: `_unhandled_input()` consumes `ui_cancel` and calls `UIManager.back(UILayer.NORMAL)`.
 - While open: pauses gameplay input, shows mouse cursor.
 - Contains an **equipment panel** (left), **container grids** (right), and a **hotbar strip** (bottom).
+- Data (grid, equipment) is passed via `_on_open(data)` dictionary.
+- Uses `CacheMode.CACHE` to preserve state between open/close cycles.
 
 ### 5.2 Equipment Panel
 
@@ -106,13 +110,15 @@ The hotbar references items **already placed** in the grid. Setting a hotbar slo
 |------|------|---------|
 | `scripts/game/components/gameplay/grid_inventory.gd` | Data | Cell-based grid with placements |
 | `scripts/game/components/gameplay/equipment_state.gd` | Data | Equipment slots + container grids |
-| `scripts/game/ui/inventory_menu.gd` | UI Script | Equipment panel + container grids + hotbar |
+| `scripts/game/ui/inventory_menu.gd` | UI Script | Equipment panel + container grids + hotbar (extends UIPanel) |
 | `scripts/game/ui/inventory_grid_panel.gd` | UI Script | Grid rendering + drag & drop |
 | `scripts/game/ui/inventory_slot.gd` | UI Script | Single cell (StyleBoxFlat, no texture) |
-| `scenes/game_scene/inventory_menu.tscn` | Scene | Inventory menu scene |
+| `scenes/game_scene/ui/inventory_panel.tscn` | Scene | Inventory panel scene (UIPanel root) |
+| `scripts/game/registry/ui_catalog.gd` | Registry | UI panel registration catalog |
 
 ## 7. Integration
 
-- `DemoGameRuntime._ready()` instantiates `scenes/game_scene/inventory_menu.tscn`, creates an `EquipmentState` with default backpack (6×6) and tactical vest (3×2), and binds both the equipment state and the player's actual `InventoryState.inventory`.
+- `DemoGameRuntime._ready()` calls `UICatalog.ensure_registry()` to register `game:ui/inventory` with `UIRegistry`.
+- `DemoGameRuntime._poll_inventory_input()` opens the inventory via `UIManager.open_panel()` with grid and equipment data.
 - `PlayerHUD` hotbar display updates from the same backpack `GridInventory.hotbar_slots` used by the inventory menu.
 - The equipment system is fully extensible for future container types and mod support.

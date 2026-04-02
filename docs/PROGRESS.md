@@ -1,5 +1,36 @@
 # Project Extraction — Progress
 
+## Update 19 — MSF UIManager Integration / UI System Refactor
+
+### Changes
+
+- **Refactored all gameplay UI to use MSF `UIManager` stack-based panel management**:
+  - `PlayerHUD` changed from `CanvasLayer` to `Control` and registered as a `UIManager.add_overlay()` on `UILayer.SCENE`.
+  - `InventoryMenu` changed from `CanvasLayer` to `UIPanel`, opened/closed via `UIManager.open_panel()` / `UIManager.back()` on `UILayer.NORMAL`.
+  - New `PauseMenuPanel` extends `UIPanel`, opened via `UIManager.open_panel()` on `UILayer.POPUP`.
+  - Removed old Maaacks `PauseMenuController` dependency from `DemoGame.tscn`.
+- **Fixed ESC key conflict between inventory and pause menu**:
+  - `InventoryMenu._unhandled_input()` now consumes `ui_cancel` to close inventory via `UIManager.back(NORMAL)`.
+  - `PauseMenuPanel._unhandled_input()` consumes `ui_cancel` to close pause via `UIManager.back(POPUP)`.
+  - `DemoGameRuntime._poll_pause_input()` only opens pause menu when no other panels are open.
+  - Stack-based layer ordering guarantees correct input priority.
+- **Introduced `UICatalog` for registry-driven UI panel registration**:
+  - Follows the same catalog pattern as `ItemCatalog`, `WeaponCatalog`, etc.
+  - Registers `game:ui/pause_menu` (POPUP, CacheMode.NONE) and `game:ui/inventory` (NORMAL, CacheMode.CACHE).
+- **Converted script-built UI to Godot scenes**:
+  - New `scenes/game_scene/ui/pause_menu_panel.tscn` with full button layout and confirmation dialogs.
+  - New `scenes/game_scene/ui/inventory_panel.tscn` as UIPanel root for inventory.
+  - Updated `scenes/game_scene/player_hud.tscn` root from `CanvasLayer` to `Control`.
+- **Structural improvements per MSF patterns**:
+  - All HUD elements now use `mouse_filter = MOUSE_FILTER_IGNORE` to avoid blocking input.
+  - Inventory data (grid, equipment) passed via `_on_open(data)` dictionary instead of direct method calls.
+  - Panel lifecycle callbacks (`_on_init`, `_on_open`, `_on_close`, `_on_destroy`) replace manual open/close/toggle.
+- **New documentation**:
+  - Added `UI_SYSTEM_REFACTOR.md` / `UI_SYSTEM_REFACTOR_ZH.md`.
+  - Updated progress documents.
+
+---
+
 ## Update 18 — Minimal Vector Theme Design Documentation
 
 ### Changes

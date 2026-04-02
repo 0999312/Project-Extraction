@@ -118,11 +118,15 @@ All bindings are remappable through the GUIDE input system.
 | File | Role |
 |---|---|
 | `scripts/game/components/gameplay/equipment_state.gd` | Equipment data model |
-| `scripts/game/ui/inventory_menu.gd` | Equipment + inventory UI |
+| `scripts/game/registry/ui_catalog.gd` | UI panel registration catalog |
+| `scripts/game/ui/inventory_menu.gd` | Equipment + inventory UI (extends UIPanel) |
 | `scripts/game/ui/inventory_grid_panel.gd` | Grid rendering with fit-by-height icons |
 | `scripts/game/ui/inventory_slot.gd` | Single grid cell (StyleBoxFlat, no texture) |
-| `scripts/game/ui/player_hud.gd` | HUD hotbar (StyleBoxFlat, no texture) |
-| `scripts/game/gameplay/demo_game_runtime.gd` | Wiring: creates EquipmentState, binds to UI |
+| `scripts/game/ui/player_hud.gd` | HUD hotbar (Control, UIManager overlay) |
+| `scripts/game/ui/pause_menu_panel.gd` | Pause menu (extends UIPanel) |
+| `scripts/game/gameplay/demo_game_runtime.gd` | Wiring: creates EquipmentState, uses UIManager |
 | `scripts/game/input/player_input_context.gd` | GUIDE input action definitions |
+| `scenes/game_scene/ui/inventory_panel.tscn` | Inventory panel scene |
+| `scenes/game_scene/ui/pause_menu_panel.tscn` | Pause menu panel scene |
 | `resources/i18n/ui_text.en.json` | English UI strings |
 | `resources/i18n/ui_text.zh.json` | Chinese UI strings |
