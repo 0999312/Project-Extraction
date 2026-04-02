@@ -87,7 +87,7 @@ sync_weapons_to_hotbar(grid)          # 将武器 ID 推送至快捷栏 0-2
 
 ### 运行时绑定
 
-- `DemoGameRuntime` 现在通过实例化 `scenes/game_scene/inventory_menu.tscn` 来创建物品栏界面，而不是直接 `new()` 脚本。
+- `DemoGameRuntime` 现在通过 `UIManager.open_panel()` 来打开物品栏界面，而不是直接 `new()` 脚本。
 - 玩家自身的 `InventoryState.inventory` 作为背包网格使用，因此物品栏界面、HUD 与玩家运行时现在共用同一份数据。
 - `EquipmentState.sync_hotbar_to_grid(grid)` 会用装备槽初始化快捷栏；`InventoryMenu` 也会把快捷栏绑定结果反向同步回对应的装备槽。
 - 快捷栏第 0–2 格仅接受带有 `weapon` 标签的物品，以保持“前三格保留给武器”的设计规则。

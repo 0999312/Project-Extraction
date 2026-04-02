@@ -13,13 +13,13 @@
   - Weapon slots are exclusively managed through the equipment panel.
   - `_refresh_hotbar_ui()` now properly maps UI indices to data indices.
 - **Applied `minimal_vector.tres` theme to inventory menu**:
-  - Theme applied via scene file (`inventory_menu.tscn`), not loaded at runtime.
+  - Theme applied via scene file (`inventory_panel.tscn`), not loaded at runtime.
   - All hotbar slot corners set to 0 px (was 8 px). Grid slot corners already 0 px.
 - **Save/load interfaces retained (not called)**:
   - `save_to_dict()` / `load_from_dict()` exist on both `GridInventory` and `EquipmentState`.
   - These interfaces are not called at runtime — reserved for future persistence.
 - **Converted static UI layout to scene file**:
-  - The static layout (root control, background, scroll, center, HBoxMain, equipment panel, VBoxRight, title labels, grid container, hotbar container) is now defined in `inventory_menu.tscn`.
+  - The static layout (root control, background, scroll, center, HBoxMain, equipment panel, VBoxRight, title labels, grid container, hotbar container) is now defined in `inventory_panel.tscn`.
   - Dynamic parts (equipment slot rows, hotbar slot panels, grid panels) remain in code.
   - Script uses `@onready` references instead of `Control.new()` for static nodes.
 - **Updated documentation**:
@@ -137,7 +137,7 @@
   - Selected hotbar slots now change only their fill colour to semi-transparent green (`alpha = 64`); they no longer grow in size.
   - Inventory-menu hotbar styling was updated to match the HUD.
 - **Inventory scene is now bound to the player's real inventory**:
-  - `DemoGameRuntime` now instantiates `scenes/game_scene/inventory_menu.tscn` instead of constructing the menu purely via `InventoryMenu.new()`.
+  - `DemoGameRuntime` now opens the inventory via `UIManager.open_panel()` instead of constructing the menu purely via `InventoryMenu.new()`.
   - The player's `InventoryState.inventory` is now used as the backpack grid, so the player runtime, HUD, and inventory menu all share the same inventory data.
   - Player startup inventory was normalized to the documented default backpack size of `6 × 6`.
 - **Equipment panel now mirrors live equipment state**:

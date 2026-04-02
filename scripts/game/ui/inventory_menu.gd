@@ -4,7 +4,7 @@ extends UIPanel
 ## Opened via UIManager.open_panel(), closed via UIManager.back().
 ## Generates separate grid panels per container equipment
 ## (backpack 6×6, tactical vest 3×2) and mirrors equipment slot state.
-## Static layout defined in inventory_menu.tscn (minimal_vector.tres theme).
+## Static layout defined in inventory_panel.tscn (minimal_vector.tres theme).
 ## Weapon hotbar slots 0–2 are hidden; only slots 3–8 shown.
 
 const HOTBAR_SLOT_SIZE := 56
@@ -122,8 +122,10 @@ func is_open() -> bool:
 func _unhandled_input(event: InputEvent) -> void:
 	# ESC closes inventory via UIManager.back() — prevents pause menu conflict
 	if event.is_action_pressed("ui_cancel"):
+		var vp := get_viewport()
 		UIManager.back(UILayer.NORMAL)
-		get_viewport().set_input_as_handled()
+		if vp != null:
+			vp.set_input_as_handled()
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
 		var key_event: InputEventKey = event
@@ -133,7 +135,9 @@ func _unhandled_input(event: InputEvent) -> void:
 				_grid.set_active_hotbar(idx)
 				held_item_changed.emit(_grid.get_active_item_id())
 				_refresh_hotbar_ui()
-			get_viewport().set_input_as_handled()
+			var vp := get_viewport()
+			if vp != null:
+				vp.set_input_as_handled()
 
 # ── UI construction ────────────────────────────────────────────────────────────
 
@@ -454,6 +458,8 @@ func _get_equipment_slot_label(slot_key: String) -> String:
 const _HOTBAR_VISIBLE_START := 3
 
 func _build_hotbar_slots() -> void:
+	if _hotbar_container == null:
+		return
 	for child in _hotbar_container.get_children():
 		child.queue_free()
 	_hotbar_slots_ui.clear()
