@@ -1,5 +1,34 @@
 # Project Extraction — Progress
 
+## Update 21 — Inventory Design Refactor (Remove Patterns, Hide Weapon Hotbar, Scene-ify Layout)
+
+### Changes
+
+- **Removed custom item patterns**:
+  - Removed `pattern` field from `ItemDefinition`. All items are now strictly rectangular (`size_w × size_h`).
+  - Simplified `_get_item_cells()` in `GridInventory` to always generate a filled rectangle.
+  - Simplified rendering and drag preview in `InventoryGridPanel` — no more per-cell pattern-aware iteration.
+- **Hidden weapon hotbar slots (0–2) in inventory menu**:
+  - Only slots 3–8 are shown in the inventory menu hotbar strip.
+  - Weapon slots are exclusively managed through the equipment panel.
+  - `_refresh_hotbar_ui()` now properly maps UI indices to data indices.
+- **Applied `minimal_vector.tres` theme to inventory menu**:
+  - Theme applied via scene file (`inventory_menu.tscn`), not loaded at runtime.
+  - All hotbar slot corners set to 0 px (was 8 px). Grid slot corners already 0 px.
+- **Save/load interfaces retained (not called)**:
+  - `save_to_dict()` / `load_from_dict()` exist on both `GridInventory` and `EquipmentState`.
+  - These interfaces are not called at runtime — reserved for future persistence.
+- **Converted static UI layout to scene file**:
+  - The static layout (root control, background, scroll, center, HBoxMain, equipment panel, VBoxRight, title labels, grid container, hotbar container) is now defined in `inventory_menu.tscn`.
+  - Dynamic parts (equipment slot rows, hotbar slot panels, grid panels) remain in code.
+  - Script uses `@onready` references instead of `Control.new()` for static nodes.
+- **Updated documentation**:
+  - Updated `INVENTORY_SYSTEM.md` / `INVENTORY_SYSTEM_ZH.md` to v0.5.
+  - Updated `ITEM_REGISTRY.md` / `ITEM_REGISTRY_ZH.md` to remove pattern field.
+  - Updated progress documents.
+
+---
+
 ## Update 20 — Inventory System Enhancements (Patterns, Rarity, Stacking, Save/Load)
 
 ### Changes

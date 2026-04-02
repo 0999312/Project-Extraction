@@ -1,5 +1,34 @@
 # Project Extraction — 开发进度
 
+## 更新 21 — 物品栏设计整改（移除形状、隐藏武器快捷栏、场景化布局）
+
+### 变更内容
+
+- **移除自定义物品形状（pattern）**：
+  - 从 `ItemDefinition` 移除 `pattern` 字段。所有物品现在均为严格矩形（`size_w × size_h`）。
+  - 简化 `GridInventory` 中 `_get_item_cells()` 为始终生成填充矩形。
+  - 简化 `InventoryGridPanel` 中渲染和拖拽预览——不再逐格迭代。
+- **物品栏菜单中隐藏武器快捷栏槽位（0–2）**：
+  - 物品栏菜单快捷栏条带仅显示第 3–8 格。
+  - 武器槽专门通过装备面板管理。
+  - `_refresh_hotbar_ui()` 正确映射 UI 索引到数据索引。
+- **物品栏菜单应用 `minimal_vector.tres` 主题**：
+  - 主题通过场景文件（`inventory_menu.tscn`）设置，不在运行时加载。
+  - 所有快捷栏槽圆角设为 0 px（原为 8 px）。网格格子圆角已是 0 px。
+- **保留存档/读取接口（不实际调用）**：
+  - `save_to_dict()` / `load_from_dict()` 存在于 `GridInventory` 和 `EquipmentState`。
+  - 运行时不调用——保留给后续持久化使用。
+- **将静态 UI 布局转为场景文件**：
+  - 静态布局（根控件、背景、滚动容器、居中容器、主横向布局、装备面板、右侧纵向布局、标题标签、网格容器、快捷栏容器）定义在 `inventory_menu.tscn` 中。
+  - 动态部分（装备槽行、快捷栏槽面板、网格面板）仍在代码中生成。
+  - 脚本使用 `@onready` 引用替代 `Control.new()` 创建静态节点。
+- **更新文档**：
+  - 更新 `INVENTORY_SYSTEM.md` / `INVENTORY_SYSTEM_ZH.md` 至 v0.5。
+  - 更新 `ITEM_REGISTRY.md` / `ITEM_REGISTRY_ZH.md` 移除 pattern 字段。
+  - 更新进度文档。
+
+---
+
 ## 更新 20 — 物品栏系统增强（形状、稀有度、堆叠合并、存档/读取）
 
 ### 变更内容

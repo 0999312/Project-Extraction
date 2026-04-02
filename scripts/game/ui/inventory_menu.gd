@@ -1,9 +1,11 @@
 class_name InventoryMenu
 extends UIPanel
-## Tetris-style inventory menu managed by UIManager.
+## Rectangular grid inventory menu managed by UIManager.
 ## Opened via UIManager.open_panel(), closed via UIManager.back().
 ## Generates separate grid panels per container equipment
 ## (backpack 6×6, tactical vest 3×2) and mirrors equipment slot state.
+## Static layout defined in inventory_menu.tscn (minimal_vector.tres theme).
+## Weapon hotbar slots 0–2 are hidden; only slots 3–8 shown.
 
 const HOTBAR_SLOT_SIZE := 56
 const PANEL_BG_COLOR := Color(0.05, 0.05, 0.05, 0.92)

@@ -1,10 +1,10 @@
-# Inventory System Design – Tetris-Style Drag & Drop Grid
+# Inventory System Design – Rectangular Grid Drag & Drop
 
-> Version 0.4 – 2026-04-02
+> Version 0.5 – 2026-04-02
 
 ## 1. Overview
 
-The inventory system is a **Tetris-style grid inventory** where items occupy cells defined by their `size_w × size_h` bounding box or by a custom **occupancy pattern** for irregular shapes. Players can **drag and drop** items to place and move them. Items can be **rotated** (right-click) to fit, and matching stacks **merge automatically** when dropped onto each other. The system generates **equipment-based grids** — each container equipment (backpack, tactical vest) owns its own grid. A **hotbar** provides quick-access slots, an **item rarity system** provides visual feedback, and a **save/load API** supports game persistence.
+The inventory system is a **rectangular grid inventory** where items occupy cells defined by their `size_w × size_h` dimensions. All items are **rectangular** — custom patterns are not supported. Players can **drag and drop** items to place and move them. Items can be **rotated** (right-click) to fit, and matching stacks **merge automatically** when dropped onto each other. The system generates **equipment-based grids** — each container equipment (backpack, tactical vest) owns its own grid. A **hotbar** provides quick-access slots (with weapon slots 0–2 hidden from the inventory view and managed via the equipment panel), an **item rarity system** provides visual feedback, and a **save/load API** is available for future game persistence (not actively called at runtime).
 
 ## 2. Data Model
 
@@ -44,33 +44,30 @@ See [EQUIPMENT_SYSTEM.md](EQUIPMENT_SYSTEM.md) for full equipment slot details.
 | `id` | `String` | `""` | Item resource-location key |
 | `display_name` | `String` | `""` | Display name |
 | `category` | `String` | `""` | Item category |
-| `size_w` | `int` | 1 | Grid width (bounding box) |
-| `size_h` | `int` | 1 | Grid height (bounding box) |
+| `size_w` | `int` | 1 | Grid width |
+| `size_h` | `int` | 1 | Grid height |
 | `weight` | `float` | 0.0 | Unit weight |
 | `max_stack` | `int` | 1 | Maximum stack count |
 | `icon_path` | `String` | `""` | Path to icon texture |
 | `rarity` | `int` | 0 | Rarity level (0 = none, 1–5 = common → legendary) |
-| `pattern` | `Array[Vector2i]` | `[]` | Custom cell occupancy pattern (empty = filled rectangle) |
+
+> **Note:** The `pattern` field was removed in v0.5. All items are strictly rectangular.
 
 ## 3. Core Operations
 
 | Operation | Signature | Description |
 |-----------|-----------|-------------|
-| `can_place(item_id, gx, gy, rotated)` | `→ bool` | Check whether the item fits at `(gx, gy)` using its pattern (or bounding rect) |
+| `can_place(item_id, gx, gy, rotated)` | `→ bool` | Check whether the item's rectangle fits at `(gx, gy)` |
 | `place_item(stack, gx, gy, rotated)` | `→ bool` | Place an `ItemStack`, writing per-cell ownership |
 | `remove_item(gx, gy)` | `→ Dictionary` | Remove the placement at `(gx, gy)` and return the placement dict |
 | `get_placement_at(gx, gy)` | `→ Dictionary` | Return placement info for the item at cell `(gx, gy)` |
 | `find_first_fit(item_id, rotated)` | `→ Vector2i` | Auto-find the first valid position (top-left scan) |
 | `auto_place(stack)` | `→ bool` | Try non-rotated then rotated placement |
 | `compute_total_weight()` | `→ float` | Sum weight of all placements |
-| `save_to_dict()` | `→ Dictionary` | Serialize full inventory state |
-| `load_from_dict(data)` | `→ void` | Restore inventory from saved data |
+| `save_to_dict()` | `→ Dictionary` | Serialize full inventory state (interface only, not called at runtime) |
+| `load_from_dict(data)` | `→ void` | Restore inventory from saved data (interface only) |
 
-### 3.1 Custom Patterns
-
-Items may define a `pattern` array of `Vector2i` offsets from the top-left origin. When empty, a filled `size_w × size_h` rectangle is used. Patterns support rotation: each offset `(x, y)` rotates 90° clockwise to `(max_y - y, x)`.
-
-### 3.2 Stack Merging
+### 3.1 Stack Merging
 
 When a dragged stack is dropped onto an existing stack of the **same item**, the counts merge up to `max_stack`. If the dragged stack is fully consumed, the drag ends. If only partially merged, the remainder stays in the drag.
 
@@ -83,8 +80,8 @@ When a dragged stack is dropped onto an existing stack of the **same item**, the
 
 The hotbar references items **already placed** in the grid.
 
-- **Slots 0–2** are reserved for weapons and can **only** be assigned through the equipment panel (primary/secondary/melee weapon slots). Direct grid-drag assignment to these slots is blocked.
-- **Slots 3–8** accept any item and can be assigned by dragging from a grid.
+- **Slots 0–2** are reserved for weapons and can **only** be assigned through the equipment panel (primary/secondary/melee weapon slots). These slots are **not visible** in the inventory menu hotbar strip.
+- **Slots 3–8** are displayed in the inventory menu hotbar and accept any item via grid drag.
 - The active slot determines the **held item**.
 
 ## 5. UI Architecture
@@ -92,10 +89,10 @@ The hotbar references items **already placed** in the grid.
 ### 5.1 InventoryMenu (UIPanel — MSF Managed)
 
 - Opened/closed via `UIManager.open_panel()` / `UIManager.back()` on `UILayer.NORMAL` (layer 100).
-- Toggled with the **Tab** key (input action `pe_inventory`) in `DemoGameRuntime._poll_inventory_input()`.
+- The **static layout** (root control, background, scroll, panels, labels, containers) is defined in `inventory_menu.tscn` with the `minimal_vector.tres` theme applied.
+- The **dynamic parts** (equipment slot rows, hotbar slot panels, grid panels) are generated in code.
 - **ESC key closes inventory**: `_unhandled_input()` consumes `ui_cancel` and calls `UIManager.back(UILayer.NORMAL)`.
 - While open: pauses gameplay input, shows mouse cursor.
-- Contains an **equipment panel** (left), **container grids** (right), and a **hotbar strip** (bottom).
 - Data (grid, equipment) is passed via `_on_open(data)` dictionary.
 - Uses `CacheMode.CACHE` to preserve state between open/close cycles.
 
@@ -105,6 +102,7 @@ The hotbar references items **already placed** in the grid.
 - Each slot mirrors the current `EquipmentState` value and shows the equipped item's display name.
 - Dragging an inventory item from a grid onto a compatible equipment slot equips it.
 - Equipped items can be dragged back from non-backpack equipment slots into a grid cell to unequip them.
+- **Weapon slots 0–2 are managed here**, not in the hotbar strip.
 
 ### 5.3 Grid Panels
 
@@ -117,7 +115,6 @@ The hotbar references items **already placed** in the grid.
 
 - Grid lines are drawn first (lowest layer), then placed items (above grid lines), then drag preview (topmost).
 - Each placed item renders its `icon_path` texture with **fit-inside** scaling (maintain aspect ratio, fit within bounding rect, centre both axes). Icons never overflow their slot boundaries.
-- Items with custom patterns render per-cell backgrounds individually; the icon is drawn over the bounding rect.
 - Items with no icon show their `display_name` as a centred label.
 - Stack count (>1) is displayed in the bottom-right corner of the item rect.
 - Rarity-tinted background: the item background colour varies by rarity level (common = default, uncommon = green, rare = blue, epic = purple, legendary = gold).
@@ -128,16 +125,14 @@ The hotbar references items **already placed** in the grid.
 - **Drop on empty**: Click on an empty area → attempt `can_place`; if valid, `place_item`; if not, return to original position.
 - **Drop on matching stack**: If dropping onto a stack of the same item, merge counts up to `max_stack`.
 - **Invalid placement fallback**: If the drop target is invalid, the item returns to its original position when possible; otherwise `auto_place` finds the first valid slot.
-- **Right-click rotate**: While holding an item, right-click toggles `rotated` (swap w/h or rotate pattern 90° clockwise).
-- **Pattern preview**: Drag preview highlights individual cells for pattern items.
+- **Right-click rotate**: While holding an item, right-click toggles `rotated` (swap w/h).
 
 ### 5.6 Hotbar Interaction
 
-- The 9 hotbar slots are displayed at the bottom.
-- Hotbar slot style: **6 px pure-black border, 8 px corner radius**, background alpha = 64. Selected slot switches to a green fill.
-- Dragging an item onto a hotbar slot **3–8** assigns it.
-- Hotbar slots **0–2 are read-only** in the inventory grid — they are managed exclusively through the equipment panel (primary/secondary/melee weapon).
-- Clicking a hotbar slot number key (1–9) selects the active slot (for editing, not direct item selection).
+- Only **slots 3–8** are displayed in the inventory menu hotbar strip (weapon slots 0–2 are hidden).
+- Hotbar slot style: **6 px pure-black border, 0 px corner radius**, background alpha = 64. Selected slot switches to a green fill.
+- Dragging an item onto a visible hotbar slot assigns it.
+- Clicking a hotbar slot number key (1–9) selects the active slot.
 - When the active slot contains a registered weapon item, that item becomes the player's combat **held weapon**.
 
 ### 5.7 Item Rarity System
@@ -153,7 +148,9 @@ The hotbar references items **already placed** in the grid.
 
 Rarity is defined in `ItemDefinition.rarity` and rendered as a coloured background tint on the item's grid cells.
 
-## 6. Save/Load
+## 6. Save/Load (Interface Only)
+
+The save/load API is **defined but not called at runtime**. It is retained as an interface for future persistence implementation.
 
 ### 6.1 GridInventory
 
@@ -169,15 +166,15 @@ Rarity is defined in `ItemDefinition.rarity` and rendered as a coloured backgrou
 
 | Path | Type | Purpose |
 |------|------|---------|
-| `scripts/game/components/gameplay/grid_inventory.gd` | Data | Cell-based grid with pattern support + save/load |
-| `scripts/game/components/gameplay/equipment_state.gd` | Data | Equipment slots + container grids + save/load |
-| `scripts/game/components/gameplay/item_definition.gd` | Data | Item schema with rarity and pattern fields |
+| `scripts/game/components/gameplay/grid_inventory.gd` | Data | Cell-based rectangular grid + save/load interface |
+| `scripts/game/components/gameplay/equipment_state.gd` | Data | Equipment slots + container grids + save/load interface |
+| `scripts/game/components/gameplay/item_definition.gd` | Data | Item schema with rarity field |
 | `scripts/game/components/gameplay/item_stack.gd` | Data | Stack resource with count, durability, custom_data |
 | `scripts/game/components/gameplay/equipment_rules.gd` | Logic | Equip/hotbar validation rules |
 | `scripts/game/ui/inventory_menu.gd` | UI Script | Equipment panel + container grids + hotbar (extends UIPanel) |
 | `scripts/game/ui/inventory_grid_panel.gd` | UI Script | Grid rendering + drag & drop + stacking + rarity |
-| `scripts/game/ui/inventory_slot.gd` | UI Script | Single cell (StyleBoxFlat, no texture) |
-| `scenes/game_scene/ui/inventory_panel.tscn` | Scene | Inventory panel scene (UIPanel root) |
+| `scripts/game/ui/inventory_slot.gd` | UI Script | Single cell (StyleBoxFlat, 0 px corners) |
+| `scenes/game_scene/inventory_menu.tscn` | Scene | Inventory panel layout (theme: minimal_vector.tres) |
 | `scripts/game/registry/ui_catalog.gd` | Registry | UI panel registration catalog |
 
 ## 8. Integration
@@ -186,4 +183,4 @@ Rarity is defined in `ItemDefinition.rarity` and rendered as a coloured backgrou
 - `DemoGameRuntime._poll_inventory_input()` opens the inventory via `UIManager.open_panel()` with grid and equipment data.
 - `PlayerHUD` hotbar display updates from the same backpack `GridInventory.hotbar_slots` used by the inventory menu.
 - The equipment system is fully extensible for future container types and mod support.
-- Save/load is performed through `GridInventory.save_to_dict()`/`load_from_dict()` and `EquipmentState.save_to_dict()`/`load_from_dict()`.
+- Save/load interfaces exist on `GridInventory` and `EquipmentState` but are not called at runtime.
