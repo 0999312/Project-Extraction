@@ -1,5 +1,31 @@
 # Project Extraction — Progress
 
+## Update 22 — Held Item Render Mapping + Caller-Level No-Weapon Short-Circuit
+
+### Changes
+
+- **Added held-item render config resources and mapping resolution**:
+  - Added `HeldItemRenderConfig` resources under `resources/registries/held_item_render_configs/`.
+  - Added a JSON mapping table keyed by registry key / `ResourceLocation` strings.
+  - Implemented `HeldItemRenderCatalog` with priority `weapon RL -> item RL -> default render config`.
+- **Kept the mapping-table resource form flexible at design level, implemented as JSON here**:
+  - The agreed design allows JSON or Dictionary Resource.
+  - This implementation chooses JSON while preserving RL-string keys and a separate mapping layer.
+- **Moved no-weapon fire short-circuit responsibility to the higher-level caller**:
+  - `DemoGameRuntime` now filters fire/reload requests before calling `CombatFireRuntime`.
+  - Selecting a non-weapon held item clears `equipped_weapon_id` instead of leaving the old firearm active.
+  - `CombatFireRuntime` remains focused on valid fire requests only.
+- **Wired human held-item visuals to the render-config resolver**:
+  - `HumanActor` now reads the actual `AimPivot/Item/...` scene hierarchy.
+  - Held-item sprite selection now resolves through render config mapping instead of scene-hardcoded assumptions.
+- **Unified missing-resource wording for this flow**:
+  - Missing held-item sprite textures are treated as **Sprite missing texture** and fall back to the default render config.
+- **Updated documentation**:
+  - Added `HELD_ITEM_RENDER_DESIGN.md` / `HELD_ITEM_RENDER_DESIGN_ZH.md`.
+  - Updated item / weapon registry docs and progress docs.
+
+---
+
 ## Update 21 — Inventory Design Refactor (Remove Patterns, Hide Weapon Hotbar, Scene-ify Layout)
 
 ### Changes

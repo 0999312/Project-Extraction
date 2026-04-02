@@ -328,6 +328,13 @@
       "script_invalid": "[ProjectileCatalog] 抛射物脚本无效：{0}",
       "script_instance_invalid": "[ProjectileCatalog] 抛射物脚本未实例化为 Projectile：{0}"
     },
+    "held_item_render_catalog": {
+      "configs_dir_missing": "[HeldItemRenderCatalog] 未找到手持物渲染配置目录：{0}",
+      "json_missing": "[HeldItemRenderCatalog] 未找到手持物渲染映射 JSON：{0}",
+      "json_open_failed": "[HeldItemRenderCatalog] 打开手持物渲染映射 JSON 失败：{0}",
+      "json_parse_failed": "[HeldItemRenderCatalog] 解析 JSON 失败 {0}：{1}",
+      "json_root_invalid": "[HeldItemRenderCatalog] 手持物渲染映射 JSON 根节点必须是 Dictionary。"
+    },
     "buff_catalog": {
       "registry_unresolved": "[BuffCatalog] 无法解析 Buff 注册表。",
       "buffs_dir_missing": "[BuffCatalog] 未找到 Buff 资源目录：{0}"
@@ -355,7 +362,11 @@
         "projectile_entry_invalid": "[RegistryValidator] 抛射物条目无效：{0}",
         "projectile_script_missing": "[RegistryValidator] 抛射物“{0}”引用了缺失脚本“{1}”。",
         "projectile_script_invalid": "[RegistryValidator] 抛射物“{0}”的脚本无效：{1}",
-        "projectile_sprite_missing": "[RegistryValidator] 抛射物“{0}”缺少贴图资源：{1}",
+        "projectile_sprite_missing": "[RegistryValidator] 抛射物“{0}”Sprite 缺失贴图：{1}",
+        "held_item_render_default_missing": "[RegistryValidator] 手持物渲染默认配置缺失：{0}",
+        "held_item_render_weapon_missing": "[RegistryValidator] 手持物渲染的武器映射引用了不存在的武器“{0}”。",
+        "held_item_render_item_missing": "[RegistryValidator] 手持物渲染的物品映射引用了不存在的物品“{0}”。",
+        "held_item_render_sprite_missing": "[RegistryValidator] 手持物渲染配置“{0}”Sprite 缺失贴图：{1}",
         "buff_registry_missing": "[RegistryValidator] Buff 注册表不可用。",
         "buff_entry_invalid": "[RegistryValidator] Buff 条目无效：{0}",
         "buff_id_missing": "[RegistryValidator] Buff 条目缺少 ID：{0}"

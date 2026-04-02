@@ -12,7 +12,7 @@
 - **条目命名空间：** `game`
 - **条目 ID 命名规范：** `game:weapon/<名称>`（例如 `game:weapon/pistol`）
 - **标签命名规范：** 无
-- **跨注册表引用：** `item_id` 引用 `core:item`；`projectile_definition_id` 引用弹丸注册表 ID
+- **跨注册表引用：** `item_id` 引用 `core:item`；`projectile_definition_id` 引用弹丸注册表 ID；手持物渲染映射也可使用武器 RL 作为 key
 
 ## 3. 加载时机与生命周期
 
@@ -43,6 +43,7 @@
 
 - `WeaponCatalog.get_weapon_for_item(item_id)`：将已装备物品解析为武器定义。
 - `WeaponCatalog.apply_to_combat_state(combat_state)`：将武器定义写入战斗状态参数。
+- `HeldItemRenderCatalog.get_render_config_for(weapon_id, item_id)`：按“武器优先、物品回退”解析手持物渲染配置。
 
 ## 6. 当前内置条目
 
@@ -54,5 +55,6 @@
 - `scripts/game/components/combat/weapon_definition.gd`
 - `scripts/game/registry/weapon_registry.gd`
 - `scripts/game/registry/weapon_catalog.gd`
+- `scripts/game/registry/held_item_render_catalog.gd`
 - `resources/registries/weapons/*.tres`
-
+- `resources/registries/held_item_render_configs/held_item_render_mappings.json`

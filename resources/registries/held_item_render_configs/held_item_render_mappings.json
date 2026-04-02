@@ -1,0 +1,11 @@
+{
+  "default_render_config_id": "game:held_item_render/default",
+  "weapon_render_configs": {
+    "game:weapon/pistol": "game:held_item_render/pistol"
+  },
+  "item_render_configs": {
+    "game:item/weapon/pistol": "game:held_item_render/pistol",
+    "game:item/weapon/creature": "game:held_item_render/default",
+    "game:item/med/bandage": "game:held_item_render/default"
+  }
+}

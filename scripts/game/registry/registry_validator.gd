@@ -7,6 +7,7 @@ static func validate_all() -> bool:
 	WeaponCatalog.ensure_registry()
 	EntityCatalog.ensure_registry()
 	ProjectileCatalog.ensure_registry()
+	HeldItemRenderCatalog.ensure_loaded()
 	BuffCatalog.ensure_registry()
 
 	var is_valid := true
@@ -14,6 +15,7 @@ static func validate_all() -> bool:
 	is_valid = _validate_weapons() and is_valid
 	is_valid = _validate_entities() and is_valid
 	is_valid = _validate_projectiles() and is_valid
+	is_valid = _validate_held_item_render_configs() and is_valid
 	is_valid = _validate_buffs() and is_valid
 	return is_valid
 
@@ -113,6 +115,31 @@ static func _validate_projectiles() -> bool:
 		var sprite_path := str(projectile_entry.get("sprite_path", ""))
 		if not sprite_path.is_empty() and not _resource_exists(sprite_path):
 			LocalizedText.warn("logs.registry.validator.projectile_sprite_missing", [key, sprite_path])
+	return is_valid
+
+
+static func _validate_held_item_render_configs() -> bool:
+	var is_valid := true
+	var default_config_id := HeldItemRenderCatalog.get_default_render_config_id()
+	if HeldItemRenderCatalog.get_default_render_config() == null:
+		LocalizedText.error("logs.registry.validator.held_item_render_default_missing", [default_config_id])
+		is_valid = false
+	for config_id in HeldItemRenderCatalog.get_registered_config_ids():
+		var render_config := HeldItemRenderCatalog.get_render_config_by_id(config_id)
+		if render_config == null:
+			continue
+		if not _resource_exists(render_config.sprite_path):
+			LocalizedText.warn("logs.registry.validator.held_item_render_sprite_missing", [config_id, render_config.sprite_path])
+	for weapon_id_variant in HeldItemRenderCatalog.get_weapon_mappings().keys():
+		var weapon_id := str(weapon_id_variant)
+		if WeaponCatalog.get_weapon_definition(weapon_id) == null:
+			LocalizedText.error("logs.registry.validator.held_item_render_weapon_missing", [weapon_id])
+			is_valid = false
+	for item_id_variant in HeldItemRenderCatalog.get_item_mappings().keys():
+		var item_id := str(item_id_variant)
+		if ItemCatalog.get_item_definition(item_id) == null:
+			LocalizedText.error("logs.registry.validator.held_item_render_item_missing", [item_id])
+			is_valid = false
 	return is_valid
 
 
