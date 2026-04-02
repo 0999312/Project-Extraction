@@ -294,6 +294,7 @@
     },
     "human_actor": {
       "right_hand_missing": "HumanActor.attach_weapon：未找到 RightHand 节点。",
+      "item_pivot_missing": "HumanActor.attach_weapon：未找到 ItemPivot 节点。",
       "left_hand_missing": "HumanActor.attach_left_hand_item：未找到 LeftHand 节点。"
     },
     "entity_catalog": {

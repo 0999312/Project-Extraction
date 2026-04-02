@@ -65,7 +65,7 @@ static func _load_configs_from_resources() -> void:
 	if dir == null:
 		LocalizedText.warn("logs.held_item_render_catalog.configs_dir_missing", [CONFIGS_RESOURCE_DIR])
 		return
-	dir.list_dir_begin()
+	dir.list_dir_begin(true, true)
 	var file_name := dir.get_next()
 	while not file_name.is_empty():
 		if not dir.current_is_dir() and file_name.ends_with(".tres"):

@@ -56,7 +56,7 @@ func _get_aim_direction() -> Vector2:
 
 func attach_weapon(weapon_node: Node2D) -> void:
 	if _item_pivot == null:
-		LocalizedText.error("logs.human_actor.right_hand_missing")
+		LocalizedText.error("logs.human_actor.item_pivot_missing")
 		return
 	_clear_children_except(_item_pivot, _item_sprite)
 	if _item_sprite != null:
