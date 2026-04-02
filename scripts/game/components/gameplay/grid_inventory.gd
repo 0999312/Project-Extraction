@@ -51,30 +51,15 @@ func _get_item_size(item_id: String, rotated: bool) -> Vector2i:
 	var h := def.size_h
 	return Vector2i(h, w) if rotated else Vector2i(w, h)
 
-## Return the list of cell offsets that this item occupies. When a custom pattern
-## is defined on the ItemDefinition, it is used; otherwise a filled rectangle of
-## (size_w × size_h) is returned.  The offsets are relative to the top-left
-## origin (gx, gy).  When `rotated` is true, each offset (x, y) is rotated 90°
-## clockwise: (x, y) → (max_y - y, x) where max_y = bounding height - 1.
+## Return the list of cell offsets that this item occupies as a filled rectangle
+## of (size_w × size_h).  Offsets are relative to the top-left origin (gx, gy).
+## When `rotated` is true the width and height are swapped.
 func _get_item_cells(item_id: String, rotated: bool) -> Array[Vector2i]:
-	var def := ItemCatalog.get_item_definition(item_id)
-	if def == null:
-		return [Vector2i(0, 0)]
+	var sz := _get_item_size(item_id, rotated)
 	var cells_list: Array[Vector2i] = []
-	if def.pattern.size() > 0:
-		cells_list.assign(def.pattern)
-	else:
-		for cy in range(def.size_h):
-			for cx in range(def.size_w):
-				cells_list.append(Vector2i(cx, cy))
-	if rotated and cells_list.size() > 0:
-		var max_y := 0
-		for c in cells_list:
-			max_y = maxi(max_y, c.y)
-		var rotated_cells: Array[Vector2i] = []
-		for c in cells_list:
-			rotated_cells.append(Vector2i(max_y - c.y, c.x))
-		return rotated_cells
+	for cy in range(sz.y):
+		for cx in range(sz.x):
+			cells_list.append(Vector2i(cx, cy))
 	return cells_list
 
 # ── Core operations ────────────────────────────────────────────────────────────

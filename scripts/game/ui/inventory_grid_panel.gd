@@ -249,15 +249,10 @@ func _draw_placement(p: Dictionary) -> void:
 	var stack: ItemStack = p.get("stack")
 	var bg_color := _get_rarity_bg_color(item_id)
 
-	# Draw per-cell background for pattern-aware rendering
-	var item_cells := _grid._get_item_cells(item_id, rotated)
-	for offset in item_cells:
-		var cell_rect := Rect2(Vector2((gx + offset.x) * CELL_SIZE, (gy + offset.y) * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE))
-		draw_rect(cell_rect, bg_color)
-
-	# Bounding rect for icon and text rendering
+	# Bounding rect for the item
 	var sz := _grid._get_item_size(item_id, rotated)
 	var rect := Rect2(Vector2(gx * CELL_SIZE, gy * CELL_SIZE), Vector2(sz.x * CELL_SIZE, sz.y * CELL_SIZE))
+	draw_rect(rect, bg_color)
 
 	var def := ItemCatalog.get_item_definition(item_id)
 	if def != null and not def.icon_path.is_empty() and ResourceLoader.exists(def.icon_path):
@@ -312,13 +307,10 @@ func _draw_drag_preview() -> void:
 	var gy := clampi(int(mouse_pos.y) / CELL_SIZE, 0, _grid.height - 1)
 	var valid := _grid.can_place(item_id, gx, gy, _drag_rotated)
 	var color := HOVER_VALID_COLOR if valid else HOVER_INVALID_COLOR
-	# Draw per-cell highlight for pattern-aware preview
-	var item_cells := _grid._get_item_cells(item_id, _drag_rotated)
-	for offset in item_cells:
-		var cell_rect := Rect2(Vector2((gx + offset.x) * CELL_SIZE, (gy + offset.y) * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE))
-		draw_rect(cell_rect, color)
-	# Draw item icon on cursor (fit by bounding rect, not affected by mask)
+	# Rectangular highlight
 	var rect := Rect2(Vector2(gx * CELL_SIZE, gy * CELL_SIZE), Vector2(sz.x * CELL_SIZE, sz.y * CELL_SIZE))
+	draw_rect(rect, color)
+	# Draw item icon on cursor (fit inside bounding rect)
 	var def := ItemCatalog.get_item_definition(item_id)
 	if def != null and not def.icon_path.is_empty() and ResourceLoader.exists(def.icon_path):
 		var tex := ResourceLoader.load(def.icon_path, "Texture2D", ResourceLoader.CACHE_MODE_REUSE)
