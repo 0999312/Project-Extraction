@@ -249,8 +249,7 @@ func _poll_inventory_input() -> void:
 func _on_held_item_changed(item_id: String) -> void:
 	if _player == null or _player.combat_state == null:
 		return
-	if _player is HumanActor:
-		(_player as HumanActor).sync_held_item_visual("", item_id)
+	_player.sync_held_item_visual("", item_id)
 	if item_id.is_empty():
 		_player.combat_state.equipped_weapon_id = ""
 		_player.combat_state.wants_fire = false
