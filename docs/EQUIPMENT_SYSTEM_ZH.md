@@ -118,11 +118,15 @@ sync_weapons_to_hotbar(grid)          # 将武器 ID 推送至快捷栏 0-2
 | 文件 | 职责 |
 |---|---|
 | `scripts/game/components/gameplay/equipment_state.gd` | 装备数据模型 |
-| `scripts/game/ui/inventory_menu.gd` | 装备 + 物品栏 UI |
+| `scripts/game/registry/ui_catalog.gd` | UI 面板注册目录 |
+| `scripts/game/ui/inventory_menu.gd` | 装备 + 物品栏 UI（继承 UIPanel） |
 | `scripts/game/ui/inventory_grid_panel.gd` | 网格渲染（按高度缩放图标） |
 | `scripts/game/ui/inventory_slot.gd` | 单个网格格子（StyleBoxFlat，无贴图） |
-| `scripts/game/ui/player_hud.gd` | HUD 快捷栏（StyleBoxFlat，无贴图） |
-| `scripts/game/gameplay/demo_game_runtime.gd` | 接线：创建 EquipmentState 并绑定到 UI |
+| `scripts/game/ui/player_hud.gd` | HUD 快捷栏（Control，UIManager 覆盖层） |
+| `scripts/game/ui/pause_menu_panel.gd` | 暂停菜单（继承 UIPanel） |
+| `scripts/game/gameplay/demo_game_runtime.gd` | 接线：创建 EquipmentState，使用 UIManager |
 | `scripts/game/input/player_input_context.gd` | GUIDE 输入动作定义 |
+| `scenes/game_scene/ui/inventory_panel.tscn` | 物品栏面板场景 |
+| `scenes/game_scene/ui/pause_menu_panel.tscn` | 暂停菜单面板场景 |
 | `resources/i18n/ui_text.en.json` | 英文 UI 文本 |
 | `resources/i18n/ui_text.zh.json` | 中文 UI 文本 |

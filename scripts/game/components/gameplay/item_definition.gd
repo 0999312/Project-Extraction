@@ -9,3 +9,6 @@ extends Resource
 @export var weight: float = 0.0
 @export var max_stack: int = 1
 @export_file("*.png", "*.webp", "*.jpg", "*.jpeg", "*.svg") var icon_path: String = ""
+
+## Item rarity level (0 = none, 1 = common, 2 = uncommon, 3 = rare, 4 = epic, 5 = legendary).
+@export_range(0, 5) var rarity: int = 0

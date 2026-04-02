@@ -3,7 +3,6 @@ extends Node2D
 @onready var _player_spawn: Marker2D = $PlayerSpawn
 @onready var _human_enemy_spawn: Marker2D = $HumanEnemySpawn
 @onready var _non_human_enemy_spawn: Marker2D = $NonHumanEnemySpawn
-@onready var _pause_menu_controller: Node = $PauseMenuController
 @onready var _phantom_camera_2d = $PhantomCamera2D
 
 var _player: Player = null
@@ -20,10 +19,10 @@ var _combat_fire_system := CombatFireRuntime.new()
 var _projectile_motion_system := ProjectileMotionRuntime.new()
 var _projectiles: Node2D = null
 var _pause_pressed_last_frame: bool = false
-var _inventory_menu: InventoryMenu = null
 var _inventory_pressed_last_frame: bool = false
 var _player_hud: PlayerHUD = null
 var _player_equipment: EquipmentState = null
+var _backpack_grid: GridInventory = null
 
 const GUIDE_ACTION_PAUSE := &"pe_pause"
 const GUIDE_ACTION_INVENTORY := &"pe_inventory"
@@ -39,6 +38,7 @@ func _ready() -> void:
 	WeaponCatalog.ensure_registry()
 	EntityCatalog.ensure_registry()
 	ProjectileCatalog.ensure_registry()
+	UICatalog.ensure_registry()
 	RegistryValidator.validate_all()
 	_spawn_runtime_entities()
 	_setup_crosshair()
@@ -52,12 +52,18 @@ func _ready() -> void:
 	_assign_enemy_targets()
 	_default_mouse_mode = Input.mouse_mode
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-	_setup_inventory_menu()
+	_setup_equipment_and_inventory()
 	_setup_player_hud()
 	print("[DEBUG][DemoGame] _ready | actors=%d" % _get_runtime_actors().size())
 
 func _exit_tree() -> void:
 	Input.set_mouse_mode(_default_mouse_mode)
+	# Clean up UIManager overlays
+	var hud_id := UICatalog.id(UICatalog.OVERLAY_PLAYER_HUD)
+	if UIManager.get_overlay(hud_id) != null:
+		UIManager.remove_overlay(hud_id)
+	# Close all game UI panels
+	UIManager.close_all()
 
 func _spawn_runtime_entities() -> void:
 	_player = _spawn_registered_entity(EntityCatalog.PLAYER, _player_spawn.global_position, "Player") as Player
@@ -80,7 +86,8 @@ func _physics_process(delta: float) -> void:
 	_assign_enemy_targets()
 	_poll_pause_input()
 	_poll_inventory_input()
-	if _inventory_menu == null or not _inventory_menu.is_open():
+	var inventory_open := UIManager.is_panel_open(UICatalog.id(UICatalog.PANEL_INVENTORY))
+	if not inventory_open:
 		_update_crosshair_and_camera_target()
 		_combat_fire_system.process(_get_runtime_actors(), _projectiles, delta)
 		_projectile_motion_system.process(_projectiles, _get_runtime_actors(), delta)
@@ -100,8 +107,15 @@ func _assign_enemy_targets() -> void:
 
 func _poll_pause_input() -> void:
 	var is_triggered := GuideInputRuntime.is_action_triggered(GUIDE_ACTION_PAUSE)
-	if is_triggered and not _pause_pressed_last_frame and _pause_menu_controller != null:
-		_pause_menu_controller.pause()
+	if is_triggered and not _pause_pressed_last_frame:
+		# Only open pause if no other NORMAL/POPUP panels are open
+		var inv_id := UICatalog.id(UICatalog.PANEL_INVENTORY)
+		var pause_id := UICatalog.id(UICatalog.PANEL_PAUSE_MENU)
+		if UIManager.is_panel_open(inv_id):
+			# If inventory is open, ESC closes it instead of opening pause
+			pass  # Handled by InventoryMenu._unhandled_input
+		elif not UIManager.is_panel_open(pause_id):
+			UIManager.open_panel(pause_id)
 	_pause_pressed_last_frame = is_triggered
 
 func _setup_crosshair() -> void:
@@ -182,23 +196,13 @@ func _update_ads_vignette(active: bool) -> void:
 			_ads_vignette.update_center(screen_pos)
 
 func _is_relaxed_state() -> bool:
-	if _inventory_menu != null and _inventory_menu.is_open():
+	if UIManager.is_panel_open(UICatalog.id(UICatalog.PANEL_INVENTORY)):
 		return true
 	return get_tree().paused
 
-func _setup_inventory_menu() -> void:
-	var backpack_grid := _get_player_backpack_grid()
-	_player_equipment = _build_player_equipment(backpack_grid)
-	var inventory_menu_scene := load("res://scenes/game_scene/inventory_menu.tscn")
-	if inventory_menu_scene != null:
-		_inventory_menu = inventory_menu_scene.instantiate() as InventoryMenu
-	else:
-		_inventory_menu = InventoryMenu.new()
-	_inventory_menu.name = "InventoryMenu"
-	add_child(_inventory_menu)
-	_inventory_menu.bind_inventory(backpack_grid)
-	_inventory_menu.bind_equipment(_player_equipment)
-	_inventory_menu.held_item_changed.connect(_on_held_item_changed)
+func _setup_equipment_and_inventory() -> void:
+	_backpack_grid = _get_player_backpack_grid()
+	_player_equipment = _build_player_equipment(_backpack_grid)
 
 func _get_player_backpack_grid() -> GridInventory:
 	if _player != null:
@@ -223,8 +227,20 @@ func _build_player_equipment(backpack_grid: GridInventory) -> EquipmentState:
 func _poll_inventory_input() -> void:
 	var is_triggered := GuideInputRuntime.is_action_triggered(GUIDE_ACTION_INVENTORY)
 	if is_triggered and not _inventory_pressed_last_frame:
-		if _inventory_menu != null:
-			_inventory_menu.toggle()
+		var inv_id := UICatalog.id(UICatalog.PANEL_INVENTORY)
+		if UIManager.is_panel_open(inv_id):
+			UIManager.back(UILayer.NORMAL)
+		else:
+			# Only open inventory if pause menu is not showing
+			var pause_id := UICatalog.id(UICatalog.PANEL_PAUSE_MENU)
+			if not UIManager.is_panel_open(pause_id):
+				var panel := UIManager.open_panel(inv_id, {
+					"grid": _backpack_grid,
+					"equipment": _player_equipment
+				})
+				if panel is InventoryMenu:
+					if not panel.held_item_changed.is_connected(_on_held_item_changed):
+						panel.held_item_changed.connect(_on_held_item_changed)
 	_inventory_pressed_last_frame = is_triggered
 
 func _on_held_item_changed(item_id: String) -> void:
@@ -248,7 +264,9 @@ func _setup_player_hud() -> void:
 	_player_hud = hud_scene.instantiate() as PlayerHUD
 	if _player_hud == null:
 		return
-	add_child(_player_hud)
+	# Register as overlay on SCENE layer via UIManager
+	var hud_id := UICatalog.id(UICatalog.OVERLAY_PLAYER_HUD)
+	UIManager.add_overlay(hud_id, _player_hud, UILayer.SCENE)
 	# Bind to backpack grid (primary container)
 	if _player_equipment != null:
 		var bp_grid := _player_equipment.get_container_grid("backpack")

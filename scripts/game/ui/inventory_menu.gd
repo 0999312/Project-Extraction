@@ -1,9 +1,11 @@
 class_name InventoryMenu
-extends CanvasLayer
-## Tetris-style inventory menu. Toggled via pe_inventory (Tab).
-## While open: pauses gameplay input, shows mouse cursor.
+extends UIPanel
+## Rectangular grid inventory menu managed by UIManager.
+## Opened via UIManager.open_panel(), closed via UIManager.back().
 ## Generates separate grid panels per container equipment
 ## (backpack 6×6, tactical vest 3×2) and mirrors equipment slot state.
+## Static layout defined in inventory_menu.tscn (minimal_vector.tres theme).
+## Weapon hotbar slots 0–2 are hidden; only slots 3–8 shown.
 
 const HOTBAR_SLOT_SIZE := 56
 const PANEL_BG_COLOR := Color(0.05, 0.05, 0.05, 0.92)
@@ -13,7 +15,7 @@ const HOTBAR_BG_COLOR := Color(0.0, 0.0, 0.0, 64.0 / 255.0)
 const HOTBAR_SELECTED_BG_COLOR := Color(0.0, 1.0, 0.0, 64.0 / 255.0)
 const HOTBAR_BORDER_COLOR := Color(0.0, 0.0, 0.0, 1.0)
 const HOTBAR_BORDER_WIDTH := 6
-const HOTBAR_CORNER_RADIUS := 8
+const HOTBAR_CORNER_RADIUS := 0
 
 # ── Equipment placeholder slot visual constants ────────────────────────────────
 const EQUIP_SLOT_SIZE := Vector2(64, 64)
@@ -37,20 +39,22 @@ const EQUIPMENT_LAYOUT := [
 	],
 ]
 
-var _is_open: bool = false
 var _grid_panels: Array[InventoryGridPanel] = []
-var _hotbar_container: HBoxContainer = null
 var _hotbar_slots_ui: Array[Control] = []
 var _equipment_slots_ui: Dictionary = {}
 var _grid: GridInventory = null
 var _equipment: EquipmentState = null
-var _root_panel: PanelContainer = null
-var _title_label: Label = null
-var _grids_vbox: VBoxContainer = null
 var _dragged_equipment_slot_key: String = ""
 var _dragged_equipment_item_id: String = ""
 
-signal inventory_toggled(is_open: bool)
+# ── Scene-defined node references ──────────────────────────────────────────────
+@onready var _equip_vbox: VBoxContainer = $Root/Scroll/Center/HBoxMain/EquipmentPanel/EquipmentVBox
+@onready var _equip_title: Label = $Root/Scroll/Center/HBoxMain/EquipmentPanel/EquipmentVBox/EquipmentTitle
+@onready var _title_label: Label = $Root/Scroll/Center/HBoxMain/VBoxRight/TitleLabel
+@onready var _grids_vbox: VBoxContainer = $Root/Scroll/Center/HBoxMain/VBoxRight/GridsVBox
+@onready var _hotbar_label: Label = $Root/Scroll/Center/HBoxMain/VBoxRight/HotbarLabel
+@onready var _hotbar_container: HBoxContainer = $Root/Scroll/Center/HBoxMain/VBoxRight/HotbarContainer
+
 signal held_item_changed(item_id: String)
 
 
@@ -58,10 +62,9 @@ func _txt(key: String, args: Array = []) -> String:
 	return LocalizedText.text(key, args)
 
 func _ready() -> void:
-	layer = 20
-	visible = false
-	_is_open = false
-	_build_ui()
+	_localize_labels()
+	_build_equipment_slots()
+	_build_hotbar_slots()
 
 func bind_inventory(grid: GridInventory) -> void:
 	if _grid != null and _grid.inventory_changed.is_connected(_on_inventory_changed):
@@ -93,39 +96,34 @@ func _on_equipment_changed(_slot_key: String) -> void:
 	_rebuild_equipment_grids()
 	_refresh_hotbar_ui()
 
-func toggle() -> void:
-	if _is_open:
-		close()
-	else:
-		open()
+# ── UIPanel lifecycle ──────────────────────────────────────────────────────────
 
-func open() -> void:
-	if _is_open:
-		return
-	_is_open = true
-	visible = true
+func _on_open(data: Dictionary = {}) -> void:
+	var grid: GridInventory = data.get("grid") as GridInventory
+	if grid != null:
+		bind_inventory(grid)
+	var equip: EquipmentState = data.get("equipment") as EquipmentState
+	if equip != null:
+		bind_equipment(equip)
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	_rebuild_equipment_grids()
 	_refresh_hotbar_ui()
-	inventory_toggled.emit(true)
 
-func close() -> void:
-	if not _is_open:
-		return
+func _on_close() -> void:
 	for gp in _grid_panels:
 		if gp != null and gp.is_dragging():
 			gp._cancel_drag()
 	_clear_equipment_drag()
-	_is_open = false
-	visible = false
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-	inventory_toggled.emit(false)
 
 func is_open() -> bool:
-	return _is_open
+	return UIManager.is_panel_open(UICatalog.id(UICatalog.PANEL_INVENTORY))
 
-func _input(event: InputEvent) -> void:
-	if not _is_open:
+func _unhandled_input(event: InputEvent) -> void:
+	# ESC closes inventory via UIManager.back() — prevents pause menu conflict
+	if event.is_action_pressed("ui_cancel"):
+		UIManager.back(UILayer.NORMAL)
+		get_viewport().set_input_as_handled()
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
 		var key_event: InputEventKey = event
@@ -138,100 +136,27 @@ func _input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 # ── UI construction ────────────────────────────────────────────────────────────
-func _build_ui() -> void:
-	var root := Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(root)
 
-	var bg := ColorRect.new()
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.color = Color(0, 0, 0, 0.55)
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(bg)
+## Apply localized strings to scene-defined labels.
+func _localize_labels() -> void:
+	if _title_label != null:
+		_title_label.text = _txt("ui.inventory.title")
+	if _equip_title != null:
+		_equip_title.text = _txt("ui.inventory.equipment_title")
+	if _hotbar_label != null:
+		_hotbar_label.text = _txt("ui.inventory.hotbar_title")
 
-	# ScrollContainer so content can exceed viewport
-	var scroll := ScrollContainer.new()
-	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	root.add_child(scroll)
-
-	var center := CenterContainer.new()
-	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.add_child(center)
-
-	# Main horizontal layout: equipment panel | inventory grids
-	var hbox_main := HBoxContainer.new()
-	hbox_main.alignment = BoxContainer.ALIGNMENT_CENTER
-	hbox_main.add_theme_constant_override("separation", 16)
-	center.add_child(hbox_main)
-
-	# Left side: equipment slots
-	_build_equipment_panel(hbox_main)
-
-	# Right side: inventory grids + hotbar
-	var vbox_right := VBoxContainer.new()
-	vbox_right.alignment = BoxContainer.ALIGNMENT_CENTER
-	vbox_right.add_theme_constant_override("separation", 12)
-	hbox_main.add_child(vbox_right)
-
-	_title_label = Label.new()
-	_title_label.text = _txt("ui.inventory.title")
-	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_title_label.add_theme_font_size_override("font_size", 22)
-	vbox_right.add_child(_title_label)
-
-	# Container for dynamically generated grid panels
-	_grids_vbox = VBoxContainer.new()
-	_grids_vbox.add_theme_constant_override("separation", 12)
-	vbox_right.add_child(_grids_vbox)
-
-	# Hotbar section
-	var hotbar_label := Label.new()
-	hotbar_label.text = _txt("ui.inventory.hotbar_title")
-	hotbar_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox_right.add_child(hotbar_label)
-
-	_hotbar_container = HBoxContainer.new()
-	_hotbar_container.alignment = BoxContainer.ALIGNMENT_CENTER
-	_hotbar_container.add_theme_constant_override("separation", 4)
-	vbox_right.add_child(_hotbar_container)
-
-	_build_hotbar_slots()
-
-# ── Equipment panel (left side) ────────────────────────────────────────────────
-func _build_equipment_panel(parent: Control) -> void:
-	var panel := PanelContainer.new()
-	var ps := StyleBoxFlat.new()
-	ps.bg_color = PANEL_BG_COLOR
-	ps.border_width_left = 2
-	ps.border_width_top = 2
-	ps.border_width_right = 2
-	ps.border_width_bottom = 2
-	ps.border_color = Color(0.8, 0.8, 0.8, 0.7)
-	ps.content_margin_left = 12.0
-	ps.content_margin_top = 12.0
-	ps.content_margin_right = 12.0
-	ps.content_margin_bottom = 12.0
-	panel.add_theme_stylebox_override("panel", ps)
-	parent.add_child(panel)
-
-	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 8)
-	panel.add_child(vbox)
-
-	var equip_title := Label.new()
-	equip_title.text = _txt("ui.inventory.equipment_title")
-	equip_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	equip_title.add_theme_font_size_override("font_size", 18)
-	vbox.add_child(equip_title)
-
+# ── Equipment panel — dynamic slot generation ──────────────────────────────────
+## Equipment rows and individual slots are still generated dynamically because
+## they connect gui_input signals and must map to EQUIPMENT_LAYOUT.
+func _build_equipment_slots() -> void:
+	if _equip_vbox == null:
+		return
 	for row_entries in EQUIPMENT_LAYOUT:
 		var row := HBoxContainer.new()
 		row.alignment = BoxContainer.ALIGNMENT_CENTER
 		row.add_theme_constant_override("separation", 8)
-		vbox.add_child(row)
+		_equip_vbox.add_child(row)
 		for entry in row_entries:
 			_add_equip_slot(row, entry["slot_key"], entry["label_key"])
 	_refresh_equipment_panel()
@@ -507,7 +432,7 @@ func _add_grid_section(title: String, grid: GridInventory) -> void:
 
 	var gp := InventoryGridPanel.new()
 	gp.mouse_filter = Control.MOUSE_FILTER_STOP
-	gp.clip_contents = true
+	gp.clip_contents = false
 	panel.add_child(gp)
 	gp.setup(grid, null)
 	gp.set_external_drop_handler(func(local_pos: Vector2) -> bool:
@@ -523,11 +448,16 @@ func _get_equipment_slot_label(slot_key: String) -> String:
 	return _make_readable_item_id(slot_key)
 
 # ── Hotbar ─────────────────────────────────────────────────────────────────────
+## Hotbar slots 0-2 (weapon slots) are managed exclusively via the equipment
+## panel and are therefore hidden from the inventory-menu hotbar strip.  Only
+## usable slots 3-8 are shown here.
+const _HOTBAR_VISIBLE_START := 3
+
 func _build_hotbar_slots() -> void:
 	for child in _hotbar_container.get_children():
 		child.queue_free()
 	_hotbar_slots_ui.clear()
-	for i in range(9):
+	for i in range(_HOTBAR_VISIBLE_START, 9):
 		var slot := PanelContainer.new()
 		slot.custom_minimum_size = Vector2(HOTBAR_SLOT_SIZE, HOTBAR_SLOT_SIZE)
 		slot.add_theme_stylebox_override("panel", _make_hotbar_sb(false))
@@ -570,6 +500,10 @@ func _on_hotbar_slot_input(event: InputEvent, slot_index: int) -> void:
 			if gp != null and gp.is_dragging():
 				any_dragging = true
 				var item_id := gp.get_drag_item_id()
+				# Weapon hotbar slots 0-2 can only be assigned through the
+				# equipment panel, not by dragging items from a container grid.
+				if slot_index < EquipmentRules.WEAPON_ONLY_HOTBAR_SLOT_COUNT:
+					break
 				if not item_id.is_empty() and _grid != null and EquipmentRules.can_assign_item_to_hotbar(slot_index, item_id):
 					_grid.set_hotbar_slot(slot_index, item_id)
 					_sync_equipment_slot_from_hotbar(slot_index)
@@ -585,11 +519,14 @@ func _on_hotbar_slot_input(event: InputEvent, slot_index: int) -> void:
 func _refresh_hotbar_ui() -> void:
 	if _grid == null:
 		return
-	for i in range(mini(_hotbar_slots_ui.size(), _grid.hotbar_slots.size())):
-		var slot: PanelContainer = _hotbar_slots_ui[i]
-		var is_active := (i == _grid.active_hotbar_index)
+	for ui_idx in range(_hotbar_slots_ui.size()):
+		var slot_index := ui_idx + _HOTBAR_VISIBLE_START
+		if slot_index >= _grid.hotbar_slots.size():
+			break
+		var slot: PanelContainer = _hotbar_slots_ui[ui_idx]
+		var is_active := (slot_index == _grid.active_hotbar_index)
 		slot.add_theme_stylebox_override("panel", _make_hotbar_sb(is_active))
-		slot.tooltip_text = _txt("ui.inventory.hotbar_slot_tooltip", [i + 1, _get_item_display_name(_grid.hotbar_slots[i])])
+		slot.tooltip_text = _txt("ui.inventory.hotbar_slot_tooltip", [slot_index + 1, _get_item_display_name(_grid.hotbar_slots[slot_index])])
 
 func _sync_equipment_from_hotbar() -> void:
 	if _grid == null or _equipment == null:

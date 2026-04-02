@@ -111,11 +111,18 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[node name="PlayerHUD" type="CanvasLayer" unique_id=2129801643]
-layer = 10
+[node name="PlayerHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_hud_script")
 
-[node name="HUDRoot" type="VBoxContainer" parent="." unique_id=352499070]
+[node name="HUDRoot" type="VBoxContainer" parent="."]
+layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
@@ -123,113 +130,128 @@ anchor_bottom = 1.0
 offset_top = -160.0
 grow_horizontal = 2
 grow_vertical = 0
+mouse_filter = 2
 theme = ExtResource("2_hud_theme")
 alignment = 1
 
-[node name="StatsPanel" type="PanelContainer" parent="HUDRoot" unique_id=180226073]
+[node name="StatsPanel" type="PanelContainer" parent="HUDRoot"]
 custom_minimum_size = Vector2(600, 0)
 layout_mode = 2
 size_flags_horizontal = 4
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_ixt46")
 
-[node name="StatsVBox" type="VBoxContainer" parent="HUDRoot/StatsPanel" unique_id=499143157]
+[node name="StatsVBox" type="VBoxContainer" parent="HUDRoot/StatsPanel"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 4
 
-[node name="Row1" type="HBoxContainer" parent="HUDRoot/StatsPanel/StatsVBox" unique_id=2112280776]
+[node name="Row1" type="HBoxContainer" parent="HUDRoot/StatsPanel/StatsVBox"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 8
 
-[node name="EnergyBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row1" unique_id=1227825951]
+[node name="EnergyBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row1"]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_maywa")
 theme_override_styles/fill = SubResource("StyleBoxFlat_yrr7f")
 value = 100.0
 show_percentage = false
 
-[node name="EnergyLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row1/EnergyBar" unique_id=343346399]
+[node name="EnergyLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row1/EnergyBar"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 text = "100/100"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ThirstBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row1" unique_id=668664573]
+[node name="ThirstBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row1"]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_njvgo")
 theme_override_styles/fill = SubResource("StyleBoxFlat_y0ufx")
 value = 100.0
 show_percentage = false
 
-[node name="ThirstLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row1/ThirstBar" unique_id=1874446991]
+[node name="ThirstLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row1/ThirstBar"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 text = "100/100"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Row2" type="HBoxContainer" parent="HUDRoot/StatsPanel/StatsVBox" unique_id=761005814]
+[node name="Row2" type="HBoxContainer" parent="HUDRoot/StatsPanel/StatsVBox"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 8
 
-[node name="HPBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row2" unique_id=1097752553]
+[node name="HPBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row2"]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_6wsxy")
 theme_override_styles/fill = SubResource("StyleBoxFlat_2lc7q")
 value = 100.0
 show_percentage = false
 
-[node name="HPLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row2/HPBar" unique_id=186311383]
+[node name="HPLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row2/HPBar"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 text = "100/100"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StaminaBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row2" unique_id=1511854881]
+[node name="StaminaBar" type="ProgressBar" parent="HUDRoot/StatsPanel/StatsVBox/Row2"]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_yue00")
 theme_override_styles/fill = SubResource("StyleBoxFlat_wrtkm")
 value = 100.0
 show_percentage = false
 
-[node name="StaminaLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row2/StaminaBar" unique_id=1152345940]
+[node name="StaminaLabel" type="Label" parent="HUDRoot/StatsPanel/StatsVBox/Row2/StaminaBar"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 text = "100/100"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HotbarRow" type="PanelContainer" parent="HUDRoot" unique_id=4862395]
+[node name="HotbarRow" type="PanelContainer" parent="HUDRoot"]
 texture_filter = 1
 layout_mode = 2
 size_flags_horizontal = 4
+mouse_filter = 2
 
-[node name="Hotbar" type="HBoxContainer" parent="HUDRoot/HotbarRow" unique_id=856603493]
+[node name="Hotbar" type="HBoxContainer" parent="HUDRoot/HotbarRow"]
 texture_filter = 1
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 4

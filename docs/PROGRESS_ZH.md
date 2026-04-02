@@ -1,5 +1,97 @@
 # Project Extraction — 开发进度
 
+## 更新 21 — 物品栏设计整改（移除形状、隐藏武器快捷栏、场景化布局）
+
+### 变更内容
+
+- **移除自定义物品形状（pattern）**：
+  - 从 `ItemDefinition` 移除 `pattern` 字段。所有物品现在均为严格矩形（`size_w × size_h`）。
+  - 简化 `GridInventory` 中 `_get_item_cells()` 为始终生成填充矩形。
+  - 简化 `InventoryGridPanel` 中渲染和拖拽预览——不再逐格迭代。
+- **物品栏菜单中隐藏武器快捷栏槽位（0–2）**：
+  - 物品栏菜单快捷栏条带仅显示第 3–8 格。
+  - 武器槽专门通过装备面板管理。
+  - `_refresh_hotbar_ui()` 正确映射 UI 索引到数据索引。
+- **物品栏菜单应用 `minimal_vector.tres` 主题**：
+  - 主题通过场景文件（`inventory_menu.tscn`）设置，不在运行时加载。
+  - 所有快捷栏槽圆角设为 0 px（原为 8 px）。网格格子圆角已是 0 px。
+- **保留存档/读取接口（不实际调用）**：
+  - `save_to_dict()` / `load_from_dict()` 存在于 `GridInventory` 和 `EquipmentState`。
+  - 运行时不调用——保留给后续持久化使用。
+- **将静态 UI 布局转为场景文件**：
+  - 静态布局（根控件、背景、滚动容器、居中容器、主横向布局、装备面板、右侧纵向布局、标题标签、网格容器、快捷栏容器）定义在 `inventory_menu.tscn` 中。
+  - 动态部分（装备槽行、快捷栏槽面板、网格面板）仍在代码中生成。
+  - 脚本使用 `@onready` 引用替代 `Control.new()` 创建静态节点。
+- **更新文档**：
+  - 更新 `INVENTORY_SYSTEM.md` / `INVENTORY_SYSTEM_ZH.md` 至 v0.5。
+  - 更新 `ITEM_REGISTRY.md` / `ITEM_REGISTRY_ZH.md` 移除 pattern 字段。
+  - 更新进度文档。
+
+---
+
+## 更新 20 — 物品栏系统增强（形状、稀有度、堆叠合并、存档/读取）
+
+### 变更内容
+
+- **修复物品栏格子内贴图渲染**：
+  - 物品图标现在绘制在网格线和边框之上（绘制顺序：网格线 → 物品 → 拖拽预览）。
+  - 用 `fit_inside_rect` 替换 `fit_by_height_rect`，确保物品图标不会超出格子边界（按宽高双向缩放，双轴居中）。
+  - 网格面板使用 `clip_contents = false`，物品贴图不被 PanelContainer 边框裁切。
+- **限制物品栏快捷栏武器槽位**：
+  - 快捷栏第 0–2 格（武器槽）不再允许从容器网格直接拖拽分配。在物品栏网格视图中为只读，只能通过装备面板（主武器/副武器/近战武器）管理。
+  - 快捷栏第 3–8 格仍可通过网格拖拽接受任何物品。
+- **实现物品堆叠合并**：
+  - 将拖拽的物品堆叠放到已有的同类物品堆叠上时，数量自动合并（上限为 `max_stack`）。
+  - 完全合并则结束拖拽，部分合并则剩余数量保持拖拽状态。
+  - 堆叠数量（>1）显示在物品矩形的右下角，带阴影以增强可读性。
+- **新增物品稀有度系统**：
+  - `ItemDefinition` 新增 `rarity` 字段（`int`，0–5：无/普通/优良/稀有/史诗/传说）。
+  - 物品以稀有度着色背景渲染：默认蓝灰色、绿色（优良）、蓝色（稀有）、紫色（史诗）、金色（传说）。
+- **新增自定义物品形状（不规则占位）**：
+  - `ItemDefinition` 新增 `pattern` 字段（`Array[Vector2i]`），用于定义非矩形占位形状。
+  - `GridInventory` 的 `can_place()`、`place_item()`、`remove_item()`、`get_placement_at()` 均使用形状感知的逐格迭代。
+  - 形状旋转：拖拽时右键将形状格子顺时针旋转 90°。
+  - 网格面板为形状物品逐格渲染背景色；拖拽预览逐格高亮占位区域。
+- **新增物品栏存档/读取 API**：
+  - `GridInventory.save_to_dict()` / `load_from_dict()` 序列化/恢复完整物品栏状态，包括放置记录、快捷栏和 ItemStack 数据。
+  - `EquipmentState.save_to_dict()` / `load_from_dict()` 序列化/恢复装备槽位和所有容器网格。
+- **更新文档**：
+  - 更新 `INVENTORY_SYSTEM.md` / `INVENTORY_SYSTEM_ZH.md` 至 v0.4。
+  - 更新进度文档。
+
+---
+
+## 更新 19 — MSF UIManager 集成 / UI 系统重构
+
+### 变更内容
+
+- **将所有游戏 UI 重构为使用 MSF `UIManager` 栈式面板管理**：
+  - `PlayerHUD` 从 `CanvasLayer` 改为 `Control`，通过 `UIManager.add_overlay()` 注册在 `UILayer.SCENE`。
+  - `InventoryMenu` 从 `CanvasLayer` 改为 `UIPanel`，通过 `UIManager.open_panel()` / `UIManager.back()` 在 `UILayer.NORMAL` 管理。
+  - 新增 `PauseMenuPanel` 继承 `UIPanel`，通过 `UIManager.open_panel()` 在 `UILayer.POPUP` 打开。
+  - 从 `DemoGame.tscn` 中移除了旧的 Maaacks `PauseMenuController` 依赖。
+- **修复了物品栏与暂停菜单的 ESC 按键冲突**：
+  - `InventoryMenu._unhandled_input()` 现在消费 `ui_cancel` 以通过 `UIManager.back(NORMAL)` 关闭物品栏。
+  - `PauseMenuPanel._unhandled_input()` 消费 `ui_cancel` 以通过 `UIManager.back(POPUP)` 关闭暂停。
+  - `DemoGameRuntime._poll_pause_input()` 仅在没有其他面板打开时才打开暂停菜单。
+  - 栈式层级排序保证正确的输入优先级。
+- **引入 `UICatalog` 实现注册表驱动的 UI 面板注册**：
+  - 遵循与 `ItemCatalog`、`WeaponCatalog` 等相同的目录模式。
+  - 注册 `game:ui/pause_menu`（POPUP，CacheMode.NONE）和 `game:ui/inventory`（NORMAL，CacheMode.CACHE）。
+- **将脚本构建的 UI 转换为 Godot 场景**：
+  - 新增 `scenes/game_scene/ui/pause_menu_panel.tscn`，包含完整按钮布局和确认对话框。
+  - 新增 `scenes/game_scene/ui/inventory_panel.tscn` 作为物品栏的 UIPanel 根节点。
+  - 更新 `scenes/game_scene/player_hud.tscn` 根节点从 `CanvasLayer` 改为 `Control`。
+- **按 MSF 模式进行结构改进**：
+  - 所有 HUD 元素现使用 `mouse_filter = MOUSE_FILTER_IGNORE` 避免阻挡输入。
+  - 物品栏数据（网格、装备）通过 `_on_open(data)` 字典传递，而非直接方法调用。
+  - 面板生命周期回调取代手动的打开/关闭/切换。
+- **新增文档**：
+  - 新增 `UI_SYSTEM_REFACTOR.md` / `UI_SYSTEM_REFACTOR_ZH.md`。
+  - 更新进度文档。
+
+---
+
 ## 更新 18 — Minimal Vector 主题设计文档补全
 
 ### 变更内容

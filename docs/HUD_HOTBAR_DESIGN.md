@@ -1,6 +1,6 @@
 # HUD & Hotbar System Design
 
-> Version 0.3 – 2026-03-30
+> Version 0.4 – 2026-04-01
 
 ## 1. Overview
 
@@ -8,11 +8,12 @@ The HUD (Heads-Up Display) system provides real-time gameplay information includ
 
 ## 2. HUD Loading
 
-The `PlayerHUD` scene (`scenes/game_scene/player_hud.tscn`) is loaded at runtime by `DemoGameRuntime._setup_player_hud()`. The HUD is a `CanvasLayer` (layer 10) that renders above the game world.
+The `PlayerHUD` scene (`scenes/game_scene/player_hud.tscn`) is loaded at runtime by `DemoGameRuntime._setup_player_hud()`. The HUD is a `Control` node registered as a persistent overlay via `UIManager.add_overlay()` on `UILayer.SCENE` (layer 0).
 
-- **Loading**: `load("res://scenes/game_scene/player_hud.tscn")` → `instantiate()` → `add_child()`
+- **Loading**: `load("res://scenes/game_scene/player_hud.tscn")` → `instantiate()` → `UIManager.add_overlay(hud_id, hud, UILayer.SCENE)`
 - **Inventory binding**: `PlayerHUD.bind_inventory(grid)` connects the HUD to the player's `GridInventory` (backpack grid by default)
 - **Default selection**: Hotbar slot 0 is selected by default (`active_hotbar_index = 0`)
+- **UIManager integration**: The HUD is an overlay, not a panel in the stack. It remains visible regardless of other panel open/close states.
 
 ## 3. Hotbar Design
 

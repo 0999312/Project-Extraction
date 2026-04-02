@@ -1,5 +1,97 @@
 # Project Extraction — Progress
 
+## Update 21 — Inventory Design Refactor (Remove Patterns, Hide Weapon Hotbar, Scene-ify Layout)
+
+### Changes
+
+- **Removed custom item patterns**:
+  - Removed `pattern` field from `ItemDefinition`. All items are now strictly rectangular (`size_w × size_h`).
+  - Simplified `_get_item_cells()` in `GridInventory` to always generate a filled rectangle.
+  - Simplified rendering and drag preview in `InventoryGridPanel` — no more per-cell pattern-aware iteration.
+- **Hidden weapon hotbar slots (0–2) in inventory menu**:
+  - Only slots 3–8 are shown in the inventory menu hotbar strip.
+  - Weapon slots are exclusively managed through the equipment panel.
+  - `_refresh_hotbar_ui()` now properly maps UI indices to data indices.
+- **Applied `minimal_vector.tres` theme to inventory menu**:
+  - Theme applied via scene file (`inventory_menu.tscn`), not loaded at runtime.
+  - All hotbar slot corners set to 0 px (was 8 px). Grid slot corners already 0 px.
+- **Save/load interfaces retained (not called)**:
+  - `save_to_dict()` / `load_from_dict()` exist on both `GridInventory` and `EquipmentState`.
+  - These interfaces are not called at runtime — reserved for future persistence.
+- **Converted static UI layout to scene file**:
+  - The static layout (root control, background, scroll, center, HBoxMain, equipment panel, VBoxRight, title labels, grid container, hotbar container) is now defined in `inventory_menu.tscn`.
+  - Dynamic parts (equipment slot rows, hotbar slot panels, grid panels) remain in code.
+  - Script uses `@onready` references instead of `Control.new()` for static nodes.
+- **Updated documentation**:
+  - Updated `INVENTORY_SYSTEM.md` / `INVENTORY_SYSTEM_ZH.md` to v0.5.
+  - Updated `ITEM_REGISTRY.md` / `ITEM_REGISTRY_ZH.md` to remove pattern field.
+  - Updated progress documents.
+
+---
+
+## Update 20 — Inventory System Enhancements (Patterns, Rarity, Stacking, Save/Load)
+
+### Changes
+
+- **Fixed item texture rendering in inventory slots**:
+  - Item icons now render above grid lines and borders (draw order: grid lines → items → drag preview).
+  - Replaced `fit_by_height_rect` with `fit_inside_rect` to ensure item icons never overflow slot boundaries (scales by both width and height, centres both axes).
+  - Grid panels now use `clip_contents = false` so item textures are not clipped by PanelContainer borders.
+- **Restricted hotbar weapon slots in inventory menu**:
+  - Hotbar slots 0–2 (weapon slots) can no longer be assigned by dragging items from container grids. They are read-only in the inventory grid view and can only be managed through the equipment panel (primary/secondary/melee weapon).
+  - Hotbar slots 3–8 continue to accept any item via grid drag.
+- **Implemented item stacking and merging**:
+  - Dropping a dragged item stack onto an existing stack of the same item merges counts up to `max_stack`.
+  - Full merge ends the drag; partial merge leaves the remainder in the drag state.
+  - Stack count (>1) is displayed in the bottom-right corner of the item rect with shadow for readability.
+- **Added item rarity system**:
+  - New `ItemDefinition.rarity` field (`int`, 0–5: none/common/uncommon/rare/epic/legendary).
+  - Items render with rarity-coloured background tints: default gray-blue, green (uncommon), blue (rare), purple (epic), gold (legendary).
+- **Added custom item patterns (irregular shapes)**:
+  - New `ItemDefinition.pattern` field (`Array[Vector2i]`) for defining non-rectangular occupancy shapes.
+  - `GridInventory.can_place()`, `place_item()`, `remove_item()`, `get_placement_at()` all use pattern-aware cell iteration.
+  - Pattern rotation: right-click during drag rotates pattern cells 90° clockwise.
+  - Grid panel renders per-cell backgrounds for pattern items; drag preview highlights individual cells.
+- **Added inventory save/load API**:
+  - `GridInventory.save_to_dict()` / `load_from_dict()` serializes/restores full inventory state including placements, hotbar, and ItemStack data.
+  - `EquipmentState.save_to_dict()` / `load_from_dict()` serializes/restores equipment slots and all container grids.
+- **Updated documentation**:
+  - Updated `INVENTORY_SYSTEM.md` / `INVENTORY_SYSTEM_ZH.md` to v0.4.
+  - Updated progress documents.
+
+---
+
+## Update 19 — MSF UIManager Integration / UI System Refactor
+
+### Changes
+
+- **Refactored all gameplay UI to use MSF `UIManager` stack-based panel management**:
+  - `PlayerHUD` changed from `CanvasLayer` to `Control` and registered as a `UIManager.add_overlay()` on `UILayer.SCENE`.
+  - `InventoryMenu` changed from `CanvasLayer` to `UIPanel`, opened/closed via `UIManager.open_panel()` / `UIManager.back()` on `UILayer.NORMAL`.
+  - New `PauseMenuPanel` extends `UIPanel`, opened via `UIManager.open_panel()` on `UILayer.POPUP`.
+  - Removed old Maaacks `PauseMenuController` dependency from `DemoGame.tscn`.
+- **Fixed ESC key conflict between inventory and pause menu**:
+  - `InventoryMenu._unhandled_input()` now consumes `ui_cancel` to close inventory via `UIManager.back(NORMAL)`.
+  - `PauseMenuPanel._unhandled_input()` consumes `ui_cancel` to close pause via `UIManager.back(POPUP)`.
+  - `DemoGameRuntime._poll_pause_input()` only opens pause menu when no other panels are open.
+  - Stack-based layer ordering guarantees correct input priority.
+- **Introduced `UICatalog` for registry-driven UI panel registration**:
+  - Follows the same catalog pattern as `ItemCatalog`, `WeaponCatalog`, etc.
+  - Registers `game:ui/pause_menu` (POPUP, CacheMode.NONE) and `game:ui/inventory` (NORMAL, CacheMode.CACHE).
+- **Converted script-built UI to Godot scenes**:
+  - New `scenes/game_scene/ui/pause_menu_panel.tscn` with full button layout and confirmation dialogs.
+  - New `scenes/game_scene/ui/inventory_panel.tscn` as UIPanel root for inventory.
+  - Updated `scenes/game_scene/player_hud.tscn` root from `CanvasLayer` to `Control`.
+- **Structural improvements per MSF patterns**:
+  - All HUD elements now use `mouse_filter = MOUSE_FILTER_IGNORE` to avoid blocking input.
+  - Inventory data (grid, equipment) passed via `_on_open(data)` dictionary instead of direct method calls.
+  - Panel lifecycle callbacks (`_on_init`, `_on_open`, `_on_close`, `_on_destroy`) replace manual open/close/toggle.
+- **New documentation**:
+  - Added `UI_SYSTEM_REFACTOR.md` / `UI_SYSTEM_REFACTOR_ZH.md`.
+  - Updated progress documents.
+
+---
+
 ## Update 18 — Minimal Vector Theme Design Documentation
 
 ### Changes
