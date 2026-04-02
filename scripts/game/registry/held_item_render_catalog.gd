@@ -76,7 +76,6 @@ static func _load_configs_from_resources() -> void:
 				if not render_config.id.is_empty() and not _configs_by_id.has(render_config.id):
 					_configs_by_id[render_config.id] = render_config
 		file_name = dir.get_next()
-	dir.list_dir_end()
 
 static func _load_mappings_from_json() -> void:
 	if not FileAccess.file_exists(MAPPINGS_JSON_PATH):
