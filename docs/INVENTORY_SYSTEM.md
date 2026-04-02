@@ -89,7 +89,7 @@ The hotbar references items **already placed** in the grid.
 ### 5.1 InventoryMenu (UIPanel — MSF Managed)
 
 - Opened/closed via `UIManager.open_panel()` / `UIManager.back()` on `UILayer.NORMAL` (layer 100).
-- The **static layout** (root control, background, scroll, panels, labels, containers) is defined in `inventory_menu.tscn` with the `minimal_vector.tres` theme applied.
+- The **static layout** (root control, background, scroll, panels, labels, containers) is defined in `inventory_panel.tscn` with the `minimal_vector.tres` theme applied.
 - The **dynamic parts** (equipment slot rows, hotbar slot panels, grid panels) are generated in code.
 - **ESC key closes inventory**: `_unhandled_input()` consumes `ui_cancel` and calls `UIManager.back(UILayer.NORMAL)`.
 - While open: pauses gameplay input, shows mouse cursor.
@@ -174,7 +174,7 @@ The save/load API is **defined but not called at runtime**. It is retained as an
 | `scripts/game/ui/inventory_menu.gd` | UI Script | Equipment panel + container grids + hotbar (extends UIPanel) |
 | `scripts/game/ui/inventory_grid_panel.gd` | UI Script | Grid rendering + drag & drop + stacking + rarity |
 | `scripts/game/ui/inventory_slot.gd` | UI Script | Single cell (StyleBoxFlat, 0 px corners) |
-| `scenes/game_scene/inventory_menu.tscn` | Scene | Inventory panel layout (theme: minimal_vector.tres) |
+| `scenes/game_scene/ui/inventory_panel.tscn` | Scene | Inventory panel layout (theme: minimal_vector.tres) |
 | `scripts/game/registry/ui_catalog.gd` | Registry | UI panel registration catalog |
 
 ## 8. Integration

@@ -13,13 +13,13 @@
   - 武器槽专门通过装备面板管理。
   - `_refresh_hotbar_ui()` 正确映射 UI 索引到数据索引。
 - **物品栏菜单应用 `minimal_vector.tres` 主题**：
-  - 主题通过场景文件（`inventory_menu.tscn`）设置，不在运行时加载。
+  - 主题通过场景文件（`inventory_panel.tscn`）设置，不在运行时加载。
   - 所有快捷栏槽圆角设为 0 px（原为 8 px）。网格格子圆角已是 0 px。
 - **保留存档/读取接口（不实际调用）**：
   - `save_to_dict()` / `load_from_dict()` 存在于 `GridInventory` 和 `EquipmentState`。
   - 运行时不调用——保留给后续持久化使用。
 - **将静态 UI 布局转为场景文件**：
-  - 静态布局（根控件、背景、滚动容器、居中容器、主横向布局、装备面板、右侧纵向布局、标题标签、网格容器、快捷栏容器）定义在 `inventory_menu.tscn` 中。
+  - 静态布局（根控件、背景、滚动容器、居中容器、主横向布局、装备面板、右侧纵向布局、标题标签、网格容器、快捷栏容器）定义在 `inventory_panel.tscn` 中。
   - 动态部分（装备槽行、快捷栏槽面板、网格面板）仍在代码中生成。
   - 脚本使用 `@onready` 引用替代 `Control.new()` 创建静态节点。
 - **更新文档**：
@@ -137,7 +137,7 @@
   - 选中快捷栏格现在只会把填充色切换为半透明绿色（`alpha = 64`），不再放大尺寸。
   - 物品栏菜单中的快捷栏样式也已同步到与 HUD 一致。
 - **物品栏场景现在绑定到玩家真实库存**：
-  - `DemoGameRuntime` 现在会实例化 `scenes/game_scene/inventory_menu.tscn`，而不是仅通过 `InventoryMenu.new()` 构造菜单。
+  - `DemoGameRuntime` 现在通过 `UIManager.open_panel()` 打开物品栏，而不是仅通过 `InventoryMenu.new()` 构造菜单。
   - 玩家自身的 `InventoryState.inventory` 现在作为背包网格使用，因此玩家运行时、HUD 与物品栏菜单共享同一份库存数据。
   - 玩家初始库存尺寸已整理为文档规定的默认背包大小 `6 × 6`。
 - **装备面板现在镜像实时装备状态**：

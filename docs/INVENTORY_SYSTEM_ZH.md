@@ -89,7 +89,7 @@
 ### 5.1 InventoryMenu（UIPanel — MSF 管理）
 
 - 通过 `UIManager.open_panel()` / `UIManager.back()` 在 `UILayer.NORMAL`（层级 100）上打开/关闭。
-- **静态布局**（根控件、背景、滚动容器、面板、标签、容器）定义在 `inventory_menu.tscn` 中，应用 `minimal_vector.tres` 主题。
+- **静态布局**（根控件、背景、滚动容器、面板、标签、容器）定义在 `inventory_panel.tscn` 中，应用 `minimal_vector.tres` 主题。
 - **动态部分**（装备槽行、快捷栏槽、网格面板）在代码中生成。
 - **ESC 键关闭物品栏**：`_unhandled_input()` 消费 `ui_cancel` 并调用 `UIManager.back(UILayer.NORMAL)`。
 - 打开时：暂停游戏输入，显示鼠标光标。
@@ -174,7 +174,7 @@
 | `scripts/game/ui/inventory_menu.gd` | UI 脚本 | 装备面板 + 容器网格 + 快捷栏（继承 UIPanel） |
 | `scripts/game/ui/inventory_grid_panel.gd` | UI 脚本 | 网格渲染 + 拖拽 + 堆叠合并 + 稀有度 |
 | `scripts/game/ui/inventory_slot.gd` | UI 脚本 | 单格视觉（StyleBoxFlat，0 px 圆角） |
-| `scenes/game_scene/inventory_menu.tscn` | 场景 | 物品栏面板布局（主题: minimal_vector.tres） |
+| `scenes/game_scene/ui/inventory_panel.tscn` | 场景 | 物品栏面板布局（主题: minimal_vector.tres） |
 | `scripts/game/registry/ui_catalog.gd` | 注册表 | UI 面板注册目录 |
 
 ## 8. 集成

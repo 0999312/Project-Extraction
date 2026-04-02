@@ -87,7 +87,7 @@ The `InventoryMenu` now displays:
 
 ### Runtime Binding
 
-- `DemoGameRuntime` instantiates `scenes/game_scene/inventory_menu.tscn` rather than constructing the menu script directly.
+- `DemoGameRuntime` opens the inventory via `UIManager.open_panel()` rather than constructing the menu script directly.
 - The player's `InventoryState.inventory` is used as the backpack grid, so the inventory scene, HUD, and player runtime now all point at the same data.
 - `EquipmentState.sync_hotbar_to_grid(grid)` initializes the hotbar from equipment-backed slots, and `InventoryMenu` mirrors hotbar assignments back into the corresponding equipment slots.
 - Hotbar slots 0–2 only accept items tagged as `weapon`, preserving the design rule that those slots are reserved for weapons.
