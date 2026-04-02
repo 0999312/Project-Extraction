@@ -29,3 +29,72 @@ For each step, record only:
 - **Status:** Pass / Issue / Needs follow-up
 - **Main findings:** up to 3 items
 - **Action:** fix now / defer / clarify requirement
+
+## 4. Prompt Templates
+
+### 4.1 New Feature — Design Prompt
+
+Use this before implementation:
+
+```text
+Based on `docs/PROJECT_REVIEW_REFERENCE.md`, first produce a design for the following feature, and do not implement it yet:
+
+Feature:
+<describe the feature>
+
+Requirements:
+<list requirements>
+
+Please output only:
+1. review scope
+2. affected modules/files
+3. design approach
+4. implementation order
+5. risks / points needing confirmation
+```
+
+### 4.2 New Feature — Implementation Prompt
+
+Use this after the design is confirmed:
+
+```text
+Implement the confirmed feature design in this repository.
+
+Feature:
+<describe the feature>
+
+Confirmed design constraints:
+<paste confirmed design summary>
+
+Requirements:
+<list requirements>
+
+Please:
+1. follow the review order in `docs/PROJECT_REVIEW_REFERENCE.md`
+2. make minimal necessary changes
+3. update related documentation if needed
+4. report what files changed and what was implemented
+```
+
+### 4.3 Requirement Mismatch — Review Feedback and Fix Prompt
+
+Use this when a delivered feature does not meet expectations:
+
+```text
+Review the implemented feature against the expected requirements and fix the gaps.
+
+Feature:
+<describe the feature>
+
+Expected requirements:
+<list requirements>
+
+Current problems / feedback:
+<list review comments or failed expectations>
+
+Please:
+1. identify which requirements are not satisfied
+2. list the affected files/modules
+3. make the required corrections
+4. summarize the fixes and any remaining follow-up items
+```
