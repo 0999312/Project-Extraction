@@ -497,7 +497,7 @@ func _add_grid_section(title: String, grid: GridInventory) -> void:
 
 	var gp := InventoryGridPanel.new()
 	gp.mouse_filter = Control.MOUSE_FILTER_STOP
-	gp.clip_contents = true
+	gp.clip_contents = false
 	panel.add_child(gp)
 	gp.setup(grid, null)
 	gp.set_external_drop_handler(func(local_pos: Vector2) -> bool:
@@ -560,6 +560,10 @@ func _on_hotbar_slot_input(event: InputEvent, slot_index: int) -> void:
 			if gp != null and gp.is_dragging():
 				any_dragging = true
 				var item_id := gp.get_drag_item_id()
+				# Weapon hotbar slots 0-2 can only be assigned through the
+				# equipment panel, not by dragging items from a container grid.
+				if slot_index < EquipmentRules.WEAPON_ONLY_HOTBAR_SLOT_COUNT:
+					break
 				if not item_id.is_empty() and _grid != null and EquipmentRules.can_assign_item_to_hotbar(slot_index, item_id):
 					_grid.set_hotbar_slot(slot_index, item_id)
 					_sync_equipment_slot_from_hotbar(slot_index)

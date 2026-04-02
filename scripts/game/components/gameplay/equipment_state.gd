@@ -115,3 +115,29 @@ func sync_weapons_to_hotbar(grid: GridInventory) -> void:
 	var weapon_keys := ["primary_weapon", "secondary_weapon", "melee_weapon"]
 	for i in range(mini(weapon_keys.size(), grid.hotbar_slots.size())):
 		grid.hotbar_slots[i] = get_equipped(weapon_keys[i])
+
+# ── Save / Load ────────────────────────────────────────────────────────────────
+
+## Serialize equipment state and its container grids to a Dictionary.
+func save_to_dict() -> Dictionary:
+	_ensure_slots()
+	var grids_data: Dictionary = {}
+	for key in container_grids:
+		var grid: GridInventory = container_grids[key]
+		if grid != null:
+			grids_data[key] = grid.save_to_dict()
+	return {
+		"slots": slots.duplicate(),
+		"container_grids": grids_data,
+	}
+
+## Restore equipment state from a Dictionary previously produced by save_to_dict().
+func load_from_dict(data: Dictionary) -> void:
+	slots = data.get("slots", {})
+	_ensure_slots()
+	container_grids.clear()
+	var grids_data: Dictionary = data.get("container_grids", {})
+	for key in grids_data:
+		var grid := GridInventory.new()
+		grid.load_from_dict(grids_data[key])
+		container_grids[key] = grid

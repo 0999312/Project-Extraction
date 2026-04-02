@@ -51,16 +51,43 @@ func _get_item_size(item_id: String, rotated: bool) -> Vector2i:
 	var h := def.size_h
 	return Vector2i(h, w) if rotated else Vector2i(w, h)
 
+## Return the list of cell offsets that this item occupies. When a custom pattern
+## is defined on the ItemDefinition, it is used; otherwise a filled rectangle of
+## (size_w × size_h) is returned.  The offsets are relative to the top-left
+## origin (gx, gy).  When `rotated` is true, each offset (x, y) is rotated 90°
+## clockwise: (x, y) → (max_y - y, x) where max_y = bounding height - 1.
+func _get_item_cells(item_id: String, rotated: bool) -> Array[Vector2i]:
+	var def := ItemCatalog.get_item_definition(item_id)
+	if def == null:
+		return [Vector2i(0, 0)]
+	var cells_list: Array[Vector2i] = []
+	if def.pattern.size() > 0:
+		cells_list.assign(def.pattern)
+	else:
+		for cy in range(def.size_h):
+			for cx in range(def.size_w):
+				cells_list.append(Vector2i(cx, cy))
+	if rotated and cells_list.size() > 0:
+		var max_y := 0
+		for c in cells_list:
+			max_y = maxi(max_y, c.y)
+		var rotated_cells: Array[Vector2i] = []
+		for c in cells_list:
+			rotated_cells.append(Vector2i(max_y - c.y, c.x))
+		return rotated_cells
+	return cells_list
+
 # ── Core operations ────────────────────────────────────────────────────────────
 func can_place(item_id: String, gx: int, gy: int, rotated: bool = false) -> bool:
 	_ensure_cells()
-	var size := _get_item_size(item_id, rotated)
-	if gx < 0 or gy < 0 or gx + size.x > width or gy + size.y > height:
-		return false
-	for cy in range(gy, gy + size.y):
-		for cx in range(gx, gx + size.x):
-			if cells[_cell_index(cx, cy)] != "":
-				return false
+	var item_cells := _get_item_cells(item_id, rotated)
+	for offset in item_cells:
+		var cx := gx + offset.x
+		var cy := gy + offset.y
+		if cx < 0 or cy < 0 or cx >= width or cy >= height:
+			return false
+		if cells[_cell_index(cx, cy)] != "":
+			return false
 	return true
 
 func place_item(stack: ItemStack, gx: int, gy: int, rotated: bool = false) -> bool:
@@ -69,10 +96,9 @@ func place_item(stack: ItemStack, gx: int, gy: int, rotated: bool = false) -> bo
 	_ensure_cells()
 	if not can_place(stack.item_id, gx, gy, rotated):
 		return false
-	var size := _get_item_size(stack.item_id, rotated)
-	for cy in range(gy, gy + size.y):
-		for cx in range(gx, gx + size.x):
-			cells[_cell_index(cx, cy)] = stack.item_id
+	var item_cells := _get_item_cells(stack.item_id, rotated)
+	for offset in item_cells:
+		cells[_cell_index(gx + offset.x, gy + offset.y)] = stack.item_id
 	placements.append({
 		"item_id": stack.item_id,
 		"grid_x": gx,
@@ -88,13 +114,14 @@ func remove_item(gx: int, gy: int) -> Dictionary:
 	var placement := get_placement_at(gx, gy)
 	if placement.is_empty():
 		return {}
-	var size := _get_item_size(placement["item_id"], placement.get("rotated", false))
+	var item_cells := _get_item_cells(placement["item_id"], placement.get("rotated", false))
 	var px: int = placement["grid_x"]
 	var py: int = placement["grid_y"]
-	for cy in range(py, py + size.y):
-		for cx in range(px, px + size.x):
-			if _is_in_bounds(cx, cy):
-				cells[_cell_index(cx, cy)] = ""
+	for offset in item_cells:
+		var cx := px + offset.x
+		var cy := py + offset.y
+		if _is_in_bounds(cx, cy):
+			cells[_cell_index(cx, cy)] = ""
 	placements.erase(placement)
 	# Clean up hotbar references
 	for i in range(hotbar_slots.size()):
@@ -118,11 +145,12 @@ func get_placement_at(gx: int, gy: int) -> Dictionary:
 	if cell_id.is_empty():
 		return {}
 	for p in placements:
-		var size := _get_item_size(p["item_id"], p.get("rotated", false))
+		var item_cells := _get_item_cells(p["item_id"], p.get("rotated", false))
 		var px: int = p["grid_x"]
 		var py: int = p["grid_y"]
-		if gx >= px and gx < px + size.x and gy >= py and gy < py + size.y:
-			return p
+		for offset in item_cells:
+			if px + offset.x == gx and py + offset.y == gy:
+				return p
 	return {}
 
 func find_first_fit(item_id: String, rotated: bool = false) -> Vector2i:
@@ -190,4 +218,55 @@ var stacks: Array[ItemStack]:
 			if p.get("stack") is ItemStack:
 				arr.append(p["stack"])
 		return arr
+
+# ── Save / Load ────────────────────────────────────────────────────────────────
+
+## Serialize the inventory to a Dictionary that can be stored as JSON or in a
+## save-game resource.  ItemStack instances are inlined as dictionaries.
+func save_to_dict() -> Dictionary:
+	var saved_placements: Array[Dictionary] = []
+	for p in placements:
+		var sp: Dictionary = {
+			"item_id": p.get("item_id", ""),
+			"grid_x": p.get("grid_x", 0),
+			"grid_y": p.get("grid_y", 0),
+			"rotated": p.get("rotated", false),
+		}
+		var stack: ItemStack = p.get("stack")
+		if stack != null:
+			sp["stack"] = {
+				"item_id": stack.item_id,
+				"count": stack.count,
+				"durability": stack.durability,
+				"custom_data": stack.custom_data.duplicate(),
+			}
+		saved_placements.append(sp)
+	return {
+		"width": width,
+		"height": height,
+		"placements": saved_placements,
+		"hotbar_slots": hotbar_slots.duplicate(),
+		"active_hotbar_index": active_hotbar_index,
+	}
+
+## Restore inventory state from a Dictionary previously produced by
+## save_to_dict().  Existing content is cleared first.
+func load_from_dict(data: Dictionary) -> void:
+	width = data.get("width", width)
+	height = data.get("height", height)
+	cells.clear()
+	placements.clear()
+	_ensure_cells()
+	hotbar_slots.assign(data.get("hotbar_slots", ["", "", "", "", "", "", "", "", ""]))
+	active_hotbar_index = data.get("active_hotbar_index", 0)
+	var saved_placements: Array = data.get("placements", [])
+	for sp in saved_placements:
+		var stack_data: Dictionary = sp.get("stack", {})
+		var stack := ItemStack.new(
+			stack_data.get("item_id", sp.get("item_id", "")),
+			stack_data.get("count", 1)
+		)
+		stack.durability = stack_data.get("durability", 1.0)
+		stack.custom_data = stack_data.get("custom_data", {})
+		place_item(stack, sp.get("grid_x", 0), sp.get("grid_y", 0), sp.get("rotated", false))
 
