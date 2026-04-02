@@ -1,5 +1,37 @@
 # Project Extraction — Progress
 
+## Update 20 — Inventory System Enhancements (Patterns, Rarity, Stacking, Save/Load)
+
+### Changes
+
+- **Fixed item texture rendering in inventory slots**:
+  - Item icons now render above grid lines and borders (draw order: grid lines → items → drag preview).
+  - Replaced `fit_by_height_rect` with `fit_inside_rect` to ensure item icons never overflow slot boundaries (scales by both width and height, centres both axes).
+  - Grid panels now use `clip_contents = false` so item textures are not clipped by PanelContainer borders.
+- **Restricted hotbar weapon slots in inventory menu**:
+  - Hotbar slots 0–2 (weapon slots) can no longer be assigned by dragging items from container grids. They are read-only in the inventory grid view and can only be managed through the equipment panel (primary/secondary/melee weapon).
+  - Hotbar slots 3–8 continue to accept any item via grid drag.
+- **Implemented item stacking and merging**:
+  - Dropping a dragged item stack onto an existing stack of the same item merges counts up to `max_stack`.
+  - Full merge ends the drag; partial merge leaves the remainder in the drag state.
+  - Stack count (>1) is displayed in the bottom-right corner of the item rect with shadow for readability.
+- **Added item rarity system**:
+  - New `ItemDefinition.rarity` field (`int`, 0–5: none/common/uncommon/rare/epic/legendary).
+  - Items render with rarity-coloured background tints: default gray-blue, green (uncommon), blue (rare), purple (epic), gold (legendary).
+- **Added custom item patterns (irregular shapes)**:
+  - New `ItemDefinition.pattern` field (`Array[Vector2i]`) for defining non-rectangular occupancy shapes.
+  - `GridInventory.can_place()`, `place_item()`, `remove_item()`, `get_placement_at()` all use pattern-aware cell iteration.
+  - Pattern rotation: right-click during drag rotates pattern cells 90° clockwise.
+  - Grid panel renders per-cell backgrounds for pattern items; drag preview highlights individual cells.
+- **Added inventory save/load API**:
+  - `GridInventory.save_to_dict()` / `load_from_dict()` serializes/restores full inventory state including placements, hotbar, and ItemStack data.
+  - `EquipmentState.save_to_dict()` / `load_from_dict()` serializes/restores equipment slots and all container grids.
+- **Updated documentation**:
+  - Updated `INVENTORY_SYSTEM.md` / `INVENTORY_SYSTEM_ZH.md` to v0.4.
+  - Updated progress documents.
+
+---
+
 ## Update 19 — MSF UIManager Integration / UI System Refactor
 
 ### Changes

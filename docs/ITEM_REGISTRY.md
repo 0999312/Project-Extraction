@@ -28,17 +28,20 @@
 | `id` | `String` (RL) | Yes | — | Item RL key |
 | `display_name` | `String` | Yes | `""` | Display name |
 | `category` | `String` | Yes | `""` | Item category |
-| `size_w` | `int` | No | `1` | Grid width |
-| `size_h` | `int` | No | `1` | Grid height |
+| `size_w` | `int` | No | `1` | Grid width (bounding box) |
+| `size_h` | `int` | No | `1` | Grid height (bounding box) |
 | `weight` | `float` | No | `0.0` | Unit weight |
 | `max_stack` | `int` | No | `1` | Max stack count |
 | `icon_path` | `String` | No | `""` | Path to the item icon texture |
+| `rarity` | `int` | No | `0` | Rarity level (0 = none, 1–5 = common → legendary) |
+| `pattern` | `Array[Vector2i]` | No | `[]` | Custom occupancy pattern (empty = filled rectangle) |
 
 ## 5. Validation Rules
 
 - Entry must be `ItemDefinition` with non-empty `id`.
 - Duplicate IDs are skipped (first registration wins).
 - `size_w`, `size_h`, and `max_stack` should be positive.
+- `rarity` must be in range 0–5.
 
 ## 6. Runtime Access Pattern
 

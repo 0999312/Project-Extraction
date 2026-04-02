@@ -28,17 +28,20 @@
 | `id` | `String`（RL） | 是 | — | 物品 RL 唯一键 |
 | `display_name` | `String` | 是 | `""` | 显示名称 |
 | `category` | `String` | 是 | `""` | 物品类别 |
-| `size_w` | `int` | 否 | `1` | 网格宽度 |
-| `size_h` | `int` | 否 | `1` | 网格高度 |
+| `size_w` | `int` | 否 | `1` | 网格宽度（边界框） |
+| `size_h` | `int` | 否 | `1` | 网格高度（边界框） |
 | `weight` | `float` | 否 | `0.0` | 单位重量 |
 | `max_stack` | `int` | 否 | `1` | 最大堆叠数量 |
 | `icon_path` | `String` | 否 | `""` | 物品图标贴图路径 |
+| `rarity` | `int` | 否 | `0` | 稀有度等级（0 = 无，1–5 = 普通 → 传说） |
+| `pattern` | `Array[Vector2i]` | 否 | `[]` | 自定义占位形状（空 = 填充矩形） |
 
 ## 5. 校验规则
 
 - 条目必须为 `ItemDefinition`，且 `id` 非空。
 - 重复 ID 跳过（先注册优先）。
 - `size_w`、`size_h`、`max_stack` 应为正值。
+- `rarity` 必须在 0–5 范围内。
 
 ## 6. 运行时访问方式
 
